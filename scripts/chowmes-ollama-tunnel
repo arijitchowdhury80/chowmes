@@ -1,0 +1,95 @@
+#!/bin/sh
+set -eu
+
+env_file="${HERMES_ENV_FILE:-.env.local}"
+remote_port="${CHOWMES_REMOTE_OLLAMA_PORT:-11435}"
+local_host="${OLLAMA_LOCAL_HOST:-127.0.0.1}"
+local_port="${OLLAMA_LOCAL_PORT:-11434}"
+background=""
+
+if [ "${1:-}" = "--background" ]; then
+  background="-f"
+  shift
+fi
+
+if [ ! -f "$env_file" ]; then
+  echo "chowmes-ollama-tunnel: env file not found: $env_file" >&2
+  exit 1
+fi
+
+case "$env_file" in
+  /*) ;;
+  *) env_file="$(pwd)/$env_file" ;;
+esac
+
+host="$(awk '/^SSH_HOST=/{print substr($0,10); exit}' "$env_file")"
+user="$(awk '/^SSH_USER=/{print substr($0,10); exit}' "$env_file")"
+key="$(awk '/^SSH_KEY=/{print substr($0,9); exit}' "$env_file")"
+has_pass="$(awk '/^SSH_PASS=/{if (length(substr($0,10)) > 0) print "yes"; exit}' "$env_file")"
+
+if [ -z "$host" ]; then
+  echo "chowmes-ollama-tunnel: SSH_HOST is missing in $env_file" >&2
+  exit 1
+fi
+
+if [ -z "$user" ]; then
+  user="root"
+fi
+
+if [ -n "$key" ]; then
+  case "$key" in
+    "~/"*) key="$HOME/${key#~/}" ;;
+  esac
+fi
+
+target="$user@$host"
+
+if [ "${1:-}" = "--check-local" ]; then
+  curl --fail --silent --show-error --max-time 5 "http://$local_host:$local_port/api/tags" >/dev/null
+  echo "Local Ollama is reachable at http://$local_host:$local_port"
+  exit 0
+fi
+
+echo "Opening private tunnel: chowmes 127.0.0.1:$remote_port -> Mac $local_host:$local_port"
+if [ -n "$background" ]; then
+  echo "Starting tunnel in the background."
+else
+  echo "Leave this running while chowmes should use your local Ollama."
+fi
+
+ssh_auth_opts=""
+if [ -n "$key" ]; then
+  ssh_auth_opts="-i $key -o BatchMode=yes"
+elif [ -n "$has_pass" ]; then
+  askpass="$(mktemp /tmp/chowmes_ssh_askpass.XXXXXX)"
+  cleanup() {
+    rm -f "$askpass"
+  }
+  trap cleanup EXIT INT TERM
+  cat > "$askpass" <<'EOF'
+#!/bin/sh
+awk '/^SSH_PASS=/{print substr($0,10); exit}' "$HERMES_ENV_FILE"
+EOF
+  chmod 700 "$askpass"
+  export HERMES_ENV_FILE="$env_file"
+  export SSH_ASKPASS="$askpass"
+  export SSH_ASKPASS_REQUIRE=force
+  export DISPLAY=none
+  ssh_auth_opts="-o BatchMode=no -o PreferredAuthentications=password -o PubkeyAuthentication=no -o NumberOfPasswordPrompts=1"
+else
+  echo "chowmes-ollama-tunnel: SSH_KEY or SSH_PASS is missing in $env_file" >&2
+  exit 1
+fi
+
+# shellcheck disable=SC2086
+exec ssh $background \
+  -N \
+  -T \
+  $ssh_auth_opts \
+  -o ExitOnForwardFailure=yes \
+  -o ServerAliveInterval=30 \
+  -o ServerAliveCountMax=3 \
+  -o StrictHostKeyChecking=accept-new \
+  -o UserKnownHostsFile=/tmp/hermes_vps_known_hosts \
+  -R "127.0.0.1:${remote_port}:${local_host}:${local_port}" \
+  "$target"

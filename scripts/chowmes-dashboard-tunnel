@@ -1,0 +1,67 @@
+#!/bin/sh
+set -eu
+
+env_file="${HERMES_ENV_FILE:-.env.local}"
+local_port="${CHOWMES_DASHBOARD_LOCAL_PORT:-9119}"
+remote_host="${CHOWMES_DASHBOARD_REMOTE_HOST:-127.0.0.1}"
+remote_port="${CHOWMES_DASHBOARD_REMOTE_PORT:-9119}"
+background=""
+
+if [ "${1:-}" = "--background" ]; then
+  background="-f"
+  shift
+fi
+
+if [ ! -f "$env_file" ]; then
+  echo "chowmes-dashboard-tunnel: env file not found: $env_file" >&2
+  exit 1
+fi
+
+case "$env_file" in
+  /*) ;;
+  *) env_file="$(pwd)/$env_file" ;;
+esac
+
+host="$(awk '/^SSH_HOST=/{print substr($0,10); exit}' "$env_file")"
+user="$(awk '/^SSH_USER=/{print substr($0,10); exit}' "$env_file")"
+key="$(awk '/^SSH_KEY=/{print substr($0,9); exit}' "$env_file")"
+
+if [ -z "$host" ]; then
+  echo "chowmes-dashboard-tunnel: SSH_HOST is missing in $env_file" >&2
+  exit 1
+fi
+
+if [ -z "$user" ]; then
+  user="chowmesadmin"
+fi
+
+if [ -z "$key" ]; then
+  echo "chowmes-dashboard-tunnel: SSH_KEY is missing in $env_file" >&2
+  exit 1
+fi
+
+case "$key" in
+  "~/"*) key="$HOME/${key#~/}" ;;
+esac
+
+target="$user@$host"
+
+echo "Opening private dashboard tunnel: Mac 127.0.0.1:$local_port -> chowmes $remote_host:$remote_port"
+if [ -n "$background" ]; then
+  echo "Starting tunnel in the background."
+else
+  echo "Leave this running while using the dashboard."
+fi
+
+exec ssh $background \
+  -N \
+  -T \
+  -i "$key" \
+  -o BatchMode=yes \
+  -o ExitOnForwardFailure=yes \
+  -o ServerAliveInterval=30 \
+  -o ServerAliveCountMax=3 \
+  -o StrictHostKeyChecking=accept-new \
+  -o UserKnownHostsFile=/tmp/hermes_vps_known_hosts \
+  -L "127.0.0.1:${local_port}:${remote_host}:${remote_port}" \
+  "$target"
