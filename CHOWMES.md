@@ -6,10 +6,10 @@ Chowmes is the Hostinger VPS running Hermes Agent for Telegram and agent work.
 
 Hermes now uses OpenRouter directly. Local Ollama/Gemma on the Mac is disabled and should not be restarted unless explicitly requested.
 
-- Default Telegram/Hermes model: `google/gemini-2.5-flash`
+- Default Telegram/Hermes workhorse model: `deepseek/deepseek-v4-pro`
 - Provider: OpenRouter
 - Context length override: `65536`
-- Deep/delegated work model: `anthropic/claude-sonnet-4.6`
+- Deep/delegated judgment model: `anthropic/claude-sonnet-4.6`
 - OpenRouter key location on host: `/root/.hermes/.env`
 - OpenRouter key location in container: `/opt/data/.env`
 - Direct Google/Gemini key: not configured on VPS
@@ -20,22 +20,45 @@ Note: `32768` was tested on June 16, 2026, but Hermes Agent rejected it because 
 Verified on June 16, 2026:
 
 ```text
-Model:    google/gemini-2.5-flash
+Model:    deepseek/deepseek-v4-pro
 Provider: OpenRouter
 Telegram: configured and gateway running
 ```
 
 OpenRouter pricing checked on June 16, 2026:
 
+- `deepseek/deepseek-v4-flash`: $0.098 per 1M input tokens, $0.196 per 1M output tokens
+- `deepseek/deepseek-v4-pro`: $0.435 per 1M input tokens, $0.87 per 1M output tokens
+- `moonshotai/kimi-k2.7-code`: $0.75 per 1M input tokens, $3.50 per 1M output tokens
 - `google/gemini-2.5-flash`: $0.30 per 1M input tokens, $2.50 per 1M output tokens
 - `anthropic/claude-sonnet-4.6`: $3 per 1M input tokens, $15 per 1M output tokens
-- `google/gemini-3.1-flash-lite`: $0.25 per 1M input tokens, $1.50 per 1M output tokens
+- `anthropic/claude-opus-4.8`: $5 per 1M input tokens, $25 per 1M output tokens
+- `openai/gpt-5.5`: $5 per 1M input tokens, $30 per 1M output tokens
 
 Recommended routing:
 
-- Use `google/gemini-2.5-flash` for normal Telegram conversation and day-to-day tasks.
-- Use `anthropic/claude-sonnet-4.6` for hard planning, architecture, research, debugging, and strategic work.
-- Consider `google/gemini-3.1-flash-lite` only if Telegram volume becomes high and cost matters more than answer quality.
+- Use `deepseek/deepseek-v4-flash` for fast low-risk work: quick Telegram replies, cleanup, extraction, titles, compression, and cheap side tasks.
+- Use `deepseek/deepseek-v4-pro` as the default workhorse for normal Mallory/Hermes reasoning, project scans, research synthesis, and bulk serious work.
+- Use `anthropic/claude-sonnet-4.6` for trusted coding, judgment escalation, architecture, strategy, complex debugging, security-sensitive planning, and delegated deep work.
+- Use `moonshotai/kimi-k2.7-code` only as an experimental open coding comparison, not as the trusted Chowmes coding lane.
+- Use `anthropic/claude-opus-4.8` only for final boardroom review of expensive, risky, or company-level decisions.
+- Use `openai/gpt-5.5` as a non-Claude frontier second opinion when useful.
+- Keep `google/gemini-2.5-flash` for vision or multimodal fallback because DeepSeek V4 Pro is text-only on OpenRouter.
+
+Model aliases configured in Hermes:
+
+```text
+/model fast        -> openrouter:deepseek/deepseek-v4-flash
+/model workhorse   -> openrouter:deepseek/deepseek-v4-pro
+/model coding      -> openrouter:anthropic/claude-sonnet-4.6
+/model kimi-code   -> openrouter:moonshotai/kimi-k2.7-code
+/model judge       -> openrouter:anthropic/claude-sonnet-4.6
+/model boardroom   -> openrouter:anthropic/claude-opus-4.8
+/model gpt-review  -> openrouter:openai/gpt-5.5
+/model vision      -> openrouter:google/gemini-2.5-flash
+```
+
+Operating rule: DeepSeek handles volume, frontier models handle authority. DeepSeek can draft and reason, but production infrastructure, security, credentials, destructive actions, major architecture, and CEO/company strategy need frontier review before being treated as final.
 
 ## Telegram fast mode
 
@@ -50,13 +73,69 @@ Current fast-mode settings:
 
 Reason: previous Telegram turns were slow because Hermes made many model/tool calls per message, including large session searches and text-to-speech. A direct OpenRouter test responds quickly; the slowdown came from agent orchestration overhead.
 
+## Web access
+
+Hermes has native `web_search` and `web_extract` tools. For Chowmes/Mallory, the preferred premium web provider is Parallel because it supports AI-native search, extraction, deep research, enrichment, FindAll-style discovery, and monitoring.
+
+Installed on June 16, 2026:
+
+- Hermes skill: `research/parallel-cli`
+- Location in container: `/opt/data/skills/research/parallel-cli/SKILL.md`
+- Status: installed and enabled
+- Active provider credential: `PARALLEL_API_KEY` configured in the VPS Hermes environment.
+- Active web backend: `parallel`
+- Verification: standalone Hermes web tools reported `Web backend: parallel` and a live Parallel search smoke test returned results.
+
+Recommended operating model:
+
+- Use native Hermes `web_search` and `web_extract` for normal Telegram web lookups.
+- Keep `PARALLEL_API_KEY` in the VPS Hermes environment and `web.backend: parallel`.
+- Use the `parallel-cli` skill later for deeper research workflows that specifically need Parallel's CLI features. Do not enable Telegram terminal/file/code execution just to make basic web search work.
+
+Permission lesson:
+
+- The Docker gateway drops privileges and runs as the `hermes` user.
+- `/opt/data` is Hermes' home and must be traversable by `hermes`.
+- Do not run Hermes CLI runtime commands as root inside the container. Use `s6-setuidgid hermes ...` for status checks, send tests, session edits, and web backend smoke tests.
+- After editing `/opt/data/.env`, `/opt/data/config.yaml`, or syncing files with `sudo docker exec`, verify ownership and gateway status.
+- Safe expected state: `/opt/data` owned by `hermes:hermes`, `.env` mode `600`, `config.yaml` mode `640`, gateway status running.
+- If Telegram goes silent after a gateway restart and logs show `PermissionError`, check the exact path. Known paths include `/opt/data/.env` and `/opt/data/pairing/telegram-approved.json`. Restore ownership with `chown -R hermes:hermes /opt/data`, keep `.env` at `600`, restart the gateway, and verify with a Telegram send test run as `hermes`.
+- Use `scripts/chowmes-health-check --repair --send-test` after env/config/session/gateway changes. It checks permissions as the `hermes` user, gateway status, Parallel web backend, recent permission errors, and Telegram delivery.
+
+## Media and knowledge wiki
+
+Chowmes has a local working wiki before Obsidian is connected:
+
+```text
+/opt/data/workspace/Knowledge
+```
+
+Installed media tooling:
+
+- FFmpeg on the VPS host.
+- FFmpeg in the Hermes container.
+- yt-dlp in the Hermes container.
+- `youtube-knowledge` skill in Hermes at `/opt/data/skills/youtube-knowledge`.
+- `youtube-knowledge` skill in Codex at `~/.codex/skills/youtube-knowledge`.
+
+Use `youtube-knowledge` to capture YouTube captions/metadata into raw and synthesized markdown notes. Keep raw captures and synthesis separate. Do not paste full copyrighted transcripts into chat.
+
+Hermes video skill research:
+
+- No standalone official `ffmpeg` skill was found.
+- Use FFmpeg directly for quick media editing operations.
+- Installed relevant skills: `ascii-video`, `manim-video`, `youtube-content`, `songsee`.
+- Optional relevant skills available in the image: `hyperframes`, `kanban-video-orchestrator`.
+
 For deep work, switch model deliberately:
 
 Inside Telegram or another Hermes chat, switch deliberately when needed:
 
 ```text
-/model openrouter:anthropic/claude-sonnet-4.6
-/model openrouter:google/gemini-2.5-flash
+/model judge
+/model workhorse
+/model fast
+/model boardroom
 ```
 
 ## Memory policy

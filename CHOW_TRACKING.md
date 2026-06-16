@@ -9,12 +9,16 @@ This file is the persistent operational dashboard for Chowmes.
 - Runtime: Hostinger VPS, Hermes in Docker container `hermes`
 - Telegram: configured and running
 - Default model provider: OpenRouter
-- Default model: `google/gemini-2.5-flash`
+- Default model: `deepseek/deepseek-v4-pro`
 - Context length override: `65536`
 - Direct Google routing: not active because no `GOOGLE_API_KEY` or `GEMINI_API_KEY` is present on the VPS
-- Deep work model: `anthropic/claude-sonnet-4.6`
+- Deep work / judgment model: `anthropic/claude-sonnet-4.6`
+- Boardroom review model: `anthropic/claude-opus-4.8`
+- GPT second-opinion model: `openai/gpt-5.5`
 - Telegram mode: fast mode
 - Local Ollama/Gemma: disabled
+- Media tools: FFmpeg installed on VPS host and Hermes container; yt-dlp installed in Hermes container
+- Local wiki: `/opt/data/workspace/Knowledge`
 
 ## Security Audit
 
@@ -52,14 +56,15 @@ SSH:
 
 OpenRouter API snapshot from 2026-06-16:
 
+- `deepseek/deepseek-v4-flash`: $0.098 input / $0.196 output per 1M tokens
+- `deepseek/deepseek-v4-pro`: $0.435 input / $0.87 output per 1M tokens
+- `moonshotai/kimi-k2.7-code`: $0.75 input / $3.50 output per 1M tokens
 - `google/gemini-2.5-flash`: $0.30 input / $2.50 output per 1M tokens
-- `google/gemini-3.1-flash-lite`: $0.25 input / $1.50 output per 1M tokens
 - `anthropic/claude-sonnet-4.6`: $3 input / $15 output per 1M tokens
-- `google/gemini-3-flash-preview`: $0.50 input / $3 output per 1M tokens
-- `openai/gpt-5.4-mini`: $0.75 input / $4.50 output per 1M tokens
-- `openai/gpt-5.4`: $2.50 input / $15 output per 1M tokens
+- `anthropic/claude-opus-4.8`: $5 input / $25 output per 1M tokens
+- `openai/gpt-5.5`: $5 input / $30 output per 1M tokens
 
-OpenRouter model directory checked on 2026-06-16 confirms `google/gemini-2.5-flash` is available. The pasted playbook target `gemini-1.5-flash` is stale for Chowmes.
+OpenRouter model directory checked on 2026-06-16 confirms the active stack is available: DeepSeek V4 Flash, DeepSeek V4 Pro, Kimi K2.7 Code, Claude Sonnet 4.6, Claude Opus 4.8, GPT-5.5, and Gemini 2.5 Flash. Kimi is experimental only; Sonnet is the trusted coding lane.
 
 ## Config Optimizations Applied
 
@@ -74,7 +79,7 @@ Applied runtime settings:
 ```yaml
 model:
   provider: openrouter
-  default: google/gemini-2.5-flash
+  default: deepseek/deepseek-v4-pro
   api_mode: chat_completions
   context_length: 65536
 
@@ -101,6 +106,8 @@ Notes:
 - Direct Google routing was not activated because no direct Gemini API key exists on the VPS.
 - The requested `32768` context value was attempted, but Hermes rejected it because Hermes Agent requires at least `64000`. The live config uses `65536`.
 - Dashboard remains localhost-only with empty `dashboard.public_url`.
+- Model stack policy: DeepSeek handles volume, frontier models handle authority.
+- Configured aliases: `/model fast`, `/model workhorse`, `/model coding`, `/model kimi-code`, `/model judge`, `/model boardroom`, `/model gpt-review`, `/model vision`.
 
 ## Telegram Fast Mode
 
@@ -151,6 +158,37 @@ Failure lesson from 2026-06-16:
 - The actual stale state can be the Telegram DM mapping in `/opt/data/sessions/sessions.json` pointing at an old session id.
 - Do not declare identity/personality fixes complete until a fresh prompt or Telegram message returns the new identity.
 
+## Media And Knowledge Capture
+
+Installed on 2026-06-16:
+
+- VPS host FFmpeg: installed through Ubuntu apt.
+- Hermes container FFmpeg: present and verified.
+- Hermes container yt-dlp: installed through Debian apt.
+- Codex-wide skill: `youtube-knowledge` under `~/.codex/skills/youtube-knowledge`.
+- Hermes skill: `youtube-knowledge` under `/opt/data/skills/youtube-knowledge`.
+- Chowmes working wiki: `/opt/data/workspace/Knowledge`.
+
+Current wiki structure:
+
+```text
+Knowledge/
+  YouTube/
+  Raw/
+  Synthesis/
+  Wiki/
+  Assets/
+```
+
+The YouTube workflow stores raw captions and metadata, then creates a synthesis scaffold. It does not dump full copyrighted transcripts into chat.
+
+Hermes video skill research:
+
+- No standalone official `ffmpeg` skill was found.
+- Installed media/video skills already include `creative/ascii-video`, `creative/manim-video`, `media/youtube-content`, and `media/songsee`.
+- Optional video skills available in the Hermes image include `creative/hyperframes` and `creative/kanban-video-orchestrator`.
+- For practical video editing, use FFmpeg directly for quick operations; use `hyperframes` for HTML/CSS/JS motion graphics; use `kanban-video-orchestrator` for larger multi-step video production.
+
 ## Next Decisions
 
 1. Add a direct `GEMINI_API_KEY` or `GOOGLE_API_KEY` if direct Google routing is still desired.
@@ -164,4 +202,4 @@ model:
 ```
 
 3. Keep OpenRouter available for Claude/Sonnet deep work.
-4. Do not connect the full Obsidian vault. Start with a curated Chowmes knowledge folder.
+4. Later, connect the Obsidian vault using a scoped access model and migrate this local wiki into the centralized vault.

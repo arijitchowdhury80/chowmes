@@ -143,16 +143,51 @@ Do not store secrets directly in `config.yaml`; use `.env` when possible.
 
 ## Current model policy
 
-Default:
+Stacking rule:
 
-- OpenRouter `google/gemini-2.5-flash`
-- Use for Telegram, ordinary chat, quick tasks, and normal agent work.
-- Context length override: `65536`
+- DeepSeek handles volume.
+- Frontier models handle authority.
+- Context length override: `65536`.
 
-Deep work:
+Default workhorse:
+
+- OpenRouter `deepseek/deepseek-v4-pro`
+- Use for normal Mallory/Hermes reasoning, project scans, research synthesis, and bulk serious work.
+
+Fast/cheap:
+
+- OpenRouter `deepseek/deepseek-v4-flash`
+- Use for quick Telegram replies, extraction, titles, compression, cleanup, and low-risk auxiliary work.
+
+Trusted coding:
 
 - OpenRouter `anthropic/claude-sonnet-4.6`
-- Use for architecture, strategy, complex debugging, research synthesis, and high-stakes planning.
+- Use for important code changes, debugging, implementation design, and reviews.
+
+Experimental open coding comparison:
+
+- OpenRouter `moonshotai/kimi-k2.7-code`
+- Use only via `/model kimi-code` when deliberately testing Kimi against the trusted coding lane.
+
+Judgment escalation:
+
+- OpenRouter `anthropic/claude-sonnet-4.6`
+- Use for architecture, strategy, complex debugging, security-sensitive planning, and delegated deep work.
+
+Boardroom review:
+
+- OpenRouter `anthropic/claude-opus-4.8`
+- Use only for final review of expensive, risky, or company-level decisions.
+
+GPT second opinion:
+
+- OpenRouter `openai/gpt-5.5`
+- Use when a non-Claude frontier check is useful.
+
+Vision fallback:
+
+- OpenRouter `google/gemini-2.5-flash`
+- Use for vision or multimodal fallback because DeepSeek V4 Pro is text-only on OpenRouter.
 
 Disabled for now:
 
@@ -164,6 +199,45 @@ Direct Google:
 - Not active until `GOOGLE_API_KEY` or `GEMINI_API_KEY` is present on the VPS.
 - Use `provider: google` and `default: gemini-2.5-flash` when the key is configured.
 - Do not use stale `gemini-1.5-flash` for Chowmes.
+
+## Web access policy
+
+Hermes native web tools:
+
+- `web_search`: web search.
+- `web_extract`: page/PDF extraction into markdown.
+
+Preferred premium provider for Chowmes:
+
+- Parallel.
+- Rationale: search, extraction, deep research, enrichment, entity/list discovery, monitoring, and structured agent-friendly output.
+
+Current installed research skill:
+
+- `research/parallel-cli` at `/opt/data/skills/research/parallel-cli/SKILL.md`.
+
+Active configuration:
+
+```yaml
+web:
+  backend: parallel
+```
+
+Active credential:
+
+```text
+PARALLEL_API_KEY=<set in VPS Hermes environment, never in markdown>
+```
+
+Do not store API keys in this file. Do not enable Telegram terminal/file/code execution merely to search the web. Normal Telegram research should use the native `web` toolset; the `parallel-cli` skill is for deliberate deep-research workflows.
+
+When changing the VPS Hermes environment:
+
+- Preserve the canonical env var name `PARALLEL_API_KEY`.
+- Keep `/opt/data/.env` private with mode `600`.
+- Keep `/opt/data` owned by `hermes:hermes`, because the gateway runs as `hermes`.
+- After any `.env` or config edit, verify gateway status and a Telegram delivery smoke test as the `hermes` user, not root.
+- Use `scripts/chowmes-health-check --repair --send-test` for the post-change check.
 
 ## Telegram speed policy
 
@@ -188,14 +262,14 @@ If Telegram feels slow again, first check:
 
 Fast Telegram mode is for everyday interaction:
 
-- OpenRouter `google/gemini-2.5-flash`
+- OpenRouter `deepseek/deepseek-v4-pro` by default, with `/model fast` available for low-risk speed/cost-sensitive replies.
 - low turn budget
 - lightweight tools
 - no terminal, file access, code execution, TTS, delegation, or session search
 
 Deep Architect mode is for serious project work:
 
-- OpenRouter `anthropic/claude-sonnet-4.6`
+- OpenRouter `anthropic/claude-sonnet-4.6` via `/model judge` or delegation
 - research and stronger reasoning
 - broader tools only when needed and explicitly allowed
 - used for architecture, strategy, complex debugging, planning, and implementation design

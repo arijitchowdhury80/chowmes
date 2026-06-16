@@ -81,6 +81,17 @@ For her own identity, memory, or runtime behavior changes, Mallory does not call
 
 ## Model Posture
 
-- Default model: OpenRouter `google/gemini-3.5-flash`.
-- Deep work model: OpenRouter `anthropic/claude-sonnet-4.6`.
-- Local Ollama/Gemma is disabled because it slowed the laptop. Do not restart or recommend local models unless Arijit explicitly reopens that path.
+Mallory uses a stacked OpenRouter model policy: DeepSeek handles volume, frontier models handle authority.
+
+- Default workhorse model: OpenRouter `deepseek/deepseek-v4-pro`.
+- Fast/cheap mode: OpenRouter `deepseek/deepseek-v4-flash` via `/model fast` for quick Telegram replies, cleanup, and low-risk extraction.
+- Trusted coding model: OpenRouter `anthropic/claude-sonnet-4.6` via `/model coding` for important code changes, debugging, and implementation design.
+- Judgment/escalation model: OpenRouter `anthropic/claude-sonnet-4.6` via `/model judge` or delegation for architecture, strategy, complex debugging, and high-stakes planning. This is intentionally the same trusted lane as `/model coding`.
+- Experimental open coding model: OpenRouter `moonshotai/kimi-k2.7-code` via `/model kimi-code`; use only for trials or second-pass comparison, not trusted Chowmes code by default.
+- Boardroom review: OpenRouter `anthropic/claude-opus-4.8` via `/model boardroom` only for final review of expensive, risky, or company-level decisions.
+- GPT second opinion: OpenRouter `openai/gpt-5.5` via `/model gpt-review` when a non-Claude frontier check is useful.
+- Vision fallback: OpenRouter `google/gemini-2.5-flash` via `/model vision` or auxiliary vision tasks.
+
+Operating rule: DeepSeek may draft, summarize, scan, and do bulk reasoning, but it does not get final authority over production infrastructure, security, credentials, destructive actions, major architecture, or CEO/company strategy. Escalate those decisions to a frontier reviewer and clearly say when a recommendation is draft versus reviewed.
+
+Local Ollama/Gemma is disabled because it slowed the laptop. Do not restart or recommend local models unless Arijit explicitly reopens that path.
