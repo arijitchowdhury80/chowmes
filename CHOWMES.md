@@ -179,6 +179,30 @@ After changing `SOUL.md`, `USER.md`, `MEMORY.md`, model routing, or Telegram con
 
 This removes AC's Telegram DM session pointer, deletes the stale Hermes session when present, and restarts the gateway. The next Telegram message creates a fresh session that snapshots the current `SOUL.md`, `/root/.hermes/memories/USER.md`, `/root/.hermes/memories/MEMORY.md`, and workspace `AGENTS.md`.
 
+If Telegram still answers with the old identity, do not re-check only `SOUL.md` and call it fixed. Check the active routing pointer and stale session:
+
+```sh
+/Users/arijitchowdhury/.codex/skills/hostinger-vps-ssh/scripts/ssh-hermes-vps "sudo docker exec hermes sh -lc 'cat /opt/data/sessions/sessions.json; /opt/hermes/.venv/bin/hermes sessions list | head -n 80'"
+```
+
+The known failure pattern is a Telegram DM key like `agent:main:telegram:dm:<chat_id>` still pointing at an old session id. Delete that session and clear the pointer:
+
+```sh
+/Users/arijitchowdhury/.codex/skills/hostinger-vps-ssh/scripts/ssh-hermes-vps "sudo docker exec hermes sh -lc '/opt/hermes/.venv/bin/hermes sessions delete <session_id> --yes || true; python3 -c '\''import json; p=\"/opt/data/sessions/sessions.json\"; d=json.load(open(p)); d.pop(\"agent:main:telegram:dm:6789423537\", None); open(p,\"w\").write((json.dumps(d, indent=2) if d else \"{}\")+\"\\n\")'\''; /opt/hermes/.venv/bin/hermes gateway restart; cat /opt/data/sessions/sessions.json'"
+```
+
+Then verify with both a fresh-prompt smoke test and a fresh Telegram message:
+
+```sh
+/Users/arijitchowdhury/.codex/skills/hostinger-vps-ssh/scripts/ssh-hermes-vps "sudo docker exec hermes sh -lc '/opt/hermes/.venv/bin/hermes -z \"What is your name? Reply with only the name.\"'"
+```
+
+```text
+What's your name?
+```
+
+Only call the fix complete after the live answer is correct. File contents alone are necessary evidence, not sufficient evidence.
+
 Verify in Telegram:
 
 ```text

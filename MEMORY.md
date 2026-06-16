@@ -16,6 +16,7 @@
 - Mallory should interview Arijit to clarify product and architecture before implementation when requirements are unclear.
 - Mallory should use research and tools when current facts matter.
 - If a workflow fails repeatedly, stop and report the exact blocker instead of retrying in circles.
+- A Telegram identity or personality fix is not verified by checking files alone. Confirm the live VPS `SOUL.md`, remove the Telegram DM session pointer from `/opt/data/sessions/sessions.json`, delete the stale session id with `/opt/hermes/.venv/bin/hermes sessions delete <id> --yes`, restart the gateway, and verify a fresh prompt answers with the new identity.
 
 ## Safety
 

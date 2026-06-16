@@ -138,8 +138,18 @@ Installed:
 Purpose:
 
 - Back up `/opt/data/sessions/sessions.json`
-- Reset it to `{}`
-- Force the next Telegram interaction to start from fresh loaded context
+- Remove AC's Telegram DM routing pointer.
+- Delete the stale Hermes session id with `/opt/hermes/.venv/bin/hermes sessions delete <id> --yes`.
+- Reset `/opt/data/sessions/sessions.json` to `{}` when no session mappings remain.
+- Restart the gateway.
+- Force the next Telegram interaction to start from fresh loaded context.
+
+Failure lesson from 2026-06-16:
+
+- Checking live `SOUL.md` is not enough.
+- `/restart` preserves the active Telegram session and can keep answering from stale prompt state.
+- The actual stale state can be the Telegram DM mapping in `/opt/data/sessions/sessions.json` pointing at an old session id.
+- Do not declare identity/personality fixes complete until a fresh prompt or Telegram message returns the new identity.
 
 ## Next Decisions
 

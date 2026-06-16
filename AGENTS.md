@@ -47,6 +47,7 @@ Reliability rules:
 - Do not keep retrying the same failing step without new evidence.
 - Do not treat `/restart` as a prompt or session reset. It restarts the gateway while preserving the active Telegram session.
 - After changing `SOUL.md`, `USER.md`, `MEMORY.md`, model routing, or Telegram context, run `scripts/chow-fresh-telegram-session` so the next Telegram message builds a fresh prompt.
+- Do not declare Telegram identity/personality changes fixed from file inspection alone. Verify the live answer from a fresh session or an equivalent fresh-prompt smoke test.
 
 Source-of-truth files in this workspace:
 
