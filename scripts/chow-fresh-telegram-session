@@ -1,20 +1,21 @@
 #!/bin/sh
 set -eu
 
-# Force Telegram to start a fresh Hermes session for Chow.
+# Force Telegram to start a fresh Hermes session for Mallory.
 # Run this after changing SOUL.md, USER.md, MEMORY.md, model routing, or gateway context.
 
 channel_id="${1:-6789423537}"
 ssh_helper="/Users/arijitchowdhury/.codex/skills/hostinger-vps-ssh/scripts/ssh-hermes-vps"
 
-"$ssh_helper" "CHANNEL_ID='$channel_id' sudo -E python3 - <<'PY'
+reset_in_container() {
+  CHANNEL_ID="$channel_id" python3 - <<'PY'
 import json
 import os
 import subprocess
 from pathlib import Path
 
 channel_id = os.environ.get('CHANNEL_ID', '')
-sessions_path = Path('/root/.hermes/sessions/sessions.json')
+sessions_path = Path('/opt/data/sessions/sessions.json')
 
 try:
     data = json.loads(sessions_path.read_text())
@@ -43,11 +44,67 @@ sessions_path.write_text((json.dumps(data, indent=2) if data else '{}') + '\n')
 
 for session_id in removed:
     subprocess.run(
-        ['docker', 'exec', 'hermes', 'hermes', 'sessions', 'delete', session_id, '--yes'],
+        ['/opt/hermes/.venv/bin/hermes', 'sessions', 'delete', session_id, '--yes'],
         check=False,
     )
 
 print('cleared_sessions=' + ','.join(removed))
 PY
-sudo docker exec hermes hermes gateway restart
-sudo cat /root/.hermes/sessions/sessions.json"
+  /opt/hermes/.venv/bin/hermes gateway restart
+  cat /opt/data/sessions/sessions.json
+}
+
+if [ -x /opt/hermes/.venv/bin/hermes ] && [ -d /opt/data/sessions ]; then
+  reset_in_container
+  exit 0
+fi
+
+"$ssh_helper" "CHANNEL_ID='$channel_id' sudo -E docker exec -i -e CHANNEL_ID='$channel_id' hermes sh -s" <<'REMOTE'
+channel_id="${CHANNEL_ID:-6789423537}"
+
+CHANNEL_ID="$channel_id" python3 - <<'PY'
+import json
+import os
+import subprocess
+from pathlib import Path
+
+channel_id = os.environ.get('CHANNEL_ID', '')
+sessions_path = Path('/opt/data/sessions/sessions.json')
+
+try:
+    data = json.loads(sessions_path.read_text())
+except FileNotFoundError:
+    data = {}
+
+removed = []
+for key, value in list(data.items()):
+    origin = value.get('origin') or {}
+    is_target = (
+        value.get('platform') == 'telegram'
+        and value.get('chat_type') == 'dm'
+        and (
+            origin.get('chat_id') == channel_id
+            or origin.get('user_id') == channel_id
+            or key.endswith('telegram:dm:' + channel_id)
+        )
+    )
+    if is_target:
+        session_id = value.get('session_id')
+        if session_id:
+            removed.append(session_id)
+        data.pop(key, None)
+
+sessions_path.write_text((json.dumps(data, indent=2) if data else '{}') + '\n')
+
+for session_id in removed:
+    subprocess.run(
+        ['/opt/hermes/.venv/bin/hermes', 'sessions', 'delete', session_id, '--yes'],
+        check=False,
+    )
+
+print('cleared_sessions=' + ','.join(removed))
+PY
+
+/opt/hermes/.venv/bin/hermes gateway restart
+cat /opt/data/sessions/sessions.json
+REMOTE
