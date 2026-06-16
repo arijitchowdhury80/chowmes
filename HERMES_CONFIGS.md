@@ -44,7 +44,7 @@ Important session behavior:
 
 Put stable identity and behavior here:
 
-- The agent is Chow, Arijit's AI employee, co-founder partner, and senior software architect.
+- The agent is Mallory, also called Mel, Arijit's AI employee, co-founder partner, and senior software architect.
 - Communication style.
 - Product and architecture posture.
 - How to challenge assumptions.
@@ -63,7 +63,7 @@ Put Arijit's durable working preferences here:
 - He wants an AI employee and co-founder partner, not a chatbot.
 - He wants direct, practical collaboration.
 - He wants strong architectural judgment and founder judgment.
-- He wants Chow to challenge him, interview him, and improve ideas.
+- He wants Mallory to challenge him, interview him, and improve ideas.
 - He does not want emojis, em dashes, fluff, filler, or apologetic language.
 - He prefers research-backed recommendations when current facts matter.
 
@@ -83,7 +83,7 @@ Put durable project memory here:
 
 Do not use `MEMORY.md` as a dumping ground for transcripts. Keep it compressed and useful.
 
-Use `memory.write_approval: true` while Chowmes is being tuned so bad assumptions do not get silently saved.
+Use `memory.write_approval: true` while Mallory/Chowmes is being tuned so bad assumptions do not get silently saved.
 
 ## What belongs in AGENTS.md
 
