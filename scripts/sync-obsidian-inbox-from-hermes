@@ -1,0 +1,13 @@
+#!/bin/sh
+set -eu
+
+vault_root="${OBSIDIAN_VAULT_ROOT:-/Users/arijitchowdhury/Dropbox/AI-Development/Personal/Obsidian-Vault/MyOS}"
+env_file="${HERMES_ENV_FILE:-/Users/arijitchowdhury/Dropbox/AI-Development/Personal/ChowMes/.env.local}"
+script_dir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+ssh_helper="$script_dir/chowmes-ssh-helper"
+
+mkdir -p "$vault_root"
+
+"$ssh_helper" --env "$env_file" "sudo docker exec hermes sh -lc 'cd /opt/data/knowledge/obsidian/MyOS 2>/dev/null && if [ -d Chowmes-Inbox ]; then tar -czf - Chowmes-Inbox; else mkdir -p /tmp/empty-obsidian-inbox && tar -czf - -C /tmp/empty-obsidian-inbox .; fi'" | tar -xzf - -C "$vault_root"
+
+echo "synced_from_hermes=$vault_root/Chowmes-Inbox"

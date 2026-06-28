@@ -1,25 +1,25 @@
 # Chowmes
 
-Chowmes is Arijit's private Hermes Agent workspace: the operating home for Mallory, a personal AI work OS, architect partner, founder partner, second brain, confidant, and challenger.
+Chowmes is Arijit's private Hermes Agent workspace: the operating home for Athena, also called Athena, a personal AI work OS, architect partner, founder partner, second brain, confidant, and challenger.
 
-The repo contains the human-readable source of truth for Mallory's identity, Arijit's working preferences, durable project memory, Chowmes operating runbooks, and local reference material for the Hermes Agent documentation.
+The repo contains the human-readable source of truth for Athena's identity, Arijit's working preferences, durable project memory, Chowmes operating runbooks, and local reference material for the Hermes Agent documentation.
 
 ## What This Repo Contains
 
-- `SOUL.md`: Mallory's core identity, personality, voice, trust model, and operating posture.
+- `SOUL.md`: Athena's core identity, personality, voice, trust model, and operating posture.
 - `USER.md`: Arijit's durable collaboration preferences and communication style.
 - `MEMORY.md`: compressed project memory, operating facts, durable lessons, and safety rules.
 - `AGENTS.md`: instructions for Codex or other agents working inside this workspace.
 - `CHOWMES.md`: operational runbook for the Hostinger VPS running Hermes.
 - `CHOW_TRACKING.md`: current state, audits, model choices, and optimization notes.
 - `HERMES_CONFIGS.md`: map of which configuration belongs where.
-- `OBSIDIAN.md`: policy for connecting curated Obsidian knowledge safely.
+- `OBSIDIAN.md`: policy and paths for using the local Obsidian `MyOS` vault as the central source of truth.
 - `scripts/`: helper scripts for Chowmes operations.
 - `reference/hermes-agent-docs/`: local snapshot of official Hermes Agent docs for local-first lookup.
 
 ## Core Idea
 
-Mallory is not a chatbot. She is designed to help Arijit think, build, decide, and execute with continuity.
+Athena is not a chatbot. She is designed to help Arijit think, build, decide, and execute with continuity.
 
 Her operating style:
 
@@ -30,7 +30,7 @@ Her operating style:
 - use a sharp, witty, layered voice instead of sterile assistant-speak
 - learn from corrections and convert lessons into better memory, rules, and workflows
 
-Chowmes is the infrastructure and runtime. Mallory is the agent.
+Chowmes is the infrastructure and runtime. Athena is the agent.
 
 ## Safety Rules
 
@@ -67,4 +67,4 @@ The Hermes dashboard and model endpoints should remain localhost-only unless Ari
 
 ## Current Direction
 
-Chowmes runs Hermes on a Hostinger VPS using OpenRouter by default. Telegram fast mode is intentionally lightweight: web, vision, skills, todo, memory, and clarify are enabled; terminal, file access, code execution, TTS, delegation, and session search are disabled unless deliberately enabled later.
+Chowmes runs Hermes on a Hostinger VPS using OpenRouter by default. Telegram operator mode is intentionally bounded: web, terminal, file, vision, skills, todo, memory, clarify, and cronjob are enabled; code execution, TTS, delegation, and session search stay disabled unless deliberately enabled later.

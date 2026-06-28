@@ -1,0 +1,61 @@
+#!/bin/sh
+set -eu
+
+default_env_file="/Users/arijitchowdhury/Dropbox/AI-Development/Personal/ChowMes/.env.local"
+env_file="${HERMES_ENV_FILE:-$default_env_file}"
+mode="${1:-chat}"
+
+if [ ! -f "$env_file" ]; then
+  echo "hermes-terminal: env file not found: $env_file" >&2
+  echo "Set HERMES_ENV_FILE to the ChowMes .env.local path if it moved." >&2
+  exit 1
+fi
+
+case "$env_file" in
+  /*) ;;
+  *) env_file="$(pwd)/$env_file" ;;
+esac
+
+host="$(awk '/^SSH_HOST=/{print substr($0,10); exit}' "$env_file")"
+user="$(awk '/^SSH_USER=/{print substr($0,10); exit}' "$env_file")"
+key="$(awk '/^SSH_KEY=/{print substr($0,9); exit}' "$env_file")"
+
+if [ -z "$host" ]; then
+  echo "hermes-terminal: SSH_HOST is missing in $env_file" >&2
+  exit 1
+fi
+
+if [ -z "$user" ]; then
+  user="chowmesadmin"
+fi
+
+if [ -z "$key" ]; then
+  echo "hermes-terminal: SSH_KEY is missing in $env_file" >&2
+  exit 1
+fi
+
+case "$key" in
+  "~/"*) key="$HOME/${key#~/}" ;;
+esac
+
+case "$mode" in
+  chat|"")
+    hermes_cmd="/opt/hermes/.venv/bin/hermes chat"
+    ;;
+  tui|--tui)
+    hermes_cmd="/opt/hermes/.venv/bin/hermes --tui"
+    ;;
+  *)
+    echo "Usage: scripts/hermes-terminal [chat|tui]" >&2
+    exit 2
+    ;;
+esac
+
+exec ssh \
+  -i "$key" \
+  -t \
+  -o BatchMode=yes \
+  -o StrictHostKeyChecking=accept-new \
+  -o UserKnownHostsFile=/tmp/hermes_vps_known_hosts \
+  "$user@$host" \
+  "sudo docker exec -it -u hermes hermes $hermes_cmd"

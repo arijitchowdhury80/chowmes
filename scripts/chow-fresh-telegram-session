@@ -1,17 +1,28 @@
 #!/bin/sh
 set -eu
 
-# Force Telegram to start a fresh Hermes session for Mallory.
+# Force Telegram to start a fresh Hermes session for Athena (the primary agent).
 # Run this after changing SOUL.md, USER.md, MEMORY.md, model routing, or gateway context.
 
 channel_id="${1:-6789423537}"
-ssh_helper="/Users/arijitchowdhury/.codex/skills/hostinger-vps-ssh/scripts/ssh-hermes-vps"
+script_dir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+ssh_helper="$script_dir/chowmes-ssh-helper"
 
 reset_in_container() {
-  CHANNEL_ID="$channel_id" python3 - <<'PY'
+  chown -R hermes:hermes /opt/data
+  chmod 700 /opt/data
+  [ -f /opt/data/.env ] && chmod 600 /opt/data/.env
+  [ -f /opt/data/config.yaml ] && chmod 640 /opt/data/config.yaml
+  setuidgid="$(command -v s6-setuidgid 2>/dev/null || true)"
+  if [ -z "$setuidgid" ]; then
+    setuidgid="/package/admin/s6-2.15.0.0/command/s6-setuidgid"
+  fi
+
+  CHANNEL_ID="$channel_id" "$setuidgid" hermes python3 - <<'PY'
 import json
 import os
 import subprocess
+import time
 from pathlib import Path
 
 channel_id = os.environ.get('CHANNEL_ID', '')
@@ -48,9 +59,26 @@ for session_id in removed:
         check=False,
     )
 
+for base in [Path('/opt/data/pairing'), Path('/opt/data/platforms/pairing')]:
+    base.mkdir(parents=True, exist_ok=True)
+    path = base / 'telegram-approved.json'
+    try:
+        approved = json.loads(path.read_text()) if path.exists() else {}
+    except Exception:
+        approved = {}
+    approved[str(channel_id)] = {
+        'user_name': approved.get(str(channel_id), {}).get('user_name', 'AC'),
+        'approved_at': approved.get(str(channel_id), {}).get('approved_at', time.time()),
+        'repair_note': 'preserved_owner_approval_during_fresh_session_reset',
+    }
+    path.write_text(json.dumps(approved, indent=2) + '\n')
+    os.chmod(path, 0o600)
+
 print('cleared_sessions=' + ','.join(removed))
 PY
-  /opt/hermes/.venv/bin/hermes gateway restart
+  "$setuidgid" hermes /opt/hermes/.venv/bin/hermes gateway restart
+  "$setuidgid" hermes /opt/hermes/.venv/bin/hermes gateway status
+  chown -R hermes:hermes /opt/data
   cat /opt/data/sessions/sessions.json
 }
 
@@ -62,10 +90,20 @@ fi
 "$ssh_helper" "CHANNEL_ID='$channel_id' sudo -E docker exec -i -e CHANNEL_ID='$channel_id' hermes sh -s" <<'REMOTE'
 channel_id="${CHANNEL_ID:-6789423537}"
 
-CHANNEL_ID="$channel_id" python3 - <<'PY'
+chown -R hermes:hermes /opt/data
+chmod 700 /opt/data
+[ -f /opt/data/.env ] && chmod 600 /opt/data/.env
+[ -f /opt/data/config.yaml ] && chmod 640 /opt/data/config.yaml
+setuidgid="$(command -v s6-setuidgid 2>/dev/null || true)"
+if [ -z "$setuidgid" ]; then
+  setuidgid="/package/admin/s6-2.15.0.0/command/s6-setuidgid"
+fi
+
+CHANNEL_ID="$channel_id" "$setuidgid" hermes python3 - <<'PY'
 import json
 import os
 import subprocess
+import time
 from pathlib import Path
 
 channel_id = os.environ.get('CHANNEL_ID', '')
@@ -102,9 +140,26 @@ for session_id in removed:
         check=False,
     )
 
+for base in [Path('/opt/data/pairing'), Path('/opt/data/platforms/pairing')]:
+    base.mkdir(parents=True, exist_ok=True)
+    path = base / 'telegram-approved.json'
+    try:
+        approved = json.loads(path.read_text()) if path.exists() else {}
+    except Exception:
+        approved = {}
+    approved[str(channel_id)] = {
+        'user_name': approved.get(str(channel_id), {}).get('user_name', 'AC'),
+        'approved_at': approved.get(str(channel_id), {}).get('approved_at', time.time()),
+        'repair_note': 'preserved_owner_approval_during_fresh_session_reset',
+    }
+    path.write_text(json.dumps(approved, indent=2) + '\n')
+    os.chmod(path, 0o600)
+
 print('cleared_sessions=' + ','.join(removed))
 PY
 
-/opt/hermes/.venv/bin/hermes gateway restart
+"$setuidgid" hermes /opt/hermes/.venv/bin/hermes gateway restart
+"$setuidgid" hermes /opt/hermes/.venv/bin/hermes gateway status
+chown -R hermes:hermes /opt/data
 cat /opt/data/sessions/sessions.json
 REMOTE

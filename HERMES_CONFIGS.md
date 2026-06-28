@@ -29,9 +29,10 @@ The active Telegram agent runs on the Hostinger VPS.
 - Active built-in user profile: `/opt/data/memories/USER.md`
 - Active built-in memory: `/opt/data/memories/MEMORY.md`
 - Active runtime config: `/opt/data/config.yaml`
+- Active Obsidian vault path for live Hermes: `/opt/data/knowledge/obsidian/MyOS`
 - Persistent workspace for project guidance: `/opt/data/workspace`
 
-The local Google Drive folder is the editable source-of-truth for human-readable project files. The VPS has the active copies that Telegram uses.
+The local Dropbox project folder and Obsidian vault are the editable source-of-truth for human-readable project files. The VPS has the active copies that Telegram uses.
 
 Important session behavior:
 
@@ -44,7 +45,7 @@ Important session behavior:
 
 Put stable identity and behavior here:
 
-- The agent is Mallory, also called Mel, Arijit's AI employee, co-founder partner, and senior software architect.
+- The agent is Athena, also called Athena, Arijit's AI employee, co-founder partner, and senior software architect.
 - Communication style.
 - Product and architecture posture.
 - How to challenge assumptions.
@@ -63,7 +64,7 @@ Put Arijit's durable working preferences here:
 - He wants an AI employee and co-founder partner, not a chatbot.
 - He wants direct, practical collaboration.
 - He wants strong architectural judgment and founder judgment.
-- He wants Mallory to challenge him, interview him, and improve ideas.
+- He wants Athena to challenge him, interview him, and improve ideas.
 - He does not want emojis, em dashes, fluff, filler, or apologetic language.
 - He prefers research-backed recommendations when current facts matter.
 
@@ -83,7 +84,7 @@ Put durable project memory here:
 
 Do not use `MEMORY.md` as a dumping ground for transcripts. Keep it compressed and useful.
 
-Use `memory.write_approval: true` while Mallory/Chowmes is being tuned so bad assumptions do not get silently saved.
+Use `memory.write_approval: true` while Athena/Chowmes is being tuned so bad assumptions do not get silently saved.
 
 ## What belongs in AGENTS.md
 
@@ -147,12 +148,12 @@ Stacking rule:
 
 - DeepSeek handles volume.
 - Frontier models handle authority.
-- Context length override: `65536`.
+- Context length override: `131072` for DeepSeek V4 Pro, verified live as of June 26, 2026.
 
 Default workhorse:
 
 - OpenRouter `deepseek/deepseek-v4-pro`
-- Use for normal Mallory/Hermes reasoning, project scans, research synthesis, and bulk serious work.
+- Use for normal Athena/Hermes reasoning, project scans, research synthesis, and bulk serious work.
 
 Fast/cheap:
 
@@ -196,7 +197,7 @@ Disabled for now:
 
 Direct Google:
 
-- Not active until `GOOGLE_API_KEY` or `GEMINI_API_KEY` is present on the VPS.
+- `GEMINI_API_KEY` is present on the VPS, but direct Google routing is not active while the live provider remains OpenRouter.
 - Use `provider: google` and `default: gemini-2.5-flash` when the key is configured.
 - Do not use stale `gemini-1.5-flash` for Chowmes.
 
@@ -229,7 +230,17 @@ Active credential:
 PARALLEL_API_KEY=<set in VPS Hermes environment, never in markdown>
 ```
 
-Do not store API keys in this file. Do not enable Telegram terminal/file/code execution merely to search the web. Normal Telegram research should use the native `web` toolset; the `parallel-cli` skill is for deliberate deep-research workflows.
+Do not store API keys in this file. Normal Telegram research should use the native `web` toolset; the `parallel-cli` skill is for deliberate deep-research workflows, monitors, FindAll, enrichment, or async research jobs. Telegram `terminal`, `file`, and `cronjob` are enabled by explicit approval from Arijit; keep Telegram `code_execution` disabled unless separately approved.
+
+Parallel CLI runtime:
+
+```text
+/usr/local/bin/parallel-cli
+/opt/data/bin/parallel-cli
+/opt/data/tools/parallel-web-cli
+```
+
+System `python3` in the Hermes container has `python3-yaml` installed, so the `competitive-research` scripts work with their documented commands, for example `python3 scripts/setup-monitors.py --dry-run` and `python3 scripts/daily-research-run.py --dry-run`, when run as the `hermes` user. The `parallel-cli` wrapper loads `PARALLEL_API_KEY` from `/opt/data/.env`; raw Python processes do not automatically expose that key in `os.environ`.
 
 When changing the VPS Hermes environment:
 
@@ -241,13 +252,13 @@ When changing the VPS Hermes environment:
 
 ## Telegram speed policy
 
-Telegram should be fast by default. Do not enable every tool for Telegram unless the user explicitly asks for a deep autonomous agent mode.
+Telegram should stay bounded, but Arijit explicitly approved Telegram `terminal`, `file`, and `cronjob` tools on June 16, 2026 for deeper operator workflows.
 
-Current fast Telegram profile:
+Current Telegram profile:
 
 - `agent.max_turns`: `12`
-- Enabled: web, vision, skills, todo, memory, clarify
-- Disabled: browser, terminal, file, code execution, image generation, text-to-speech, session search, delegation, cron jobs, cross-platform messaging, computer use
+- Enabled: web, terminal, file, vision, skills, todo, memory, clarify, cronjob
+- Disabled: browser, code execution, image generation, text-to-speech, session search, delegation, cross-platform messaging, computer use
 
 If Telegram feels slow again, first check:
 
@@ -256,16 +267,17 @@ If Telegram feels slow again, first check:
 - prompt size
 - whether session search or text-to-speech has been re-enabled
 - whether the active session needs `/new`
-- whether prompt size/tool use is creating context drag despite the `65536` context override
+- whether prompt size/tool use is creating context drag despite the `131072` context override
 
 ## Operating modes
 
-Fast Telegram mode is for everyday interaction:
+Telegram operator mode is for everyday interaction plus explicitly approved operational work:
 
 - OpenRouter `deepseek/deepseek-v4-pro` by default, with `/model fast` available for low-risk speed/cost-sensitive replies.
 - low turn budget
-- lightweight tools
-- no terminal, file access, code execution, TTS, delegation, or session search
+- bounded tools
+- terminal, file, and cronjob allowed
+- no code execution, TTS, delegation, or session search
 
 Deep Architect mode is for serious project work:
 

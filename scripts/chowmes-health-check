@@ -1,0 +1,196 @@
+#!/bin/sh
+set -eu
+
+script_dir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+ssh_helper="$script_dir/chowmes-ssh-helper"
+repair=0
+send_test=0
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --repair)
+      repair=1
+      ;;
+    --send-test)
+      send_test=1
+      ;;
+    -h|--help)
+      cat <<'EOF'
+Usage: scripts/chowmes-health-check [--repair] [--send-test]
+
+Checks the live Chowmes Hermes gateway after config, env, memory, skill,
+or session changes.
+
+  --repair     Restore expected /opt/data ownership and private file modes.
+  --send-test  Send a direct Telegram delivery smoke test to the home chat.
+EOF
+      exit 0
+      ;;
+    *)
+      echo "unknown argument: $1" >&2
+      exit 2
+      ;;
+  esac
+  shift
+done
+
+"$ssh_helper" "REPAIR='$repair' SEND_TEST='$send_test' sudo -E docker exec -i -e REPAIR='$repair' -e SEND_TEST='$send_test' hermes sh -s" <<'REMOTE'
+set -eu
+
+setuidgid="$(command -v s6-setuidgid 2>/dev/null || true)"
+if [ -z "$setuidgid" ]; then
+  setuidgid="/package/admin/s6-2.15.0.0/command/s6-setuidgid"
+fi
+if [ ! -x "$setuidgid" ]; then
+  echo "s6-setuidgid_not_found"
+  exit 1
+fi
+
+if [ "${REPAIR:-0}" = "1" ]; then
+  chown -R hermes:hermes /opt/data
+  chmod 700 /opt/data
+  [ -f /opt/data/.env ] && chmod 600 /opt/data/.env
+  [ -f /opt/data/config.yaml ] && chmod 640 /opt/data/config.yaml
+  "$setuidgid" hermes python3 - <<'PY'
+import json
+import os
+import time
+from pathlib import Path
+
+env = {}
+for line in Path("/opt/data/.env").read_text().splitlines():
+    if "=" in line and not line.lstrip().startswith("#"):
+        key, value = line.split("=", 1)
+        env[key] = value.strip().strip('"').strip("'")
+
+allowed = [
+    item.strip()
+    for item in (env.get("TELEGRAM_ALLOWED_USERS") or env.get("TELEGRAM_HOME_CHANNEL") or "").split(",")
+    if item.strip()
+]
+
+if allowed:
+    for base in [Path("/opt/data/pairing"), Path("/opt/data/platforms/pairing")]:
+        base.mkdir(parents=True, exist_ok=True)
+        path = base / "telegram-approved.json"
+        try:
+            data = json.loads(path.read_text()) if path.exists() else {}
+        except Exception:
+            data = {}
+        changed = False
+        for user_id in allowed:
+            if str(user_id) not in data:
+                data[str(user_id)] = {
+                    "user_name": "AC",
+                    "approved_at": time.time(),
+                    "repair_note": "restored_owner_approval_from_env_allowlist",
+                }
+                changed = True
+        if changed or not path.exists():
+            path.write_text(json.dumps(data, indent=2) + "\n")
+        os.chmod(path, 0o600)
+PY
+  chown -R hermes:hermes /opt/data/pairing /opt/data/platforms/pairing 2>/dev/null || true
+  echo "repair=applied"
+else
+  echo "repair=skipped"
+fi
+
+echo "== permissions =="
+find /opt/data -maxdepth 2 \( -name .env -o -name config.yaml -o -name logs -o -name sessions -o -name skills -o -name memories -o -name pairing -o -name platforms -o -name workspace -o -name . \) -printf "%M %u %g %p\n" | sort
+
+echo "== hermes-user-read =="
+if "$setuidgid" hermes sh -lc 'test -x /opt/data && test -x /opt/data/pairing && test -r /opt/data/.env && test -r /opt/data/config.yaml'; then
+  echo "hermes_can_read_runtime_files=yes"
+else
+  echo "hermes_can_read_runtime_files=no"
+  exit 1
+fi
+
+echo "== telegram-owner-approval =="
+if "$setuidgid" hermes python3 - <<'PY'
+import json
+from pathlib import Path
+
+env = {}
+for line in Path("/opt/data/.env").read_text().splitlines():
+    if "=" in line and not line.lstrip().startswith("#"):
+        key, value = line.split("=", 1)
+        env[key] = value.strip().strip('"').strip("'")
+
+allowed = [
+    item.strip()
+    for item in (env.get("TELEGRAM_ALLOWED_USERS") or env.get("TELEGRAM_HOME_CHANNEL") or "").split(",")
+    if item.strip()
+]
+
+paths = [Path("/opt/data/pairing/telegram-approved.json"), Path("/opt/data/platforms/pairing/telegram-approved.json")]
+missing = []
+for path in paths:
+    if not path.exists():
+        missing.append(str(path))
+        continue
+    try:
+        data = json.loads(path.read_text())
+    except Exception:
+        missing.append(str(path) + ":invalid_json")
+        continue
+    for user_id in allowed:
+        if str(user_id) not in data:
+            missing.append(str(path) + ":missing_owner")
+
+if missing:
+    print("telegram_owner_approval=missing")
+    for item in missing:
+        print(item)
+    raise SystemExit(1)
+print("telegram_owner_approval=present")
+PY
+then
+  :
+else
+  echo "Run with --repair to restore Telegram owner approval from TELEGRAM_ALLOWED_USERS."
+  exit 1
+fi
+
+echo "== ownership-drift =="
+drift="$(find /opt/data -xdev ! -user hermes -print | head -n 20)"
+if [ -n "$drift" ]; then
+  echo "$drift"
+  echo "root_owned_runtime_files=yes"
+  exit 1
+fi
+echo "root_owned_runtime_files=no"
+
+echo "== gateway-status =="
+"$setuidgid" hermes /opt/hermes/.venv/bin/hermes gateway status
+
+echo "== web-backend =="
+if "$setuidgid" hermes sh -lc 'cd /opt/hermes && /opt/hermes/.venv/bin/python -m tools.web_tools' | sed -n '1,8p'; then
+  :
+else
+  echo "web_backend_check=failed"
+  exit 1
+fi
+
+echo "== recent-permission-errors =="
+if tail -n 120 /opt/data/logs/gateways/default/current 2>/dev/null | grep -q "PermissionError"; then
+  echo "permission_errors_seen_in_recent_log=yes"
+else
+  echo "permission_errors_seen_in_recent_log=no"
+fi
+
+if [ "${SEND_TEST:-0}" = "1" ]; then
+  echo "== telegram-send-test =="
+  "$setuidgid" hermes /opt/hermes/.venv/bin/hermes send --to telegram "Chowmes health check passed: gateway, permissions, and web backend are healthy."
+fi
+
+echo "== post-command-ownership-drift =="
+drift="$(find /opt/data -xdev ! -user hermes -print | head -n 20)"
+if [ -n "$drift" ]; then
+  echo "$drift"
+  echo "root_owned_runtime_files_after_checks=yes"
+  exit 1
+fi
+echo "root_owned_runtime_files_after_checks=no"
+REMOTE

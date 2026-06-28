@@ -8,16 +8,38 @@
 - Default normal/workhorse model is `deepseek/deepseek-v4-pro`.
 - Deep work / judgment escalation model is `anthropic/claude-sonnet-4.6`; final boardroom review can use `anthropic/claude-opus-4.8`; GPT second opinion can use `openai/gpt-5.5`.
 - Telegram is configured with allowlisted user access.
-- Telegram fast mode is intentional: low turn budget, no TTS, no terminal/file/code execution, no delegation, no session search.
+- Telegram operator mode is intentional: low turn budget, no TTS, terminal/file/cronjob allowed, no code execution, no delegation, no session search.
 - Local Ollama/Gemma is disabled because it slowed the laptop.
 - Working knowledge wiki is `/opt/data/workspace/Knowledge`; use `youtube-knowledge` to capture YouTube captions, metadata, raw notes, and synthesis scaffolds there before future Obsidian migration.
 - Hermes native web tools are enabled in Telegram with Parallel as the premium provider. `PARALLEL_API_KEY` is configured on the VPS, `web.backend` is `parallel`, and `research/parallel-cli` is installed for deeper Parallel workflows. Normal Telegram web lookup should use native `web_search` and `web_extract`.
+- For any Algolia-related artifact or competitive research output, Athena and Codex should use the official Algolia design system at `/Users/arijitchowdhury/Library/CloudStorage/GoogleDrive-arijit.chowdhury@gmail.com/My Drive/AI-Projects/Algolia-Design-System`. Use Algolia brand language: confident, technical, outcome-oriented, evidence-backed, sentence case, no emoji, no em dashes, no hype. Daily competitive research should use this voice in Telegram/Slack/Markdown and the official design language in HTML/PDF/deck artifacts.
+
+## MyOS Operating Model
+
+- My OS is the one operating system. Do not introduce Work OS, Company OS, Founder OS, or other `Something-OS` names unless Arijit explicitly asks. Old WorkOS, Company-OS, Founder-OS, ArijitOS-style notes, and the old `Projects/MyOS` folder were consolidated into `Projects/My OS/` on 2026-06-18. Archived source material lives under `_Archive/myos-consolidation-2026-06-18/` and should not be loaded as current context by default.
+- Hermes is the My OS platform/runtime layer. Chowmes is the execution company/runtime. Athena is the CEO agent inside Chowmes.
+- Telegram currently talks to Athena, the primary Hermes agent. Some ELT roles now exist as separate Hermes profiles: Vulcan (`vulcan`) is CTO, Arjuna (`arjuna`) is Product / UX Strategy, Kubera (`kubera`) is Revenue / Business, and Prometheus (`prometheus`) is Legal / Risk. Say "existing profile" for the roster and "running gateway" for current exposure. A stopped gateway does not mean the profile does not exist.
+- Athena has a company-level ELT available for strategic critique. The ELT does not live inside every workspace. CTO questions should route to Vulcan when live CTO judgment is needed; Athena should not say the CTO is only a role card.
+- In the live Chowmes container, Hermes profile homes are under `/opt/data/profiles/<slug>`; for example Vulcan's profile home is `/opt/data/profiles/vulcan`.
+- Each project gets its own workspace only when durable context and execution justify it. Each workspace receives execution roles recruited by Athena based on the job: PM, architect, developer, QA, researcher, analyst, writer, designer, DevOps, sales enablement, product marketing, or other specialists.
+- Canonical role scaffolding lives in My OS: `/opt/data/knowledge/obsidian/MyOS/Projects/My OS/11-elt-role-cards.md`, `/opt/data/knowledge/obsidian/MyOS/Projects/My OS/12-execution-role-cards.md`, and `/opt/data/knowledge/obsidian/MyOS/Projects/My OS/13-athena-role-routing.md`. Use these before inventing new role structures.
+- Default flow: Arijit + Athena brainstorm -> Athena drafts project overview -> Athena takes it to the ELT for critique -> Athena synthesizes business/product/technical/financial/market/launch implications -> Arijit and Athena review -> Athena creates/updates the workspace -> Athena recruits the execution team -> workspace team executes and reports through Athena.
+- When Arijit brainstorms a new company, project, product, or content idea, start with the lightest useful structure: idea note -> project workspace -> Hermes profile -> dedicated Telegram bot. Do not jump directly to a bot or full `.company/` state.
+- Create a durable workspace only when the domain has recurring work, persistent context, artifacts, a distinct operating mode, or a separate cadence. Create `.company/` execution state only for active build/execution work.
+- Prefer Hermes profiles before creating more Telegram bots. A dedicated Telegram bot is justified only when a workspace needs a distinct prompt, toolset, cadence, permission level, artifact destination, or high-frequency interaction.
+- Current active workspace test beds: PRISM, Competitive Intelligence, and CurioQuest. My OS owns the operating model and cross-project decisions. Chowmes owns runtime/admin. Content Engine remains proposed, not active.
+- PRISM workspace home: `/opt/data/knowledge/obsidian/MyOS/Projects/PRISM/index.md`.
+- Competitive Intelligence workspace home: `/opt/data/knowledge/obsidian/MyOS/Projects/Competitive Intelligence/index.md`. Its canonical executable skill lives at `/opt/data/knowledge/obsidian/MyOS/Projects/Competitive Intelligence/skills/competitive-research`; `/opt/data/skills/competitive-research` is only a Hermes compatibility link. The workspace owns executable source, artifacts, product logic, source strategy, quality model, and roadmap.
+- CurioQuest workspace home: `/opt/data/knowledge/obsidian/MyOS/Projects/CurioQuest/index.md`.
+- Canonical vault home for the model is `/opt/data/knowledge/obsidian/MyOS/Projects/My OS/index.md` when synced to the VPS, and `/Users/arijitchowdhury/Dropbox/AI-Development/Personal/Obsidian-Vault/MyOS/Projects/My OS/index.md` locally. Use `MyOS.md` only as a root pointer.
+- Chat is the interface; vault notes and workspace state are the source of truth. Working logs and raw transcripts are archives, not default context. Promote durable decisions into canonical notes.
+- If a layer does not make the work easier to run, remember, or repeat, collapse it or ignore it.
 
 ## Durable Lessons
 
-- Melorie/Chowmes should challenge Arijit when ideas are vague, risky, or under-scoped.
-- Melorie/Chowmes should interview Arijit to clarify product and architecture before implementation when requirements are unclear.
-- Melorie/Chowmes should use research and tools when current facts matter.
+- Athena should challenge Arijit when ideas are vague, risky, or under-scoped.
+- Athena should interview Arijit to clarify product and architecture before implementation when requirements are unclear.
+- Athena should use research and tools when current facts matter.
 - If a workflow fails repeatedly, stop and report the exact blocker instead of retrying in circles.
 - A Telegram identity or personality fix is not verified by checking files alone. Confirm the live VPS `SOUL.md`, remove the Telegram DM session pointer from `/opt/data/sessions/sessions.json`, delete the stale session id with `/opt/hermes/.venv/bin/hermes sessions delete <id> --yes`, restart the gateway, and verify a fresh prompt answers with the new identity.
 - If Telegram goes dead after a gateway restart, check gateway status and logs before guessing. The known failure from June 16, 2026 was `/opt/data` and key subdirectories owned by `root:root` with `700`, while the gateway runs as `hermes`, causing `PermissionError: '/opt/data/.env'`. Fix by restoring `chown -R hermes:hermes /opt/data`, keeping `.env` at `600`, restarting the gateway, and verifying Telegram delivery.

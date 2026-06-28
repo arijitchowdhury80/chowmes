@@ -1,0 +1,25 @@
+#!/bin/sh
+set -eu
+
+script_dir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+repo_root="$(CDPATH= cd -- "$script_dir/.." && pwd)"
+
+codex_helper="$HOME/.codex/skills/hostinger-vps-ssh/scripts/ssh-hermes-vps"
+workspace_helper="$repo_root/tools/hostinger-vps-ssh/scripts/ssh-hermes-vps"
+
+if [ -x "$codex_helper" ]; then
+  exec "$codex_helper" "$@"
+fi
+
+if [ -x "$workspace_helper" ]; then
+  exec "$workspace_helper" "$@"
+fi
+
+cat >&2 <<EOF
+No Chowmes SSH helper found.
+
+Expected one of:
+- $codex_helper
+- $workspace_helper
+EOF
+exit 1

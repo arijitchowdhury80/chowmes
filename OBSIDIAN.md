@@ -1,6 +1,21 @@
 # Obsidian Access Policy
 
-Chowmes should treat Obsidian as a curated knowledge base, not as unrestricted personal-data access.
+Chowmes should treat Obsidian as Arijit's central source of truth for work knowledge, projects, decisions, raw captures, synthesized notes, and operating memory.
+
+## Current Approved Vault
+
+As of June 16, 2026, Arijit has approved connecting the local Obsidian vault for Chowmes/Athena work.
+
+```text
+Mac vault container: /Users/arijitchowdhury/Dropbox/AI-Development/Personal/Obsidian-Vault
+Mac active vault root: /Users/arijitchowdhury/Dropbox/AI-Development/Personal/Obsidian-Vault/MyOS
+Hermes VPS mirror: /opt/data/knowledge/obsidian/MyOS
+Default Hermes write inbox: /opt/data/knowledge/obsidian/MyOS/Chowmes-Inbox
+```
+
+The active vault root is `MyOS` because it contains `.obsidian/`.
+
+The VPS mirror is not Obsidian Sync itself. It is a filesystem mirror used by live Hermes. Use `scripts/sync-obsidian-to-hermes` to push the local vault mirror to Hermes and `scripts/sync-obsidian-inbox-from-hermes` to pull Hermes-generated inbox notes back to the Mac vault.
 
 ## Recommended Vault Shape
 
@@ -18,7 +33,7 @@ Chowmes-Knowledge/
   Meeting-Notes/
 ```
 
-Do not connect the full personal vault by default.
+Do not expand beyond the `MyOS` vault root without a separate approval.
 
 ## Safe To Include
 
@@ -44,28 +59,28 @@ Do not connect the full personal vault by default.
 
 ## Preferred Sync Pattern
 
-Start with one-way sync of a curated folder to the VPS:
+Current sync path:
 
 ```text
-Mac curated vault subset -> VPS /opt/data/knowledge/obsidian
+Mac MyOS vault -> VPS /opt/data/knowledge/obsidian/MyOS
+VPS /opt/data/knowledge/obsidian/MyOS/Chowmes-Inbox -> Mac MyOS/Chowmes-Inbox
 ```
 
-Use Git or rsync. Avoid mounting broad cloud-drive folders directly on the VPS unless there is a specific reason.
+Use the checked-in sync scripts. Avoid mounting broad cloud-drive folders directly on the VPS unless there is a specific reason.
 
 ## Access Rules
 
-- Read-only by default.
-- Write access only to a dedicated inbox or generated-notes folder.
+- Read and search the vault when it is relevant to work.
+- Write generated notes to `Chowmes-Inbox/` by default unless Arijit names a specific project, decision, research, or knowledge note.
 - No secrets in synced notes.
-- No automatic ingestion of the full vault.
 - Summaries and extracted memory must be reviewed before being added to `MEMORY.md`.
 
 ## Future Integration Options
 
-Good first step:
+Good next step:
 
-- Sync curated markdown files to `/opt/data/knowledge/obsidian`.
-- Let Chowmes read/search them during deep work only.
+- Migrate `/opt/data/workspace/Knowledge` into the Obsidian vault structure.
+- Add scheduled or explicit sync cadence once the inbox workflow proves safe.
 
 Later options:
 

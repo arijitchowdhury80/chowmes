@@ -1,0 +1,53 @@
+#!/bin/sh
+set -eu
+
+script_dir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+ssh_helper="$script_dir/chowmes-ssh-helper"
+
+"$ssh_helper" "sudo docker exec -i hermes sh -s" <<'REMOTE'
+set -eu
+setuidgid="$(command -v s6-setuidgid 2>/dev/null || true)"
+if [ -z "$setuidgid" ]; then
+  setuidgid="/package/admin/s6-2.15.0.0/command/s6-setuidgid"
+fi
+
+echo "== gateway =="
+"$setuidgid" hermes /opt/hermes/.venv/bin/hermes gateway status
+
+echo "== telegram session context =="
+"$setuidgid" hermes python3 - <<'PY'
+import json
+from pathlib import Path
+
+path = Path("/opt/data/sessions/sessions.json")
+if not path.exists():
+    print("sessions_json=missing")
+    raise SystemExit
+
+data = json.loads(path.read_text())
+for key, value in data.items():
+    if "telegram:dm" not in key:
+        continue
+    redacted = key.rsplit(":", 1)[0] + ":<redacted>"
+    print(f"session_key={redacted}")
+    print(f"session_id={value.get('session_id')}")
+    print(f"last_prompt_tokens={value.get('last_prompt_tokens')}")
+    print(f"created_at={value.get('created_at')}")
+    print(f"is_fresh_reset={value.get('is_fresh_reset')}")
+    tokens = value.get("last_prompt_tokens") or 0
+    if tokens >= 100000:
+        print("context_status=oversized")
+        print("recommended_action=ask approval, then run ./scripts/chow-fresh-telegram-session")
+    elif tokens >= 70000:
+        print("context_status=watch")
+        print("recommended_action=avoid deep tool work in this Telegram thread")
+    else:
+        print("context_status=normal")
+PY
+
+echo "== recent gateway symptoms =="
+tail -n 160 /opt/data/logs/gateways/default/current 2>/dev/null \
+  | grep -E "Iteration budget|maximum iterations|Interrupted during API call|PermissionError" \
+  | tail -n 30 \
+  || true
+REMOTE

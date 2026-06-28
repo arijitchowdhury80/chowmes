@@ -1,0 +1,4 @@
+interface:
+  display_name: "Hostinger VPS SSH"
+  short_description: "Connect to the Hermes Hostinger VPS safely"
+  default_prompt: "Use $hostinger-vps-ssh to connect to my Hermes Hostinger VPS and inspect its status."

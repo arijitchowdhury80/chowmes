@@ -1,0 +1,52 @@
+#!/bin/sh
+set -eu
+
+vault_root="${OBSIDIAN_VAULT_ROOT:-/Users/arijitchowdhury/Dropbox/AI-Development/Personal/Obsidian-Vault/MyOS}"
+env_file="${HERMES_ENV_FILE:-/Users/arijitchowdhury/Dropbox/AI-Development/Personal/ChowMes/.env.local}"
+script_dir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+ssh_helper="$script_dir/chowmes-ssh-helper"
+project_rel="Projects/Competitive Intelligence"
+project_root="$vault_root/$project_rel"
+
+if [ ! -d "$project_root" ]; then
+  echo "project not found: $project_root" >&2
+  exit 1
+fi
+
+tmp="${TMPDIR:-/tmp}/chowmes-ci-project.$$ .tar.gz"
+tmp="$(printf '%s' "$tmp" | tr ' ' '-')"
+cleanup() {
+  rm -f "$tmp"
+}
+trap cleanup EXIT INT TERM
+
+COPYFILE_DISABLE=1 tar --no-xattrs \
+  --exclude ".DS_Store" \
+  --exclude "*/.DS_Store" \
+  -czf "$tmp" \
+  -C "$vault_root/Projects" "Competitive Intelligence"
+
+"$ssh_helper" --env "$env_file" "sudo docker exec -i hermes sh -c '
+set -eu
+target=\"/opt/data/knowledge/obsidian/MyOS/Projects/Competitive Intelligence\"
+runtime=\"\$target/artifacts/competitive-research\"
+preserve=\"/tmp/chowmes-ci-runtime-preserve.\$\$\"
+rm -rf \"\$preserve\"
+mkdir -p \"\$preserve\"
+if [ -d \"\$runtime\" ]; then
+  cp -R \"\$runtime\" \"\$preserve/competitive-research\"
+fi
+mkdir -p \"/opt/data/knowledge/obsidian/MyOS/Projects\"
+rm -rf \"\$target\"
+tar -xzf - -C \"/opt/data/knowledge/obsidian/MyOS/Projects\"
+new_runtime=\"\$target/artifacts/competitive-research\"
+if [ -d \"\$preserve/competitive-research\" ]; then
+  mkdir -p \"\$target/artifacts\"
+  rm -rf \"\$new_runtime\"
+  cp -R \"\$preserve/competitive-research\" \"\$new_runtime\"
+fi
+rm -rf \"\$preserve\"
+chown -R hermes:hermes \"\$target\"
+'" < "$tmp"
+
+echo "synced_ci_project_to_hermes=/opt/data/knowledge/obsidian/MyOS/Projects/Competitive Intelligence"

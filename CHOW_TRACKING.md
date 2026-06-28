@@ -1,24 +1,27 @@
 # Chow Tracking
 
-Last updated: 2026-06-16
+Last updated: 2026-06-26
 
 This file is the persistent operational dashboard for Chowmes.
 
 ## Current State
 
 - Runtime: Hostinger VPS, Hermes in Docker container `hermes`
+- Running containers: `hermes`, `caddy`, `scout`, `temporal`, `temporal-ui`, `temporal-db`, `ac2-lab-backend`
 - Telegram: configured and running
 - Default model provider: OpenRouter
 - Default model: `deepseek/deepseek-v4-pro`
-- Context length override: `65536`
-- Direct Google routing: not active because no `GOOGLE_API_KEY` or `GEMINI_API_KEY` is present on the VPS
+- Context length override: `131072` live as of 2026-06-26
+- Direct Google routing: key is present, but active runtime provider remains OpenRouter
 - Deep work / judgment model: `anthropic/claude-sonnet-4.6`
 - Boardroom review model: `anthropic/claude-opus-4.8`
 - GPT second-opinion model: `openai/gpt-5.5`
-- Telegram mode: fast mode
+- Telegram mode: operator mode
 - Local Ollama/Gemma: disabled
 - Media tools: FFmpeg installed on VPS host and Hermes container; yt-dlp installed in Hermes container
 - Local wiki: `/opt/data/workspace/Knowledge`
+- Active gateways: Athena/default and Vulcan. Arjuna, Kubera, and Prometheus exist as profiles but are on demand unless started.
+- Competitive Intelligence: weekly renderer fixed; daily baseline filtering fixed; `ci.sqlite` and `raw/` are preserved by sync guards.
 
 ## Security Audit
 
@@ -29,20 +32,26 @@ Sanitized key check:
 - `TELEGRAM_BOT_TOKEN`: set
 - `OPENROUTER_API_KEY`: set
 - `GOOGLE_API_KEY`: not set
-- `GEMINI_API_KEY`: not set
+- `GEMINI_API_KEY`: set
 - `/opt/data/workspace/.env.local`: missing
 
 Listening ports:
 
 - `127.0.0.1:9119`: Hermes dashboard, localhost-only
+- `127.0.0.1:7233`: Temporal, localhost-only
+- `127.0.0.1:8088`: Temporal UI, localhost-only
+- `127.0.0.1:8421`: Scout, localhost-only
+- `127.0.0.1:8787`: AC2 lab backend, localhost-only
 - `0.0.0.0:22` and `[::]:22`: SSH
+- `*:80`: Caddy HTTP
+- `*:443`: Caddy HTTPS/QUIC
 - local DNS resolver ports on `127.0.0.53` and `127.0.0.54`
 
 Firewall:
 
 - UFW active
 - Default incoming policy: deny
-- Public allowed port: `22/tcp` only
+- Public allowed ports: `22/tcp`, `80/tcp`, `443/tcp`
 
 SSH:
 
@@ -81,7 +90,7 @@ model:
   provider: openrouter
   default: deepseek/deepseek-v4-pro
   api_mode: chat_completions
-  context_length: 65536
+  context_length: 131072
 
 compression:
   enabled: true
@@ -103,34 +112,34 @@ security:
 Notes:
 
 - Hermes represents built-in memory with `memory.provider: ""`, not `built-in`.
-- Direct Google routing was not activated because no direct Gemini API key exists on the VPS.
-- The requested `32768` context value was attempted, but Hermes rejected it because Hermes Agent requires at least `64000`. The live config uses `65536`.
+- Direct Google routing is not active because the live provider is still OpenRouter, not because the key is missing.
+- The requested `32768` context value was attempted, but Hermes rejected it because Hermes Agent requires at least `64000`. That was a minimum-context lesson from the earlier Gemini setup. A previous target used `1048576`; the verified live DeepSeek V4 Pro config now uses `131072`.
 - Dashboard remains localhost-only with empty `dashboard.public_url`.
 - Model stack policy: DeepSeek handles volume, frontier models handle authority.
 - Configured aliases: `/model fast`, `/model workhorse`, `/model coding`, `/model kimi-code`, `/model judge`, `/model boardroom`, `/model gpt-review`, `/model vision`.
 
-## Telegram Fast Mode
+## Telegram Operator Mode
 
 Enabled Telegram tools:
 
 - web
+- terminal
+- file
 - vision
 - skills
 - todo
 - memory
 - clarify
+- cronjob
 
 Disabled Telegram tools:
 
 - browser
-- terminal
-- file
 - code execution
 - image generation
 - text-to-speech
 - session search
 - delegation
-- cron jobs
 - messaging
 - computer use
 
@@ -189,16 +198,35 @@ Hermes video skill research:
 - Optional video skills available in the Hermes image include `creative/hyperframes` and `creative/kanban-video-orchestrator`.
 - For practical video editing, use FFmpeg directly for quick operations; use `hyperframes` for HTML/CSS/JS motion graphics; use `kanban-video-orchestrator` for larger multi-step video production.
 
+## Visual Explainer Skill
+
+Installed on 2026-06-16:
+
+- Codex skill: `~/.codex/skills/sketch-explainer`
+- Claude skill: `~/.claude/skills/sketch-explainer`
+- Hermes skill: `/opt/data/skills/sketch-explainer`
+
+Purpose:
+
+- Convert concepts, systems, and business ideas into whiteboard-style visual explainer prompts.
+- Choose a diagram format from layered stack, flowchart, linear steps, wheel, grid, or concept map.
+- Optionally generate an image when a supported image-generation tool or `GEMINI_API_KEY` is available.
+
+Install hygiene:
+
+- `scripts/.env`, `.DS_Store`, eval files, and AppleDouble files were excluded from installed copies.
+- Kimi/Claude/Codex/Hermes should treat image generation as optional. The core reliable output is the structured breakdown plus reusable image prompt.
+
 ## Next Decisions
 
-1. Add a direct `GEMINI_API_KEY` or `GOOGLE_API_KEY` if direct Google routing is still desired.
-2. After a direct key is added, switch fast mode to:
+1. Decide whether direct Google routing should be activated now that `GEMINI_API_KEY` is present, or keep it as a fallback while OpenRouter remains primary.
+2. If direct Google routing is activated, switch the fast lane deliberately to:
 
 ```yaml
 model:
   provider: google
   default: gemini-2.5-flash
-  context_length: 65536
+  context_length: 131072
 ```
 
 3. Keep OpenRouter available for Claude/Sonnet deep work.
