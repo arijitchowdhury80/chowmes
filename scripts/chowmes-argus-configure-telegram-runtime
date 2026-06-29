@@ -1,0 +1,134 @@
+#!/bin/sh
+set -eu
+
+payload=""
+execute=0
+force=0
+profile_dir="${ARGUS_PROFILE_DIR:-/opt/data/profiles/argus}"
+env_file="${ARGUS_ENV_FILE:-$profile_dir/.env}"
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --payload)
+      shift
+      if [ "$#" -eq 0 ]; then
+        echo "--payload requires a path" >&2
+        exit 2
+      fi
+      payload="$1"
+      ;;
+    --execute)
+      execute=1
+      ;;
+    --force)
+      force=1
+      ;;
+    -h|--help)
+      cat <<'EOF'
+Usage: chowmes-argus-configure-telegram-runtime --payload /tmp/env [--execute] [--force]
+
+Container-native installer for dedicated Argus Telegram profile keys.
+Dry-run by default. Never prints secret values.
+EOF
+      exit 0
+      ;;
+    *)
+      echo "unknown argument: $1" >&2
+      exit 2
+      ;;
+  esac
+  shift
+done
+
+if [ -z "$payload" ] || [ ! -f "$payload" ]; then
+  echo "argus_telegram_config_ready=no"
+  echo "argus_telegram_config_blocker=payload file is missing"
+  exit 2
+fi
+
+if [ ! -d "$profile_dir" ]; then
+  echo "argus_telegram_config_ready=no"
+  echo "argus_telegram_config_blocker=Argus profile directory is missing"
+  exit 2
+fi
+
+read_key() {
+  key="$1"
+  awk -F= -v target="$key" '
+    $1 == target {
+      value=$0
+      sub(/^[^=]*=/, "", value)
+      print value
+      found=1
+    }
+    END { exit found ? 0 : 1 }
+  ' "$payload" 2>/dev/null || true
+}
+
+existing_token() {
+  [ -f "$env_file" ] || return 1
+  awk -F= '
+    /^[A-Za-z_][A-Za-z0-9_]*=/ {
+      if ($1 ~ /^(TELEGRAM_BOT_TOKEN|ARGUS_BOT_TOKEN|ARGUS_TELEGRAM_BOT_TOKEN)$/ && length($2) > 0) {
+        found=1
+      }
+    }
+    END { exit found ? 0 : 1 }
+  ' "$env_file"
+}
+
+token="$(read_key TELEGRAM_BOT_TOKEN)"
+home="$(read_key TELEGRAM_HOME_CHANNEL)"
+allowed="$(read_key TELEGRAM_ALLOWED_USERS)"
+
+echo "== argus-telegram-config-preflight =="
+echo "argus_profile=present"
+echo "payload_token=$([ -n "$token" ] && echo present || echo missing)"
+echo "payload_home_channel=$([ -n "$home" ] && echo present || echo missing)"
+echo "payload_allowed_users=$([ -n "$allowed" ] && echo present || echo missing)"
+
+if [ -z "$token" ]; then
+  echo "argus_telegram_config_ready=no"
+  echo "argus_telegram_config_blocker=ARGUS_TELEGRAM_BOT_TOKEN or equivalent local key is missing"
+  exit 2
+fi
+
+if existing_token && [ "$force" != "1" ]; then
+  echo "argus_telegram_config_ready=no"
+  echo "argus_telegram_config_blocker=Argus profile already has a Telegram token; rerun with --force to replace"
+  exit 2
+fi
+
+echo "argus_telegram_config_ready=yes"
+
+if [ "$execute" != "1" ]; then
+  echo "argus_telegram_config_mode=dry-run"
+  echo "would_write_argus_env=yes"
+  echo "would_restart_gateway=no"
+  echo "would_migrate_cron=no"
+  exit 0
+fi
+
+tmp="$env_file.tmp.$$"
+mkdir -p "$profile_dir"
+touch "$env_file"
+awk -F= '
+  /^[A-Za-z_][A-Za-z0-9_]*=/ {
+    if ($1 ~ /^(TELEGRAM_BOT_TOKEN|ARGUS_BOT_TOKEN|ARGUS_TELEGRAM_BOT_TOKEN|TELEGRAM_HOME_CHANNEL|TELEGRAM_ALLOWED_USERS)$/) {
+      next
+    }
+  }
+  { print }
+' "$env_file" > "$tmp"
+
+{
+  printf 'TELEGRAM_BOT_TOKEN=%s\n' "$token"
+  [ -n "$home" ] && printf 'TELEGRAM_HOME_CHANNEL=%s\n' "$home"
+  [ -n "$allowed" ] && printf 'TELEGRAM_ALLOWED_USERS=%s\n' "$allowed"
+} >> "$tmp"
+
+mv "$tmp" "$env_file"
+chmod 600 "$env_file"
+echo "argus_telegram_config_mode=execute"
+echo "argus_env_updated=yes"
+echo "next_step=run scripts/chowmes-argus-activate --execute --to telegram[:chat_id]"

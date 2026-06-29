@@ -1,0 +1,125 @@
+#!/bin/sh
+set -eu
+
+script_dir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+ssh_helper="$script_dir/chowmes-ssh-helper"
+runtime="$script_dir/chowmes-argus-configure-telegram-runtime"
+env_file=".env.local"
+execute=0
+force=0
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --env-file)
+      shift
+      if [ "$#" -eq 0 ]; then
+        echo "--env-file requires a path" >&2
+        exit 2
+      fi
+      env_file="$1"
+      ;;
+    --execute)
+      execute=1
+      ;;
+    --force)
+      force=1
+      ;;
+    -h|--help)
+      cat <<'EOF'
+Usage: scripts/chowmes-argus-configure-telegram [--env-file .env.local] [--execute] [--force]
+
+Safely installs only the dedicated Argus Telegram keys into the Argus Hermes
+profile on Chowmes. Secrets are copied over SSH stdin and are never printed.
+
+Expected local keys:
+- ARGUS_TELEGRAM_BOT_TOKEN or ARGUS_BOT_TOKEN or TELEGRAM_BOT_TOKEN_ARGUS
+- ARGUS_TELEGRAM_HOME_CHANNEL or TELEGRAM_HOME_CHANNEL_ARGUS (optional)
+- ARGUS_TELEGRAM_ALLOWED_USERS or TELEGRAM_ALLOWED_USERS_ARGUS (optional)
+
+Default mode is dry-run. Use --execute to write /opt/data/profiles/argus/.env.
+Use --force only to intentionally replace an existing Argus token.
+EOF
+      exit 0
+      ;;
+    *)
+      echo "unknown argument: $1" >&2
+      exit 2
+      ;;
+  esac
+  shift
+done
+
+if [ ! -f "$runtime" ]; then
+  echo "missing runtime script: $runtime" >&2
+  exit 1
+fi
+
+if [ ! -f "$env_file" ]; then
+  echo "env_file_missing=$env_file" >&2
+  exit 2
+fi
+
+payload="$(mktemp)"
+trap 'rm -f "$payload"' EXIT INT TERM
+
+python3 - "$env_file" "$payload" <<'PY'
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+source = Path(sys.argv[1])
+dest = Path(sys.argv[2])
+
+raw = {}
+for line in source.read_text().splitlines():
+    stripped = line.strip()
+    if not stripped or stripped.startswith("#") or "=" not in stripped:
+        continue
+    key, value = stripped.split("=", 1)
+    key = key.strip()
+    value = value.strip().strip('"').strip("'")
+    raw[key] = value
+
+token = (
+    raw.get("ARGUS_TELEGRAM_BOT_TOKEN")
+    or raw.get("ARGUS_BOT_TOKEN")
+    or raw.get("TELEGRAM_BOT_TOKEN_ARGUS")
+    or ""
+)
+home = raw.get("ARGUS_TELEGRAM_HOME_CHANNEL") or raw.get("TELEGRAM_HOME_CHANNEL_ARGUS") or ""
+allowed = raw.get("ARGUS_TELEGRAM_ALLOWED_USERS") or raw.get("TELEGRAM_ALLOWED_USERS_ARGUS") or home
+
+lines = []
+if token:
+    lines.append(f"TELEGRAM_BOT_TOKEN={token}")
+if home:
+    lines.append(f"TELEGRAM_HOME_CHANNEL={home}")
+if allowed:
+    lines.append(f"TELEGRAM_ALLOWED_USERS={allowed}")
+
+dest.write_text("\n".join(lines) + ("\n" if lines else ""))
+PY
+
+(
+  cd "$script_dir"
+  COPYFILE_DISABLE=1 tar --no-xattrs -cf - chowmes-argus-configure-telegram-runtime
+) |
+  "$ssh_helper" "sudo docker exec -i hermes /bin/sh -lc 'tar --no-xattrs -xf - -C /opt/data/scripts && rm -f /opt/data/scripts/._chowmes-argus-configure-telegram-runtime && chown hermes:hermes /opt/data/scripts/chowmes-argus-configure-telegram-runtime && chmod 755 /opt/data/scripts/chowmes-argus-configure-telegram-runtime'"
+
+remote_payload="/tmp/argus-telegram.env.$$"
+COPYFILE_DISABLE=1 tar --no-xattrs -C "$(dirname "$payload")" -cf - "$(basename "$payload")" |
+  "$ssh_helper" "sudo docker exec -i hermes /bin/sh -lc 'set -eu; umask 077; tar --no-xattrs -xf - -C /tmp; mv /tmp/$(basename "$payload") $remote_payload; chown hermes:hermes $remote_payload; chmod 600 $remote_payload'"
+
+execute_arg=""
+force_arg=""
+[ "$execute" = "1" ] && execute_arg="--execute"
+[ "$force" = "1" ] && force_arg="--force"
+
+set +e
+"$ssh_helper" "sudo docker exec -i -u hermes -e HOME=/opt/data hermes /opt/data/scripts/chowmes-argus-configure-telegram-runtime --payload $remote_payload $execute_arg $force_arg"
+status="$?"
+set -e
+
+"$ssh_helper" "sudo docker exec -i hermes /bin/sh -lc 'rm -f $remote_payload'"
+exit "$status"

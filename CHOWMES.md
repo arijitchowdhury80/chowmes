@@ -228,16 +228,19 @@ argus_activation_blocker=dedicated Argus Telegram bot token/channel is not confi
 Activation sequence after Arijit provides the token/channel:
 
 1. Add the dedicated Argus Telegram token to `/opt/data/profiles/argus/.env`; do not reuse the Athena/Chowmes token.
-2. Run `scripts/chowmes-argus-activate` without `--execute` to dry-run the preflight.
-3. Run `scripts/chowmes-argus-activate --execute --to telegram[:chat_id]` to start the Argus gateway and send a smoke test.
-4. Run `scripts/chowmes-argus-migrate-ci-cron` without `--execute` to dry-run the CI cron migration preflight.
-5. Run `scripts/chowmes-argus-migrate-ci-cron --execute` only after Argus gateway delivery has been smoke-tested.
-6. Keep the existing default no-agent CI cron active until Argus scheduled delivery is proven.
-7. Pause or remove the default CI delivery only after Argus delivery is verified and documented.
+2. Preferred safe installer after the local token is added to `.env.local`: `scripts/chowmes-argus-configure-telegram --env-file .env.local`, then `scripts/chowmes-argus-configure-telegram --env-file .env.local --execute`.
+3. Run `scripts/chowmes-argus-activate` without `--execute` to dry-run the preflight.
+4. Run `scripts/chowmes-argus-activate --execute --to telegram[:chat_id]` to start the Argus gateway and send a smoke test.
+5. Run `scripts/chowmes-argus-migrate-ci-cron` without `--execute` to dry-run the CI cron migration preflight.
+6. Run `scripts/chowmes-argus-migrate-ci-cron --execute` only after Argus gateway delivery has been smoke-tested.
+7. Keep the existing default no-agent CI cron active until Argus scheduled delivery is proven.
+8. Pause or remove the default CI delivery only after Argus delivery is verified and documented.
 
 Do not claim CI has dedicated-bot delivery until `scripts/chowmes-argus-status` reports Argus activation readiness and a live Telegram smoke test has passed.
 
 `scripts/chowmes-argus-activate` intentionally exits with code `2` when the dedicated token is missing. That is a safe blocker, not a runtime failure.
+
+`scripts/chowmes-argus-configure-telegram` installs only Argus Telegram keys from a local env file and never prints secret values. Expected local keys are `ARGUS_TELEGRAM_BOT_TOKEN` or `ARGUS_BOT_TOKEN` or `TELEGRAM_BOT_TOKEN_ARGUS`; optional channel keys are `ARGUS_TELEGRAM_HOME_CHANNEL` and `ARGUS_TELEGRAM_ALLOWED_USERS`. It refuses to overwrite an existing Argus token unless `--force` is supplied.
 
 `scripts/chowmes-argus-migrate-ci-cron` intentionally exits with code `2` when the dedicated token is missing or the Argus gateway is not running. That helper copies the daily/weekly CI wrappers into `/opt/data/profiles/argus/scripts/` and creates Argus-profile cron jobs named `argus-competitive-research-daily` and `argus-competitive-research-weekly` only with explicit `--execute`. It never pauses the current default CI cron jobs.
 
@@ -285,6 +288,13 @@ Verification:
 - Gateway restarted successfully; `scripts/chowmes-health-check --repair --send-test` passed and delivered the Telegram test.
 - `scripts/chowmes-athena-gateway-voice-guard --check` verifies the hotfix is present after Hermes updates or container rebuilds.
 - `scripts/chowmes-athena-gateway-voice-guard --apply --restart-gateway` reapplies the guard and restarts the default gateway if the guard is missing.
+
+Voice refactor update:
+
+- `SOUL.md` now has a Living Voice Kernel that forces Athena to read the moment before answering: comfort, truth, decision, action, or proof.
+- The source prompt now explicitly separates casual human replies, serious decision replies, and operational failure replies.
+- Operational failures must state blocker, effect, and next move, and duplicate failure messages are explicitly forbidden.
+- This prompt-level refactor complements the gateway hotfix. The gateway guard catches tiny greetings and provider failures before a model call; `SOUL.md` governs normal Athena responses after the model is reached.
 
 Live gateway hotfix backups:
 
