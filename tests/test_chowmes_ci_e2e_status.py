@@ -85,6 +85,7 @@ class CiE2eStatusRuntimeTests(unittest.TestCase):
                         "ci_run_self_check.py",
                         "ci_run_review.py",
                         "publish-dashboard.py",
+                        "temporary default Chowmes Telegram gateway",
                     ]
                 )
                 + "\n"
@@ -170,6 +171,8 @@ class CiE2eStatusRuntimeTests(unittest.TestCase):
             result = self.run_runtime(env)
         self.assertEqual(result.returncode, 0, result.stdout)
         self.assertIn("ci_current_pipeline_mechanically_healthy=yes", result.stdout)
+        self.assertIn("default_daily_delivery_identity_notice=present", result.stdout)
+        self.assertIn("default_weekly_delivery_identity_notice=present", result.stdout)
         self.assertIn("argus_profile_contract_ready=yes", result.stdout)
         self.assertIn("ci_skill_argus_contract_ready=yes", result.stdout)
         self.assertIn("ci_synthesis_identity_ready=yes", result.stdout)
