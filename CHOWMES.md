@@ -283,6 +283,8 @@ Verification:
 - Live helper check returned `Hey. I am here.` for `whats up`.
 - Live provider-credit helper check returned the new provider-agnostic message.
 - Gateway restarted successfully; `scripts/chowmes-health-check --repair --send-test` passed and delivered the Telegram test.
+- `scripts/chowmes-athena-gateway-voice-guard --check` verifies the hotfix is present after Hermes updates or container rebuilds.
+- `scripts/chowmes-athena-gateway-voice-guard --apply --restart-gateway` reapplies the guard and restarts the default gateway if the guard is missing.
 
 Live gateway hotfix backups:
 
