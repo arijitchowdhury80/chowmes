@@ -251,18 +251,43 @@ Current verified state:
 - Both wrappers run post-run self-check after Markdown, HTML, ledger, and dashboard publish steps.
 - Live daily self-check for `2026-06-29` passed against Markdown, HTML, `ci.sqlite`, dashboard publish log, and weak-language gate.
 - Live weekly self-check for `2026-06-29` passed against Markdown, HTML, `ci.sqlite`, dashboard publish log, and weak-language gate.
+- Argus post-run review is wired after the self-check. It writes `run-reviews/YYYY-MM-DD-{cadence}.json`, Markdown, and `run-reviews/argus-learning-log.md`.
+- The first live Argus review found a quiet-day `missing_links` quality warning; the CI quality gate was patched so full-coverage quiet days are not falsely penalized while material reports still require links. The rerun produced daily quality score `1.00`, self-check `pass`, and Argus review `healthy`.
 - Dashboard publishing is wired through the CI app repository publisher.
 - Forced Hermes cron runs on June 29, 2026 verified the scheduler path:
   - Daily last run: `2026-06-29T06:52:45.692560-04:00 ok`.
   - Weekly last run: `2026-06-29T06:53:16.805569-04:00 ok`.
 - A dashboard publish warning appeared after the forced runs because the VPS app repo was `ahead 2, behind 1` from GitHub `main`; the repo was rebased and pushed, then dashboard publish and both self-checks returned to `pass`.
 - The dedicated Argus CI bot is not yet end-to-end because the Argus Telegram token/channel is not configured.
+- `scripts/chowmes-argus-status` is a Mac-side operator helper. Run it from this repository, not from inside `/opt/data/scripts` on the container.
 
 Interpretation:
 
 - The current CI pipeline is mechanically healthy through the existing default no-agent Telegram delivery path.
 - The intended architecture is not complete until Argus owns CI delivery in its own Telegram channel.
 - Athena remains supervisor/CEO. She should not be described as the final daily CI operator once Argus is activated.
+
+### Athena live voice status - June 29, 2026
+
+Confirmed root cause of the robotic provider-failure messages: the model-provider error copy was hardcoded in `/opt/hermes/gateway/run.py`, so those Telegram bubbles bypassed `SOUL.md` entirely.
+
+Live hotfix applied:
+
+- Provider/auth/rate-limit/credit failures now use Athena-style operational language with `blocked by`, `effect`, and `next move`, without raw provider details or emoji.
+- Greeting-only Telegram messages now use a narrow deterministic Athena guard instead of spending a model call and drifting into canned phrases such as "what's on your mind?"
+- The guard only catches exact low-context greetings such as `hi`, `hello`, and `whats up`; substantive messages like `whats up with CI` still go to the agent.
+
+Verification:
+
+- Gateway source compiled with `/opt/hermes/.venv/bin/python -m py_compile /opt/hermes/gateway/run.py`.
+- Live helper check returned `Hey. I am here.` for `whats up`.
+- Live provider-credit helper check returned the new provider-agnostic message.
+- Gateway restarted successfully; `scripts/chowmes-health-check --repair --send-test` passed and delivered the Telegram test.
+
+Live gateway hotfix backups:
+
+- `/opt/hermes/gateway/run.py.bak.athena-provider-voice-`
+- `/opt/hermes/gateway/run.py.bak.athena-casual-guard-20260629074019`
 
 New canonical My OS files:
 
