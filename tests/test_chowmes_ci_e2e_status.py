@@ -12,13 +12,51 @@ RUNTIME = REPO_ROOT / "scripts" / "chowmes-ci-e2e-status-runtime"
 
 
 class CiE2eStatusRuntimeTests(unittest.TestCase):
-    def make_fixture(self, *, token=False, gateway="stopped", argus_crons=False):
+    def make_fixture(self, *, token=False, gateway="stopped", argus_crons=False, valid_profile=True, valid_skill=True):
         temp = tempfile.TemporaryDirectory()
         root = Path(temp.name)
         profile = root / "profiles" / "argus"
         profile.mkdir(parents=True)
-        (profile / "SOUL.md").write_text("# Argus\n")
+        if valid_profile:
+            (profile / "SOUL.md").write_text(
+                "\n".join(
+                    [
+                        "# Argus Soul",
+                        "You are Argus, Arijit's dedicated competitive intelligence agent.",
+                        "You are male.",
+                        "You are not Athena.",
+                        "## Competitive Intelligence Doctrine",
+                        "## Algolia CI Wedge",
+                        "No evidence, no claim.",
+                        "## Current Activation State",
+                    ]
+                )
+                + "\n"
+            )
+        else:
+            (profile / "SOUL.md").write_text("# Argus\n")
         (profile / ".env").write_text("TELEGRAM_BOT_TOKEN=test\n" if token else "GEMINI_API_KEY=test\n")
+
+        skill = root / "skill"
+        skill.mkdir()
+        (skill / "SKILL.md").write_text(
+            (
+                "\n".join(
+                    [
+                        "# Competitive Research",
+                        "Operational owner: Argus",
+                        "Athena supervises quality and escalation",
+                        "ci_run_self_check.py",
+                        "ci_run_review.py",
+                        "## Argus CI Agent Mandate",
+                        "Current live cron mode remains `no-agent` until Arijit provides the dedicated Argus Telegram bot token",
+                    ]
+                )
+                + "\n"
+            )
+            if valid_skill
+            else "# Competitive Research\n"
+        )
 
         scripts = root / "scripts"
         scripts.mkdir()
@@ -93,6 +131,7 @@ class CiE2eStatusRuntimeTests(unittest.TestCase):
                 "ARGUS_PROFILE_DIR": str(profile),
                 "GLOBAL_SCRIPT_DIR": str(scripts),
                 "CI_ARTIFACT_ROOT": str(root / "artifacts"),
+                "CI_SKILL_ROOT": str(skill),
                 "HERMES_BIN": str(hermes),
                 "PYTHON_BIN": "python3",
             }
@@ -114,8 +153,34 @@ class CiE2eStatusRuntimeTests(unittest.TestCase):
             result = self.run_runtime(env)
         self.assertEqual(result.returncode, 0, result.stdout)
         self.assertIn("ci_current_pipeline_mechanically_healthy=yes", result.stdout)
+        self.assertIn("argus_profile_contract_ready=yes", result.stdout)
+        self.assertIn("ci_skill_argus_contract_ready=yes", result.stdout)
         self.assertIn("ci_target_argus_e2e_ready=no", result.stdout)
         self.assertIn("ci_target_argus_e2e_blocker=dedicated Argus Telegram bot token/channel is not configured", result.stdout)
+
+    def test_blocks_target_when_argus_profile_contract_is_incomplete(self):
+        temp, env = self.make_fixture(token=True, gateway="running", argus_crons=True, valid_profile=False)
+        with temp:
+            result = self.run_runtime(env)
+        self.assertEqual(result.returncode, 0, result.stdout)
+        self.assertIn("argus_profile_contract_ready=no", result.stdout)
+        self.assertIn("ci_target_argus_e2e_ready=no", result.stdout)
+        self.assertIn(
+            "ci_target_argus_e2e_blocker=Argus SOUL.md is missing required CI identity/persona contract markers",
+            result.stdout,
+        )
+
+    def test_blocks_target_when_skill_contract_is_incomplete(self):
+        temp, env = self.make_fixture(token=True, gateway="running", argus_crons=True, valid_skill=False)
+        with temp:
+            result = self.run_runtime(env)
+        self.assertEqual(result.returncode, 0, result.stdout)
+        self.assertIn("ci_skill_argus_contract_ready=no", result.stdout)
+        self.assertIn("ci_target_argus_e2e_ready=no", result.stdout)
+        self.assertIn(
+            "ci_target_argus_e2e_blocker=competitive-research skill is missing required Argus ownership/self-review contract markers",
+            result.stdout,
+        )
 
     def test_require_argus_e2e_fails_when_target_path_not_ready(self):
         temp, env = self.make_fixture(token=False)
@@ -137,6 +202,8 @@ class CiE2eStatusRuntimeTests(unittest.TestCase):
             result = self.run_runtime(env)
         self.assertEqual(result.returncode, 0, result.stdout)
         self.assertIn("ci_current_pipeline_mechanically_healthy=yes", result.stdout)
+        self.assertIn("argus_profile_contract_ready=yes", result.stdout)
+        self.assertIn("ci_skill_argus_contract_ready=yes", result.stdout)
         self.assertIn("argus_telegram_token_key=present", result.stdout)
         self.assertIn("argus_gateway=running", result.stdout)
         self.assertIn("argus_daily_cron=present", result.stdout)

@@ -99,6 +99,12 @@ wrapper_has() {
   [ -f "$wrapper" ] && grep -Fq "$needle" "$wrapper"
 }
 
+file_has() {
+  file="$1"
+  needle="$2"
+  [ -f "$file" ] && grep -Fq "$needle" "$file"
+}
+
 audit_status() {
   cadence="$1"
   dir="$artifact_root/run-audits"
@@ -186,6 +192,57 @@ else
   status_line argus_soul missing
 fi
 
+argus_profile_contract_ready=yes
+argus_profile_contract_missing=""
+for marker in \
+  "You are Argus" \
+  "You are male" \
+  "You are not Athena" \
+  "Competitive Intelligence Doctrine" \
+  "Algolia CI Wedge" \
+  "No evidence, no claim" \
+  "Current Activation State"
+do
+  if ! file_has "$profile_dir/SOUL.md" "$marker"; then
+    argus_profile_contract_ready=no
+    if [ -z "$argus_profile_contract_missing" ]; then
+      argus_profile_contract_missing="$marker"
+    else
+      argus_profile_contract_missing="$argus_profile_contract_missing,$marker"
+    fi
+  fi
+done
+status_line argus_profile_contract_ready "$argus_profile_contract_ready"
+if [ "$argus_profile_contract_ready" != "yes" ]; then
+  status_line argus_profile_contract_missing "$argus_profile_contract_missing"
+fi
+
+ci_skill_argus_contract_ready=yes
+ci_skill_argus_contract_missing=""
+skill_file="$skill_root/SKILL.md"
+for marker in \
+  "Operational owner: Argus" \
+  "Athena supervises quality and escalation" \
+  "ci_run_self_check.py" \
+  "ci_run_review.py" \
+  "Argus CI Agent Mandate" \
+  "Current live cron mode remains" \
+  "dedicated Argus Telegram bot token"
+do
+  if ! file_has "$skill_file" "$marker"; then
+    ci_skill_argus_contract_ready=no
+    if [ -z "$ci_skill_argus_contract_missing" ]; then
+      ci_skill_argus_contract_missing="$marker"
+    else
+      ci_skill_argus_contract_missing="$ci_skill_argus_contract_missing,$marker"
+    fi
+  fi
+done
+status_line ci_skill_argus_contract_ready "$ci_skill_argus_contract_ready"
+if [ "$ci_skill_argus_contract_ready" != "yes" ]; then
+  status_line ci_skill_argus_contract_missing "$ci_skill_argus_contract_missing"
+fi
+
 if [ -f "$profile_dir/.env" ]; then
   status_line argus_env present
 else
@@ -221,6 +278,12 @@ if [ ! -d "$profile_dir" ]; then
 elif [ ! -f "$profile_dir/SOUL.md" ]; then
   target_ok=no
   blocker="Argus SOUL.md is missing"
+elif [ "$argus_profile_contract_ready" != "yes" ]; then
+  target_ok=no
+  blocker="Argus SOUL.md is missing required CI identity/persona contract markers"
+elif [ "$ci_skill_argus_contract_ready" != "yes" ]; then
+  target_ok=no
+  blocker="competitive-research skill is missing required Argus ownership/self-review contract markers"
 elif ! contains_token_key "$profile_dir/.env"; then
   target_ok=no
   blocker="dedicated Argus Telegram bot token/channel is not configured"

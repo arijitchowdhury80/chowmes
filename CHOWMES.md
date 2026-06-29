@@ -263,7 +263,7 @@ Current verified state:
 - A dashboard publish warning appeared after the forced runs because the VPS app repo was `ahead 2, behind 1` from GitHub `main`; the repo was rebased and pushed, then dashboard publish and both self-checks returned to `pass`.
 - The dedicated Argus CI bot is not yet end-to-end because the Argus Telegram token/channel is not configured.
 - `scripts/chowmes-argus-status` is a Mac-side operator helper. Run it from this repository, not from inside `/opt/data/scripts` on the container.
-- `scripts/chowmes-ci-e2e-status` is the canonical current-vs-target health helper. It reports current default CI delivery health, daily/weekly wrapper wiring, latest daily/weekly audit status, target Argus E2E readiness, and the exact blocker when Argus delivery is not ready.
+- `scripts/chowmes-ci-e2e-status` is the canonical current-vs-target health helper. It reports current default CI delivery health, daily/weekly wrapper wiring, latest daily/weekly audit status, Argus profile/persona contract readiness, CI skill Argus ownership/self-review contract readiness, target Argus E2E readiness, and the exact blocker when Argus delivery is not ready.
 - Use `scripts/chowmes-ci-e2e-status --require-argus-e2e` in activation gates. It intentionally exits `2` until the dedicated Argus bot token, Argus gateway, and Argus daily/weekly cron jobs are all present.
 
 Fresh manual wrapper verification on June 29, 2026:
@@ -273,6 +273,7 @@ Fresh manual wrapper verification on June 29, 2026:
 - Daily self-check was rerun and passed. Argus daily post-run review was rerun and reported `healthy`.
 - Weekly wrapper executed manually on the VPS and passed self-check and Argus post-run review.
 - `scripts/chowmes-ci-e2e-status` reported `ci_current_pipeline_mechanically_healthy=yes`.
+- The same helper reported `argus_profile_contract_ready=yes` and `ci_skill_argus_contract_ready=yes`, proving Argus has the dedicated CI identity/persona contract and the competitive-research skill has the Argus ownership/self-review contract.
 - The same helper reported `ci_target_argus_e2e_ready=no` with blocker `dedicated Argus Telegram bot token/channel is not configured`.
 
 Interpretation:
