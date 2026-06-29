@@ -429,6 +429,32 @@ Verify in Telegram:
 who are you and what do you know about me
 ```
 
+## Provider credit incident response
+
+Known failure pattern from June 28, 2026:
+
+- OpenRouter credits were exhausted. The credit API reported `total_credits=35`, `total_usage=35.258734652`, leaving roughly `-$0.2587`.
+- Athena/default Telegram, Vulcan, and CI synthesis all depended on OpenRouter, so a provider-credit failure affected multiple agents.
+- The gateway originally replied with a generic provider failure. The live gateway was patched so HTTP 402 / insufficient-credit failures return a credit-specific Telegram message.
+- CI cron jobs originally caught Hermes synthesis failures, fell back to local synthesis, returned success, and could publish weak fallback artifacts. Production daily/weekly wrappers now run a provider preflight and pass `--fail-on-synthesis-error`.
+- The daily Chowmes provider credit watch cron runs at `08:45 America/New_York`, before the 09:00 CI jobs, and delivers a Telegram alert if credits are below the configured floor.
+
+Current protective checks:
+
+- CI production preflight: `/opt/data/knowledge/obsidian/MyOS/Projects/Competitive Intelligence/skills/competitive-research/scripts/ci-provider-preflight.py`
+- Daily wrapper: `/opt/data/scripts/competitive-research-daily.sh`
+- Weekly wrapper: `/opt/data/scripts/competitive-research-weekly.sh`
+- Chowmes credit watch: `/opt/data/scripts/chowmes-provider-credit-watch`
+- Hermes cron job: `chowmes-provider-credit-watch`, schedule `45 8 * * *`, delivery `telegram`
+
+Recovery loop:
+
+1. Check provider credits before debugging agent identity, prompts, or CI quality.
+2. If credits are below floor, add credits or switch provider/model before the next scheduled run.
+3. Run the CI daily or weekly wrapper manually and expect exit `0`; exit `75` means the job intentionally failed closed.
+4. Run `scripts/chowmes-health-check --repair --send-test`.
+5. Confirm `hermes cron list` shows CI jobs and credit watch with truthful status.
+
 ## Dashboard access
 
 From this Hermes directory on the Mac:

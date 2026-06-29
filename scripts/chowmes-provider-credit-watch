@@ -1,0 +1,63 @@
+#!/bin/sh
+set -eu
+
+env_file="${HERMES_ENV_FILE:-/Users/arijitchowdhury/Dropbox/AI-Development/Personal/ChowMes/.env.local}"
+
+if [ -f /opt/data/.env ]; then
+  set -a
+  # shellcheck disable=SC1091
+  . /opt/data/.env
+  set +a
+else
+  ssh_helper="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)/chowmes-ssh-helper"
+  exec "$ssh_helper" --env "$env_file" "sudo docker exec -i hermes /opt/data/scripts/chowmes-provider-credit-watch"
+fi
+
+python3 - <<'PY'
+import json
+import os
+import sys
+import urllib.request
+from decimal import Decimal, InvalidOperation
+
+
+def money(value):
+    try:
+        return Decimal(str(value))
+    except (InvalidOperation, ValueError):
+        return Decimal("0")
+
+
+api_key = os.environ.get("OPENROUTER_API_KEY", "").strip()
+if not api_key:
+    print("Chowmes provider credit watch failed: OPENROUTER_API_KEY is missing.")
+    raise SystemExit(75)
+
+floor = money(os.environ.get("CHOWMES_OPENROUTER_CREDIT_FLOOR", "5.00"))
+request = urllib.request.Request(
+    "https://openrouter.ai/api/v1/credits",
+    headers={"Authorization": "Bearer " + api_key},
+)
+
+try:
+    with urllib.request.urlopen(request, timeout=15) as response:
+        payload = json.loads(response.read().decode("utf-8"))
+except Exception as exc:
+    print("Chowmes provider credit watch failed.")
+    print(f"Reason: {type(exc).__name__}: {str(exc)[:240]}")
+    raise SystemExit(75)
+
+data = payload.get("data") or payload
+total = money(data.get("total_credits"))
+used = money(data.get("total_usage"))
+remaining = total - used
+
+if remaining < floor:
+    print("Chowmes provider credit alert")
+    print(f"OpenRouter remaining=${remaining:.4f}; floor=${floor:.4f}.")
+    print("Effect: Athena, Vulcan, CI synthesis, and other OpenRouter-backed agents may fail.")
+    print("Action: add OpenRouter credits or switch provider/model before the next scheduled run.")
+    raise SystemExit(75)
+
+# Keep success silent so scheduled checks do not spam Telegram.
+PY
