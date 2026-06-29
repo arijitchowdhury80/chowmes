@@ -90,6 +90,9 @@ echo "payload_allowed_users=$([ -n "$allowed" ] && echo present || echo missing)
 if [ -z "$token" ]; then
   echo "argus_telegram_config_ready=no"
   echo "argus_telegram_config_blocker=ARGUS_TELEGRAM_BOT_TOKEN or equivalent local key is missing"
+  echo "expected_local_token_keys=ARGUS_TELEGRAM_BOT_TOKEN|ARGUS_BOT_TOKEN|TELEGRAM_BOT_TOKEN_ARGUS"
+  echo "optional_local_channel_keys=ARGUS_TELEGRAM_HOME_CHANNEL|TELEGRAM_HOME_CHANNEL_ARGUS"
+  echo "optional_local_allowed_user_keys=ARGUS_TELEGRAM_ALLOWED_USERS|TELEGRAM_ALLOWED_USERS_ARGUS"
   exit 2
 fi
 

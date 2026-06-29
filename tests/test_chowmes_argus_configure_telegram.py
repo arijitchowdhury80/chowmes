@@ -44,6 +44,9 @@ class ArgusTelegramConfigRuntimeTests(unittest.TestCase):
         self.assertEqual(result.returncode, 2)
         self.assertIn("payload_token=missing", result.stdout)
         self.assertIn("ARGUS_TELEGRAM_BOT_TOKEN or equivalent local key is missing", result.stdout)
+        self.assertIn("expected_local_token_keys=ARGUS_TELEGRAM_BOT_TOKEN|ARGUS_BOT_TOKEN|TELEGRAM_BOT_TOKEN_ARGUS", result.stdout)
+        self.assertIn("optional_local_channel_keys=ARGUS_TELEGRAM_HOME_CHANNEL|TELEGRAM_HOME_CHANNEL_ARGUS", result.stdout)
+        self.assertIn("optional_local_allowed_user_keys=ARGUS_TELEGRAM_ALLOWED_USERS|TELEGRAM_ALLOWED_USERS_ARGUS", result.stdout)
 
     def test_dry_run_reports_without_mutating_env(self):
         temp, _root, env, payload, env_file = self.make_fixture(
