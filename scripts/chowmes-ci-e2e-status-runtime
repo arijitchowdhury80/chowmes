@@ -182,7 +182,7 @@ for cadence in daily weekly; do
     wrapper_has "$wrapper" "ci_run_self_check.py" && status_line "default_${cadence}_self_check" present || status_line "default_${cadence}_self_check" missing
     wrapper_has "$wrapper" "ci_run_review.py" && status_line "default_${cadence}_post_review" present || status_line "default_${cadence}_post_review" missing
     wrapper_has "$wrapper" "publish-dashboard.py" && status_line "default_${cadence}_dashboard_publish" present || status_line "default_${cadence}_dashboard_publish" missing
-    wrapper_has "$wrapper" "temporary default Chowmes Telegram gateway" && status_line "default_${cadence}_delivery_identity_notice" present || status_line "default_${cadence}_delivery_identity_notice" missing
+    wrapper_has "$wrapper" "dedicated Argus Telegram gateway" && status_line "default_${cadence}_delivery_identity_notice" present || status_line "default_${cadence}_delivery_identity_notice" missing
   else
     status_line "default_${cadence}_wrapper" missing
   fi
@@ -197,11 +197,11 @@ cron_has_job default "$weekly_job" || current_ok=no
 wrapper_has "$daily_wrapper" "ci-provider-preflight.py" || current_ok=no
 wrapper_has "$daily_wrapper" "ci_run_self_check.py" || current_ok=no
 wrapper_has "$daily_wrapper" "ci_run_review.py" || current_ok=no
-wrapper_has "$daily_wrapper" "temporary default Chowmes Telegram gateway" || current_ok=no
+wrapper_has "$daily_wrapper" "dedicated Argus Telegram gateway" || current_ok=no
 wrapper_has "$weekly_wrapper" "ci-provider-preflight.py" || current_ok=no
 wrapper_has "$weekly_wrapper" "ci_run_self_check.py" || current_ok=no
 wrapper_has "$weekly_wrapper" "ci_run_review.py" || current_ok=no
-wrapper_has "$weekly_wrapper" "temporary default Chowmes Telegram gateway" || current_ok=no
+wrapper_has "$weekly_wrapper" "dedicated Argus Telegram gateway" || current_ok=no
 status_line ci_current_pipeline_mechanically_healthy "$current_ok"
 
 echo "== target-argus-ci-delivery =="
@@ -252,8 +252,8 @@ for marker in \
   "ci_run_self_check.py" \
   "ci_run_review.py" \
   "Argus CI Agent Mandate" \
-  "Current live cron mode remains" \
-  "dedicated Argus Telegram bot token"
+  "Current live delivery mode is Argus-owned Telegram delivery" \
+  "old default daily/weekly CI cron jobs are paused"
 do
   if ! file_has "$skill_file" "$marker"; then
     ci_skill_argus_contract_ready=no

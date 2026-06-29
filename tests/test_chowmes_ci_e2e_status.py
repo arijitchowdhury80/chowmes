@@ -59,7 +59,8 @@ class CiE2eStatusRuntimeTests(unittest.TestCase):
                         "ci_run_self_check.py",
                         "ci_run_review.py",
                         "## Argus CI Agent Mandate",
-                        "Current live cron mode remains `no-agent` until Arijit provides the dedicated Argus Telegram bot token",
+                        "Current live delivery mode is Argus-owned Telegram delivery through the `argus` Hermes profile",
+                        "The old default daily/weekly CI cron jobs are paused, not deleted.",
                     ]
                 )
                 + "\n"
@@ -86,7 +87,7 @@ class CiE2eStatusRuntimeTests(unittest.TestCase):
                         "ci_run_self_check.py",
                         "ci_run_review.py",
                         "publish-dashboard.py",
-                        "temporary default Chowmes Telegram gateway",
+                        "dedicated Argus Telegram gateway",
                     ]
                 )
                 + "\n"
