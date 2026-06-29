@@ -1,0 +1,44 @@
+#!/bin/sh
+set -eu
+
+script_dir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+ssh_helper="$script_dir/chowmes-ssh-helper"
+runtime="$script_dir/chowmes-ci-e2e-status-runtime"
+
+require_argus=0
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --require-argus-e2e)
+      require_argus=1
+      ;;
+    -h|--help)
+      cat <<'EOF'
+Usage: scripts/chowmes-ci-e2e-status [--require-argus-e2e]
+
+Reports the current Competitive Intelligence delivery health and the target
+Argus-owned end-to-end readiness. Default mode exits 0 even when Argus is not
+ready so the report can be used diagnostically. Use --require-argus-e2e when
+the caller wants a failing exit code until the dedicated Argus bot path is live.
+EOF
+      exit 0
+      ;;
+    *)
+      echo "unknown argument: $1" >&2
+      exit 2
+      ;;
+  esac
+  shift
+done
+
+if [ ! -f "$runtime" ]; then
+  echo "runtime helper missing: $runtime" >&2
+  exit 2
+fi
+
+(
+  cd "$script_dir"
+  COPYFILE_DISABLE=1 tar --no-xattrs -cf - chowmes-ci-e2e-status-runtime
+) | "$ssh_helper" "sudo docker exec -i hermes /bin/sh -lc 'tar --no-xattrs -xf - -C /opt/data/scripts && rm -f /opt/data/scripts/._chowmes-ci-e2e-status-runtime && chown hermes:hermes /opt/data/scripts/chowmes-ci-e2e-status-runtime && chmod 755 /opt/data/scripts/chowmes-ci-e2e-status-runtime'"
+
+"$ssh_helper" "sudo docker exec -i -u hermes -e HOME=/opt/data -e REQUIRE_ARGUS_E2E='$require_argus' hermes /opt/data/scripts/chowmes-ci-e2e-status-runtime"

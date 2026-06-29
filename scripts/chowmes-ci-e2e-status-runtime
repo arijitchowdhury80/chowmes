@@ -1,0 +1,245 @@
+#!/bin/sh
+set -eu
+
+require_argus="${REQUIRE_ARGUS_E2E:-0}"
+
+profile_dir="${ARGUS_PROFILE_DIR:-/opt/data/profiles/argus}"
+global_script_dir="${GLOBAL_SCRIPT_DIR:-/opt/data/scripts}"
+ci_root="${CI_WORKSPACE_ROOT:-/opt/data/knowledge/obsidian/MyOS/Projects/Competitive Intelligence}"
+skill_root="${CI_SKILL_ROOT:-$ci_root/skills/competitive-research}"
+artifact_root="${CI_ARTIFACT_ROOT:-$ci_root/artifacts/competitive-research}"
+hermes_bin="${HERMES_BIN:-/opt/hermes/.venv/bin/hermes}"
+python_bin="${PYTHON_BIN:-/opt/hermes/.venv/bin/python}"
+
+status_line() {
+  printf '%s=%s\n' "$1" "$2"
+}
+
+contains_token_key() {
+  file="$1"
+  if [ ! -f "$file" ]; then
+    return 1
+  fi
+  awk -F= '
+    /^[A-Za-z_][A-Za-z0-9_]*=/ {
+      key=$1
+      if (key ~ /^(TELEGRAM_BOT_TOKEN|ARGUS_BOT_TOKEN|ARGUS_TELEGRAM_BOT_TOKEN)$/) {
+        found=1
+      }
+    }
+    END { exit found ? 0 : 1 }
+  ' "$file"
+}
+
+gateway_state() {
+  output="$("$hermes_bin" -p argus gateway status 2>/dev/null || true)"
+  normalized="$(printf '%s\n' "$output" | tr '[:upper:]' '[:lower:]')"
+  if printf '%s\n' "$normalized" | grep -q "not running"; then
+    echo "stopped"
+    return
+  fi
+  if printf '%s\n' "$normalized" | grep -q "stopped"; then
+    echo "stopped"
+    return
+  fi
+  if printf '%s\n' "$normalized" | grep -q "running"; then
+    echo "running"
+    return
+  fi
+  echo "unknown"
+}
+
+cron_text() {
+  profile="$1"
+  if [ "$profile" = "argus" ]; then
+    "$hermes_bin" -p argus cron list 2>/dev/null || true
+  else
+    "$hermes_bin" cron list 2>/dev/null || true
+  fi
+}
+
+cron_has_job() {
+  profile="$1"
+  job="$2"
+  cron_text "$profile" | grep -Fq "Name:      $job"
+}
+
+cron_field_for_job() {
+  profile="$1"
+  job="$2"
+  field="$3"
+  cron_text "$profile" | awk -v job="$job" -v field="$field" '
+    $1 == "Name:" && $2 == job { inside = 1; next }
+    inside && $1 == "Name:" { inside = 0 }
+    inside && $1 == field ":" {
+      sub("^[[:space:]]*" field ":[[:space:]]*", "")
+      print
+      exit
+    }
+  '
+}
+
+cron_last_run_for_job() {
+  profile="$1"
+  job="$2"
+  cron_text "$profile" | awk -v job="$job" '
+    $1 == "Name:" && $2 == job { inside = 1; next }
+    inside && $1 == "Name:" { inside = 0 }
+    inside && $1 == "Last" && $2 == "run:" {
+      sub("^[[:space:]]*Last run:[[:space:]]*", "")
+      print
+      exit
+    }
+  '
+}
+
+wrapper_has() {
+  wrapper="$1"
+  needle="$2"
+  [ -f "$wrapper" ] && grep -Fq "$needle" "$wrapper"
+}
+
+audit_status() {
+  cadence="$1"
+  dir="$artifact_root/run-audits"
+  latest="$(ls -1 "$dir"/*-"$cadence".json 2>/dev/null | sort | tail -1 || true)"
+  if [ -z "$latest" ]; then
+    status_line "latest_${cadence}_audit" missing
+    status_line "latest_${cadence}_audit_status" missing
+    return
+  fi
+  status_line "latest_${cadence}_audit" "$latest"
+  "$python_bin" - "$latest" "$cadence" <<'PY' 2>/dev/null || {
+import json
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+cadence = sys.argv[2]
+data = json.loads(path.read_text())
+print(f"latest_{cadence}_audit_status={data.get('status', 'unknown')}")
+print(f"latest_{cadence}_audit_date={data.get('date', 'unknown')}")
+PY
+    status_line "latest_${cadence}_audit_status" unreadable
+  }
+}
+
+echo "== current-default-ci-delivery =="
+daily_job="competitive-research-daily"
+weekly_job="competitive-research-weekly"
+daily_wrapper="$global_script_dir/competitive-research-daily.sh"
+weekly_wrapper="$global_script_dir/competitive-research-weekly.sh"
+
+if cron_has_job default "$daily_job"; then
+  status_line default_daily_cron present
+  status_line default_daily_schedule "$(cron_field_for_job default "$daily_job" Schedule || true)"
+  status_line default_daily_last_run "$(cron_last_run_for_job default "$daily_job" || true)"
+else
+  status_line default_daily_cron missing
+fi
+
+if cron_has_job default "$weekly_job"; then
+  status_line default_weekly_cron present
+  status_line default_weekly_schedule "$(cron_field_for_job default "$weekly_job" Schedule || true)"
+  status_line default_weekly_last_run "$(cron_last_run_for_job default "$weekly_job" || true)"
+else
+  status_line default_weekly_cron missing
+fi
+
+for cadence in daily weekly; do
+  wrapper="$global_script_dir/competitive-research-$cadence.sh"
+  if [ -f "$wrapper" ]; then
+    status_line "default_${cadence}_wrapper" present
+    wrapper_has "$wrapper" "ci-provider-preflight.py" && status_line "default_${cadence}_provider_preflight" present || status_line "default_${cadence}_provider_preflight" missing
+    wrapper_has "$wrapper" "ci_run_self_check.py" && status_line "default_${cadence}_self_check" present || status_line "default_${cadence}_self_check" missing
+    wrapper_has "$wrapper" "ci_run_review.py" && status_line "default_${cadence}_post_review" present || status_line "default_${cadence}_post_review" missing
+    wrapper_has "$wrapper" "publish-dashboard.py" && status_line "default_${cadence}_dashboard_publish" present || status_line "default_${cadence}_dashboard_publish" missing
+  else
+    status_line "default_${cadence}_wrapper" missing
+  fi
+done
+
+audit_status daily
+audit_status weekly
+
+current_ok=yes
+cron_has_job default "$daily_job" || current_ok=no
+cron_has_job default "$weekly_job" || current_ok=no
+wrapper_has "$daily_wrapper" "ci-provider-preflight.py" || current_ok=no
+wrapper_has "$daily_wrapper" "ci_run_self_check.py" || current_ok=no
+wrapper_has "$daily_wrapper" "ci_run_review.py" || current_ok=no
+wrapper_has "$weekly_wrapper" "ci-provider-preflight.py" || current_ok=no
+wrapper_has "$weekly_wrapper" "ci_run_self_check.py" || current_ok=no
+wrapper_has "$weekly_wrapper" "ci_run_review.py" || current_ok=no
+status_line ci_current_pipeline_mechanically_healthy "$current_ok"
+
+echo "== target-argus-ci-delivery =="
+if [ -d "$profile_dir" ]; then
+  status_line argus_profile present
+else
+  status_line argus_profile missing
+fi
+
+if [ -f "$profile_dir/SOUL.md" ]; then
+  status_line argus_soul present
+else
+  status_line argus_soul missing
+fi
+
+if [ -f "$profile_dir/.env" ]; then
+  status_line argus_env present
+else
+  status_line argus_env missing
+fi
+
+if contains_token_key "$profile_dir/.env"; then
+  status_line argus_telegram_token_key present
+else
+  status_line argus_telegram_token_key missing
+fi
+
+argus_gateway="$(gateway_state)"
+status_line argus_gateway "$argus_gateway"
+
+if cron_has_job argus "argus-competitive-research-daily"; then
+  status_line argus_daily_cron present
+else
+  status_line argus_daily_cron missing
+fi
+
+if cron_has_job argus "argus-competitive-research-weekly"; then
+  status_line argus_weekly_cron present
+else
+  status_line argus_weekly_cron missing
+fi
+
+target_ok=yes
+blocker=""
+if [ ! -d "$profile_dir" ]; then
+  target_ok=no
+  blocker="Argus profile directory is missing"
+elif [ ! -f "$profile_dir/SOUL.md" ]; then
+  target_ok=no
+  blocker="Argus SOUL.md is missing"
+elif ! contains_token_key "$profile_dir/.env"; then
+  target_ok=no
+  blocker="dedicated Argus Telegram bot token/channel is not configured"
+elif [ "$argus_gateway" != "running" ]; then
+  target_ok=no
+  blocker="Argus gateway is not running"
+elif ! cron_has_job argus "argus-competitive-research-daily"; then
+  target_ok=no
+  blocker="Argus daily CI cron is missing"
+elif ! cron_has_job argus "argus-competitive-research-weekly"; then
+  target_ok=no
+  blocker="Argus weekly CI cron is missing"
+fi
+
+status_line ci_target_argus_e2e_ready "$target_ok"
+if [ "$target_ok" != "yes" ]; then
+  status_line ci_target_argus_e2e_blocker "$blocker"
+fi
+
+if [ "$require_argus" = "1" ] && [ "$target_ok" != "yes" ]; then
+  exit 2
+fi
