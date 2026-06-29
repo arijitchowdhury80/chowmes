@@ -497,6 +497,14 @@ After changing `SOUL.md`, `USER.md`, `MEMORY.md`, model routing, or Telegram con
 
 This removes AC's Telegram DM session pointer, deletes the stale Hermes session when present, and restarts the gateway. The next Telegram message creates a fresh session that snapshots the current `SOUL.md`, `/root/.hermes/memories/USER.md`, `/root/.hermes/memories/MEMORY.md`, and workspace `AGENTS.md`.
 
+For Argus, use the dedicated profile reset instead:
+
+```sh
+./scripts/chow-fresh-argus-telegram-session
+```
+
+This targets `/opt/data/profiles/argus`, clears only Argus Telegram DM session pointers, preserves Argus Telegram owner approval, and restarts only the Argus gateway. Use it after changing Argus `SOUL.md`, Argus profile memory, CI skill behavior that affects prompt identity, or Argus Telegram context. Do not use Athena's reset script and assume it refreshed Argus.
+
 If Telegram still answers with the old identity, do not re-check only `SOUL.md` and call it fixed. Check the active routing pointer and stale session:
 
 ```sh

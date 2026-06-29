@@ -2,15 +2,60 @@
 set -eu
 
 env_file="${HERMES_ENV_FILE:-.env.local}"
+diagnose=0
+wait_seconds=0
 
-if [ "${1:-}" = "--env" ]; then
-  if [ $# -lt 2 ]; then
-    echo "usage: ssh-hermes-vps [--env PATH] [remote-command]" >&2
-    exit 2
-  fi
-  env_file="$2"
-  shift 2
-fi
+usage() {
+  cat >&2 <<'EOF'
+usage: ssh-hermes-vps [--env PATH] [--diagnose] [--wait SECONDS] [remote-command]
+
+Options:
+  --env PATH       Read SSH_HOST, SSH_USER, SSH_KEY, SSH_PORT, SSH_PASS from PATH.
+  --diagnose      Check local config and TCP reachability without starting SSH auth.
+  --wait SECONDS  Wait for the SSH TCP port to open before running the command.
+EOF
+}
+
+while [ $# -gt 0 ]; do
+  case "${1:-}" in
+    --env)
+      if [ $# -lt 2 ]; then
+        usage
+        exit 2
+      fi
+      env_file="$2"
+      shift 2
+      ;;
+    --diagnose)
+      diagnose=1
+      shift
+      ;;
+    --wait)
+      if [ $# -lt 2 ]; then
+        usage
+        exit 2
+      fi
+      wait_seconds="$2"
+      shift 2
+      ;;
+    --help|-h)
+      usage
+      exit 0
+      ;;
+    --)
+      shift
+      break
+      ;;
+    -*)
+      echo "ssh-hermes-vps: unknown option: $1" >&2
+      usage
+      exit 2
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
 
 if [ ! -f "$env_file" ]; then
   echo "ssh-hermes-vps: env file not found: $env_file" >&2
@@ -25,6 +70,7 @@ esac
 host="$(awk '/^SSH_HOST=/{print substr($0,10); exit}' "$env_file")"
 user="$(awk '/^SSH_USER=/{print substr($0,10); exit}' "$env_file")"
 key="$(awk '/^SSH_KEY=/{print substr($0,9); exit}' "$env_file")"
+port="$(awk '/^SSH_PORT=/{print substr($0,10); exit}' "$env_file")"
 has_pass="$(awk '/^SSH_PASS=/{if (length(substr($0,10)) > 0) print "yes"; exit}' "$env_file")"
 
 if [ -z "$host" ]; then
@@ -41,10 +87,32 @@ if [ -z "$user" ]; then
   user="chowmesadmin"
 fi
 
+if [ -z "$port" ]; then
+  port="22"
+fi
+
+case "$port" in
+  *[!0-9]*|"")
+    echo "ssh-hermes-vps: SSH_PORT must be numeric when set" >&2
+    exit 1
+    ;;
+esac
+
+case "$wait_seconds" in
+  *[!0-9]*|"")
+    echo "ssh-hermes-vps: --wait must be numeric seconds" >&2
+    exit 2
+    ;;
+esac
+
 if [ -n "$key" ]; then
   case "$key" in
     "~/"*) key="$HOME/${key#~/}" ;;
   esac
+  if [ ! -f "$key" ]; then
+    echo "ssh-hermes-vps: SSH_KEY path does not exist: $key" >&2
+    exit 1
+  fi
 fi
 
 case "$host" in
@@ -52,9 +120,45 @@ case "$host" in
   *) target="$user@$host" ;;
 esac
 
+host_only="$host"
+case "$host_only" in
+  *@*) host_only="${host_only#*@}" ;;
+esac
+
+tcp_status() {
+  if command -v python3 >/dev/null 2>&1; then
+    python3 - "$host_only" "$port" <<'PY'
+import errno
+import socket
+import sys
+
+host = sys.argv[1]
+port = int(sys.argv[2])
+sock = socket.socket()
+sock.settimeout(5)
+try:
+    rc = sock.connect_ex((host, port))
+finally:
+    sock.close()
+label = errno.errorcode.get(rc, str(rc))
+if rc == 0:
+    status = "open"
+elif rc in {errno.ECONNREFUSED, 61}:
+    status = "refused-before-auth"
+elif rc in {errno.ETIMEDOUT, 60, 110, 35}:
+    status = "timeout"
+else:
+    status = f"connect_ex_{rc}"
+print(f"{status} {label}")
+PY
+    return 0
+  fi
+  echo "skipped-python3-missing UNKNOWN"
+}
+
 ssh_auth_opts=""
 if [ -n "$key" ]; then
-  ssh_auth_opts="-i $key -o BatchMode=yes"
+  ssh_auth_opts="-i $key -o BatchMode=yes -o IdentitiesOnly=yes"
 else
   askpass="$(mktemp /tmp/hermes_ssh_askpass.XXXXXX)"
   cleanup() {
@@ -75,11 +179,65 @@ EOF
   ssh_auth_opts="-o BatchMode=no -o PreferredAuthentications=password -o PubkeyAuthentication=no -o NumberOfPasswordPrompts=1"
 fi
 
-# shellcheck disable=SC2086
+if [ "$diagnose" = "1" ]; then
+  echo "ssh_diagnose_env_file=$env_file"
+  echo "ssh_diagnose_host_present=yes"
+  echo "ssh_diagnose_user=$user"
+  echo "ssh_diagnose_port=$port"
+  if [ -n "$key" ]; then
+    echo "ssh_diagnose_key_present=yes"
+    echo "ssh_diagnose_key_exists=yes"
+    if command -v stat >/dev/null 2>&1; then
+      mode="$(stat -f '%Lp' "$key" 2>/dev/null || stat -c '%a' "$key" 2>/dev/null || true)"
+      [ -n "$mode" ] && echo "ssh_diagnose_key_mode=$mode"
+    fi
+  else
+    echo "ssh_diagnose_key_present=no"
+    echo "ssh_diagnose_legacy_password_present=yes"
+  fi
+  tcp_probe="$(tcp_status)"
+  echo "ssh_diagnose_tcp_status=${tcp_probe%% *}"
+  echo "ssh_diagnose_tcp_errno=${tcp_probe#* }"
+  exit 0
+fi
 
+if [ "$wait_seconds" -gt 0 ]; then
+  deadline=$(( $(date +%s) + wait_seconds ))
+  while :; do
+    tcp_probe="$(tcp_status)"
+    if [ "${tcp_probe%% *}" = "open" ]; then
+      break
+    fi
+    now="$(date +%s)"
+    if [ "$now" -ge "$deadline" ]; then
+      echo "ssh-hermes-vps: SSH TCP port did not open before timeout (${tcp_probe%% *})" >&2
+      exit 255
+    fi
+    sleep 10
+  done
+fi
+
+# shellcheck disable=SC2086
+err_file="$(mktemp /tmp/hermes_ssh_error.XXXXXX)"
+cleanup_error() {
+  rm -f "$err_file"
+}
+trap cleanup_error EXIT INT TERM
+
+set +e
 ssh \
   $ssh_auth_opts \
+  -p "$port" \
   -o StrictHostKeyChecking=accept-new \
   -o UserKnownHostsFile=/tmp/hermes_vps_known_hosts \
   -o ConnectTimeout=10 \
-  "$target" "$@"
+  "$target" "$@" 2>"$err_file"
+rc=$?
+set -e
+if [ "$rc" -ne 0 ]; then
+  cat "$err_file" >&2
+  if grep -qi "Connection refused" "$err_file"; then
+    echo "ssh-hermes-vps: TCP connection was refused before SSH authentication. Host, user, and key were not tested by the server. Check sshd/firewall/fail2ban/provider console for $host:$port." >&2
+  fi
+  exit "$rc"
+fi

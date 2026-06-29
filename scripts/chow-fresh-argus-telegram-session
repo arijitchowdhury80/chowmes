@@ -1,0 +1,190 @@
+#!/bin/sh
+set -eu
+
+# Force Telegram to start a fresh Hermes session for Argus.
+# Run this after changing Argus SOUL.md, profile memory, model routing, skills,
+# or Telegram context. This intentionally targets only the argus profile.
+
+channel_id="${1:-6789423537}"
+script_dir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+ssh_helper="$script_dir/chowmes-ssh-helper"
+
+reset_argus_in_container() {
+  profile_dir="/opt/data/profiles/argus"
+  if [ ! -d "$profile_dir" ]; then
+    echo "argus_profile=missing"
+    exit 2
+  fi
+
+  chown -R hermes:hermes "$profile_dir"
+  chmod 700 "$profile_dir"
+  [ -f "$profile_dir/.env" ] && chmod 600 "$profile_dir/.env"
+  setuidgid="$(command -v s6-setuidgid 2>/dev/null || true)"
+  if [ -z "$setuidgid" ]; then
+    setuidgid="/package/admin/s6-2.15.0.0/command/s6-setuidgid"
+  fi
+
+  CHANNEL_ID="$channel_id" "$setuidgid" hermes python3 - <<'PY'
+import json
+import os
+import subprocess
+import time
+from pathlib import Path
+
+channel_id = os.environ.get("CHANNEL_ID", "")
+profile_dir = Path("/opt/data/profiles/argus")
+sessions_path = profile_dir / "sessions" / "sessions.json"
+sessions_path.parent.mkdir(parents=True, exist_ok=True)
+
+try:
+    data = json.loads(sessions_path.read_text())
+except FileNotFoundError:
+    data = {}
+except Exception:
+    data = {}
+
+removed = []
+for key, value in list(data.items()):
+    origin = value.get("origin") or {}
+    key_text = str(key)
+    is_target = (
+        value.get("platform") == "telegram"
+        and value.get("chat_type") == "dm"
+        and (
+            origin.get("chat_id") == channel_id
+            or origin.get("user_id") == channel_id
+            or key_text.endswith("telegram:dm:" + channel_id)
+            or key_text.endswith("argus:telegram:dm:" + channel_id)
+            or key_text.endswith("agent:argus:telegram:dm:" + channel_id)
+        )
+    )
+    if is_target:
+        session_id = value.get("session_id")
+        if session_id:
+            removed.append(session_id)
+        data.pop(key, None)
+
+sessions_path.write_text((json.dumps(data, indent=2) if data else "{}") + "\n")
+
+for session_id in removed:
+    subprocess.run(
+        ["/opt/hermes/.venv/bin/hermes", "-p", "argus", "sessions", "delete", session_id, "--yes"],
+        check=False,
+    )
+
+for base in [profile_dir / "pairing", profile_dir / "platforms" / "pairing"]:
+    base.mkdir(parents=True, exist_ok=True)
+    path = base / "telegram-approved.json"
+    try:
+        approved = json.loads(path.read_text()) if path.exists() else {}
+    except Exception:
+        approved = {}
+    approved[str(channel_id)] = {
+        "user_name": approved.get(str(channel_id), {}).get("user_name", "AC"),
+        "approved_at": approved.get(str(channel_id), {}).get("approved_at", time.time()),
+        "repair_note": "preserved_owner_approval_during_argus_fresh_session_reset",
+    }
+    path.write_text(json.dumps(approved, indent=2) + "\n")
+    os.chmod(path, 0o600)
+
+print("argus_cleared_sessions=" + ",".join(removed))
+PY
+  "$setuidgid" hermes /opt/hermes/.venv/bin/hermes -p argus gateway restart
+  "$setuidgid" hermes /opt/hermes/.venv/bin/hermes -p argus gateway status
+  chown -R hermes:hermes "$profile_dir"
+  cat "$profile_dir/sessions/sessions.json" 2>/dev/null || true
+}
+
+if [ -x /opt/hermes/.venv/bin/hermes ] && [ -d /opt/data/profiles/argus ]; then
+  reset_argus_in_container
+  exit 0
+fi
+
+"$ssh_helper" "CHANNEL_ID='$channel_id' sudo -E docker exec -i -e CHANNEL_ID='$channel_id' hermes sh -s" <<'REMOTE'
+channel_id="${CHANNEL_ID:-6789423537}"
+
+profile_dir="/opt/data/profiles/argus"
+if [ ! -d "$profile_dir" ]; then
+  echo "argus_profile=missing"
+  exit 2
+fi
+
+chown -R hermes:hermes "$profile_dir"
+chmod 700 "$profile_dir"
+[ -f "$profile_dir/.env" ] && chmod 600 "$profile_dir/.env"
+setuidgid="$(command -v s6-setuidgid 2>/dev/null || true)"
+if [ -z "$setuidgid" ]; then
+  setuidgid="/package/admin/s6-2.15.0.0/command/s6-setuidgid"
+fi
+
+CHANNEL_ID="$channel_id" "$setuidgid" hermes python3 - <<'PY'
+import json
+import os
+import subprocess
+import time
+from pathlib import Path
+
+channel_id = os.environ.get("CHANNEL_ID", "")
+profile_dir = Path("/opt/data/profiles/argus")
+sessions_path = profile_dir / "sessions" / "sessions.json"
+sessions_path.parent.mkdir(parents=True, exist_ok=True)
+
+try:
+    data = json.loads(sessions_path.read_text())
+except FileNotFoundError:
+    data = {}
+except Exception:
+    data = {}
+
+removed = []
+for key, value in list(data.items()):
+    origin = value.get("origin") or {}
+    key_text = str(key)
+    is_target = (
+        value.get("platform") == "telegram"
+        and value.get("chat_type") == "dm"
+        and (
+            origin.get("chat_id") == channel_id
+            or origin.get("user_id") == channel_id
+            or key_text.endswith("telegram:dm:" + channel_id)
+            or key_text.endswith("argus:telegram:dm:" + channel_id)
+            or key_text.endswith("agent:argus:telegram:dm:" + channel_id)
+        )
+    )
+    if is_target:
+        session_id = value.get("session_id")
+        if session_id:
+            removed.append(session_id)
+        data.pop(key, None)
+
+sessions_path.write_text((json.dumps(data, indent=2) if data else "{}") + "\n")
+
+for session_id in removed:
+    subprocess.run(
+        ["/opt/hermes/.venv/bin/hermes", "-p", "argus", "sessions", "delete", session_id, "--yes"],
+        check=False,
+    )
+
+for base in [profile_dir / "pairing", profile_dir / "platforms" / "pairing"]:
+    base.mkdir(parents=True, exist_ok=True)
+    path = base / "telegram-approved.json"
+    try:
+        approved = json.loads(path.read_text()) if path.exists() else {}
+    except Exception:
+        approved = {}
+    approved[str(channel_id)] = {
+        "user_name": approved.get(str(channel_id), {}).get("user_name", "AC"),
+        "approved_at": approved.get(str(channel_id), {}).get("approved_at", time.time()),
+        "repair_note": "preserved_owner_approval_during_argus_fresh_session_reset",
+    }
+    path.write_text(json.dumps(approved, indent=2) + "\n")
+    os.chmod(path, 0o600)
+
+print("argus_cleared_sessions=" + ",".join(removed))
+PY
+
+"$setuidgid" hermes /opt/hermes/.venv/bin/hermes -p argus gateway restart
+"$setuidgid" hermes /opt/hermes/.venv/bin/hermes -p argus gateway status
+chown -R hermes:hermes "$profile_dir"
+cat "$profile_dir/sessions/sessions.json" 2>/dev/null || true
+REMOTE

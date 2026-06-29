@@ -17,6 +17,7 @@ Expected env keys:
 SSH_HOST=72.61.72.147
 SSH_USER=chowmesadmin
 SSH_KEY=/Users/arijitchowdhury/.ssh/chowmes_ed25519
+SSH_PORT=22
 ```
 
 `SSH_PASS` is legacy-only. The server was hardened on June 15, 2026: root SSH login is disabled, SSH password login is disabled, and access should use `chowmesadmin` with the private key above. The active ChowMes workspace path is:
@@ -52,6 +53,16 @@ The helper reads `SSH_HOST`, optional `SSH_USER`, `SSH_KEY`, and legacy `SSH_PAS
 ```text
 read_passphrase: can't open /dev/tty: Operation not permitted
 ```
+
+The helper also supports optional `SSH_PORT`; it defaults to `22`.
+
+For safe connection diagnostics without printing secrets or attempting a login:
+
+```bash
+/Users/arijitchowdhury/Dropbox/AI-Development/Personal/ChowMes/scripts/chowmes-ssh-helper --diagnose
+```
+
+If diagnostics report `ssh_diagnose_tcp_status=refused-before-auth`, the failure happened before SSH authentication. Do not keep rotating users or keys in that state; check sshd, firewall, fail2ban, or Hostinger console/network controls for the configured host and port.
 
 ## Read-Only Audit
 
@@ -118,6 +129,9 @@ If SSH banner exchange, model pull, docker restart, or config verification excee
 
 ## Recent Failure Lessons
 
+- Use the bundled helper only. Do not probe `root`, `ubuntu`, `debian`, or other guessed users against this VPS; fail2ban is active and repeated wrong-user attempts can temporarily block the client before the correct key is tested.
+- If SSH fails, run the helper with `--diagnose` first. `refused-before-auth` means TCP/22 was refused before SSH credentials were exchanged, so the host/user/key are not proven wrong; wait/back off or use the provider console instead of retrying blindly.
+- The helper supports `SSH_PORT`, `--diagnose`, and `--wait SECONDS`; use `--wait` for bounded recovery from temporary firewall/fail2ban/provider restarts.
 - Do not keep retrying a local-Ollama setup if `ollama list` is empty or the server is not running; the user wants OpenRouter for now.
 - Do not run long `find` scans over Google Drive model folders; they can hang and add no value unless explicitly requested.
 - Do not launch or restart local Ollama from this skill without explicit user consent.
