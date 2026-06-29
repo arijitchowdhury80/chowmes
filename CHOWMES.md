@@ -12,7 +12,7 @@ Verified on June 29, 2026 from the Hostinger VPS.
 | Containers | `hermes`, `caddy`, `scout`, `temporal`, `temporal-ui`, `temporal-db`, `ac2-lab-backend` |
 | Public ports | `22/tcp`, `80/tcp`, `443/tcp` allowed by UFW |
 | Local-only ports | Hermes dashboard `127.0.0.1:9119`, Temporal `127.0.0.1:7233`, Temporal UI `127.0.0.1:8088`, Scout `127.0.0.1:8421`, AC2 lab backend `127.0.0.1:8787` |
-| Active provider/model | Direct Gemini API `gemini-2.5-flash` |
+| Active provider/model | Direct Gemini API `gemini-2.5-pro` |
 | Active context length | `131072` |
 | Active max turns | `6` |
 | Active web backend | `parallel` |
@@ -25,9 +25,10 @@ The older notes below are historical unless they match this verified snapshot. I
 
 Hermes now uses the direct Gemini API through `GEMINI_API_KEY`. OpenRouter remains configured as a historical/backup credential source, but it is not the active Chowmes route as of June 29, 2026. Local Ollama/Gemma on the Mac is disabled and should not be restarted unless explicitly requested.
 
-- Default Telegram/Hermes workhorse model: `gemini-2.5-flash`
+- Default Telegram/Hermes Athena model: `gemini-2.5-pro`
 - Provider: `gemini`
 - Context length override: `131072` live as of June 29, 2026
+- Routine workhorse / CI synthesis model: `gemini-2.5-flash`
 - Deep/delegated judgment model: `gemini-2.5-pro`
 - Low-end/fast lane provider: `algolia-inference` using `ALGOLIA_INFERENCE_BASE_URL`, `ALGOLIA_INFERENCE_API_KEY`, and `ALGOLIA_INFERENCE_MODEL` in `/opt/data/.env`
 - OpenRouter key location on host: `/root/.hermes/.env`
@@ -40,7 +41,7 @@ Note: `32768` was tested on June 16, 2026, but Hermes Agent rejected it because 
 Verified on June 29, 2026:
 
 ```text
-Model:    gemini-2.5-flash
+Model:    gemini-2.5-pro
 Provider: gemini
 Telegram: configured and gateway running
 ```
@@ -57,8 +58,8 @@ OpenRouter pricing checked on June 16, 2026:
 
 Current routing:
 
-- Use `gemini-2.5-flash` for Athena/default Telegram, everyday reasoning, CI synthesis, web extraction, vision, compression, approval/safety, and other content-critical auxiliary tasks.
-- Use `gemini-2.5-pro` for deep/judge/boardroom/delegated work.
+- Use `gemini-2.5-pro` for Athena/default Telegram, everyday reasoning where voice and judgment matter, deep/judge/boardroom/delegated work.
+- Use `gemini-2.5-flash` for CI synthesis, web extraction, vision, compression, approval/safety, and other bounded content-critical auxiliary tasks with quality gates.
 - Use `algolia-inference` for explicit low-end modes and cheap housekeeping tasks only: `/model fast`, `/model casual`, `title_generation`, `triage_specifier`, `profile_describer`, `monitor`, and `skills_hub`.
 - Do not route production Chowmes through OpenRouter while the active policy is "forget OpenRouter".
 - Do not add GLM/Z.ai or direct DeepSeek to live routing until direct `ZAI_API_KEY` / `GLM_API_KEY` or `DEEPSEEK_API_KEY` credentials exist and the provider path has passed a smoke test.
@@ -311,12 +312,18 @@ Voice refactor update:
 - `SOUL.md` now has a Living Voice Kernel that forces Athena to read the moment before answering: comfort, truth, decision, action, or proof.
 - The source prompt now explicitly separates casual human replies, serious decision replies, and operational failure replies.
 - Operational failures must state blocker, effect, and next move, and duplicate failure messages are explicitly forbidden.
-- This prompt-level refactor complements the gateway hotfix. The gateway guard catches tiny greetings and provider failures before a model call; `SOUL.md` governs normal Athena responses after the model is reached.
+- Gemini Flash ignored the hard-banned casual phrase rule in live CLI smoke tests and replied with variants of "what's on your mind." Gemini Pro passed the same smoke with concise Athena-like replies, so Athena/default was moved to `gemini-2.5-pro`.
+- This prompt-level refactor complements the gateway hotfix. The gateway guard catches tiny greetings, robotic tiny final replies, and provider failures before they reach Telegram; `SOUL.md` governs normal Athena responses after the model is reached.
 
 Live gateway hotfix backups:
 
 - `/opt/hermes/gateway/run.py.bak.athena-provider-voice-`
 - `/opt/hermes/gateway/run.py.bak.athena-casual-guard-20260629074019`
+- `/opt/hermes/gateway/run.py.bak.athena-voice-guard-20260629084843`
+
+Live config backup from Athena Pro cutover:
+
+- `/opt/data/config.yaml.bak.athena-pro-`
 
 New canonical My OS files:
 
@@ -554,7 +561,7 @@ Known failure pattern from June 28, 2026:
 - The first credit-specific gateway patch still sounded robotic and could arrive twice because provider failures were delivered once through the status callback path and again as the final response. The live gateway was patched again so Telegram provider-failure status callbacks are suppressed and only the final response is delivered.
 - CI cron jobs originally caught Hermes synthesis failures, fell back to local synthesis, returned success, and could publish weak fallback artifacts. Production daily/weekly wrappers now run a provider preflight and pass `--fail-on-synthesis-error`.
 - The daily Chowmes provider credit watch cron runs at `08:45 America/New_York`, before the 09:00 CI jobs, and delivers a Telegram alert if credits are below the configured floor.
-- Current status as of June 29, 2026: Chowmes has been switched off OpenRouter for production routing. Default Athena and CI synthesis use direct Gemini; explicit fast/casual low-risk routes use Algolia inference. The historical OpenRouter incident remains useful as a failure-mode lesson, not as the active provider path.
+- Current status as of June 29, 2026: Chowmes has been switched off OpenRouter for production routing. Default Athena uses direct Gemini Pro, CI synthesis uses direct Gemini Flash, and explicit fast/casual low-risk routes use Algolia inference. The historical OpenRouter incident remains useful as a failure-mode lesson, not as the active provider path.
 
 Current user-facing provider-failure style:
 

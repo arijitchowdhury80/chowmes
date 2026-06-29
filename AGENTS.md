@@ -90,8 +90,9 @@ These are role definitions and routing rules plus the current live-profile roste
 Current default model:
 
 - Provider: direct Gemini API.
-- Normal Telegram/default model: `gemini-2.5-flash`.
+- Normal Telegram/default model: `gemini-2.5-pro`.
 - Fast/cheap model: `algolia-inference` through `/model fast` and `/model casual` only.
+- Workhorse/routine synthesis model: `gemini-2.5-flash`.
 - Deep/delegated work model: `gemini-2.5-pro`.
 - CI synthesis model: `gemini-2.5-flash` unless benchmarked quality tests justify a change.
 - OpenRouter is not the active production route.

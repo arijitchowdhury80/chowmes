@@ -49,3 +49,7 @@ fi
   "$ssh_helper" "sudo docker exec -i hermes /bin/sh -lc 'tar --no-xattrs -xf - -C /opt/data/scripts && rm -f /opt/data/scripts/._chowmes-argus-cutover-ci-cron-runtime && chown hermes:hermes /opt/data/scripts/chowmes-argus-cutover-ci-cron-runtime && chmod 755 /opt/data/scripts/chowmes-argus-cutover-ci-cron-runtime'"
 
 "$ssh_helper" "sudo docker exec -i -u hermes -e HOME=/opt/data hermes /opt/data/scripts/chowmes-argus-cutover-ci-cron-runtime $execute_arg"
+
+if [ "$execute_arg" = "--execute" ]; then
+  "$script_dir/chowmes-ci-e2e-status" --require-final-argus-only
+fi

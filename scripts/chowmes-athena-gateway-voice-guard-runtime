@@ -55,11 +55,16 @@ CONSTANTS = '''_ATHENA_CASUAL_GREETING_RE = re.compile(
     re.IGNORECASE,
 )
 
+_ATHENA_ROBOTIC_CASUAL_REPLY_RE = re.compile(
+    r"\\b(?:what(?:'|’)?s on your mind|what(?:'|’)?s up\\??|how can i help|how may i assist|ready when you are|standing by)\\b",
+    re.IGNORECASE,
+)
+
 _ATHENA_CASUAL_GREETING_REPLIES = (
     "Hey. I am here.",
-    "Here. Slightly caffeinated in spirit.",
+    "Here. Already judging the machinery a little.",
     "Hey. I am with you.",
-    "Present. Let's keep it clean today.",
+    "Present. Let us keep it clean today.",
 )
 
 '''
@@ -78,6 +83,18 @@ HELPER = '''def _athena_casual_greeting_reply(text: str) -> Optional[str]:
         return None
     index = sum(ord(ch) for ch in body.lower()) % len(_ATHENA_CASUAL_GREETING_REPLIES)
     return _ATHENA_CASUAL_GREETING_REPLIES[index]
+
+
+def _athena_rewrite_robotic_casual_reply(text: str) -> Optional[str]:
+    """Rewrite tiny generic assistant replies before Telegram delivery."""
+    body = str(text or "").strip()
+    if not body or "\\n" in body or len(body) > 140:
+        return None
+    if not _ATHENA_ROBOTIC_CASUAL_REPLY_RE.search(body):
+        return None
+    return _athena_casual_greeting_reply(text) or _ATHENA_CASUAL_GREETING_REPLIES[
+        sum(ord(ch) for ch in body.lower()) % len(_ATHENA_CASUAL_GREETING_REPLIES)
+    ]
 
 
 '''
@@ -164,16 +181,27 @@ GUARD = '''        if (
 def status(src: str) -> dict[str, bool]:
     return {
         "constants": "_ATHENA_CASUAL_GREETING_RE = re.compile(" in src,
+        "robotic_constants": "_ATHENA_ROBOTIC_CASUAL_REPLY_RE = re.compile(" in src,
         "helper": "def _athena_casual_greeting_reply(" in src,
+        "robotic_helper": "def _athena_rewrite_robotic_casual_reply(" in src,
         "provider_voice": "the active model route is out of usable balance" in src
         and "OpenRouter credits are exhausted" not in src,
         "telegram_guard": "_athena_casual_greeting_reply(event.text)" in src,
+        "final_voice": "_athena_rewrite_robotic_casual_reply(redacted)" in src,
     }
 
 
 def report(flags: dict[str, bool]) -> None:
     print(f"gateway_run_path={path}")
-    for key in ["constants", "helper", "provider_voice", "telegram_guard"]:
+    for key in [
+        "constants",
+        "robotic_constants",
+        "helper",
+        "robotic_helper",
+        "provider_voice",
+        "telegram_guard",
+        "final_voice",
+    ]:
         print(f"athena_gateway_voice_guard_{key}={'present' if flags[key] else 'missing'}")
     print(
         "athena_gateway_voice_guard="
@@ -194,6 +222,21 @@ def patch(src: str) -> str:
             raise SystemExit("patch_blocker=secret pattern block end not found")
         src = src[: end + 2] + CONSTANTS + src[end + 2 :]
         changed = True
+    elif "_ATHENA_ROBOTIC_CASUAL_REPLY_RE = re.compile(" not in src:
+        start = src.find("_ATHENA_CASUAL_GREETING_REPLIES = (")
+        if start == -1:
+            raise SystemExit("patch_blocker=casual replies anchor not found")
+        end = src.find("\n\n", start)
+        if end == -1:
+            raise SystemExit("patch_blocker=casual replies block end not found")
+        robotic_constant = '''_ATHENA_ROBOTIC_CASUAL_REPLY_RE = re.compile(
+    r"\\b(?:what(?:'|’)?s on your mind|what(?:'|’)?s up\\??|how can i help|how may i assist|ready when you are|standing by)\\b",
+    re.IGNORECASE,
+)
+
+'''
+        src = src[:start] + robotic_constant + src[start:]
+        changed = True
 
     if "def _athena_casual_greeting_reply(" not in src:
         anchor = "\ndef _gateway_provider_error_reply(text: str) -> str:\n"
@@ -201,11 +244,49 @@ def patch(src: str) -> str:
             raise SystemExit("patch_blocker=provider function anchor not found")
         src = src.replace(anchor, "\n" + HELPER + anchor.lstrip(), 1)
         changed = True
+    elif "def _athena_rewrite_robotic_casual_reply(" not in src:
+        anchor = "\ndef _gateway_provider_error_reply(text: str) -> str:\n"
+        if anchor not in src:
+            raise SystemExit("patch_blocker=provider function anchor not found")
+        robotic_helper = '''def _athena_rewrite_robotic_casual_reply(text: str) -> Optional[str]:
+    """Rewrite tiny generic assistant replies before Telegram delivery."""
+    body = str(text or "").strip()
+    if not body or "\\n" in body or len(body) > 140:
+        return None
+    if not _ATHENA_ROBOTIC_CASUAL_REPLY_RE.search(body):
+        return None
+    return _athena_casual_greeting_reply(text) or _ATHENA_CASUAL_GREETING_REPLIES[
+        sum(ord(ch) for ch in body.lower()) % len(_ATHENA_CASUAL_GREETING_REPLIES)
+    ]
+
+
+'''
+        src = src.replace(anchor, "\n" + robotic_helper + anchor.lstrip(), 1)
+        changed = True
 
     if "OpenRouter credits are exhausted" in src:
         if PROVIDER_OLD not in src:
             raise SystemExit("patch_blocker=provider function shape changed")
         src = src.replace(PROVIDER_OLD, PROVIDER_NEW, 1)
+        changed = True
+
+    if "_athena_rewrite_robotic_casual_reply(redacted)" not in src:
+        anchor = (
+            "    if _looks_like_gateway_provider_error(redacted):\n"
+            "        return _gateway_provider_error_reply(redacted)\n"
+            "    return redacted\n"
+        )
+        if anchor not in src:
+            raise SystemExit("patch_blocker=final response sanitizer anchor not found")
+        replacement = (
+            "    if _looks_like_gateway_provider_error(redacted):\n"
+            "        return _gateway_provider_error_reply(redacted)\n"
+            "    robotic_reply = _athena_rewrite_robotic_casual_reply(redacted)\n"
+            "    if robotic_reply:\n"
+            "        return robotic_reply\n"
+            "    return redacted\n"
+        )
+        src = src.replace(anchor, replacement, 1)
         changed = True
 
     if "_athena_casual_greeting_reply(event.text)" not in src:

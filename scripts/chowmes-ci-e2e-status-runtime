@@ -2,6 +2,7 @@
 set -eu
 
 require_argus="${REQUIRE_ARGUS_E2E:-0}"
+require_final="${REQUIRE_FINAL_ARGUS_ONLY:-0}"
 
 profile_dir="${ARGUS_PROFILE_DIR:-/opt/data/profiles/argus}"
 global_script_dir="${GLOBAL_SCRIPT_DIR:-/opt/data/scripts}"
@@ -62,6 +63,23 @@ cron_has_job() {
   profile="$1"
   job="$2"
   cron_text "$profile" | grep -Fq "Name:      $job"
+}
+
+cron_job_state() {
+  profile="$1"
+  job="$2"
+  cron_text "$profile" | awk -v job="$job" '
+    /^[[:space:]]*[[:alnum:]]+[[:space:]]+\[[^]]+\][[:space:]]*$/ {
+      current = $1
+      state = $2
+      gsub(/[\[\]]/, "", state)
+      next
+    }
+    $1 == "Name:" && $2 == job {
+      print state
+      exit
+    }
+  '
 }
 
 cron_field_for_job() {
@@ -138,18 +156,22 @@ weekly_wrapper="$global_script_dir/competitive-research-weekly.sh"
 
 if cron_has_job default "$daily_job"; then
   status_line default_daily_cron present
+  status_line default_daily_cron_state "$(cron_job_state default "$daily_job" || true)"
   status_line default_daily_schedule "$(cron_field_for_job default "$daily_job" Schedule || true)"
   status_line default_daily_last_run "$(cron_last_run_for_job default "$daily_job" || true)"
 else
   status_line default_daily_cron missing
+  status_line default_daily_cron_state missing
 fi
 
 if cron_has_job default "$weekly_job"; then
   status_line default_weekly_cron present
+  status_line default_weekly_cron_state "$(cron_job_state default "$weekly_job" || true)"
   status_line default_weekly_schedule "$(cron_field_for_job default "$weekly_job" Schedule || true)"
   status_line default_weekly_last_run "$(cron_last_run_for_job default "$weekly_job" || true)"
 else
   status_line default_weekly_cron missing
+  status_line default_weekly_cron_state missing
 fi
 
 for cadence in daily weekly; do
@@ -327,6 +349,41 @@ if [ "$target_ok" != "yes" ]; then
   status_line ci_target_argus_e2e_blocker "$blocker"
 fi
 
+default_daily_state="$(cron_job_state default "$daily_job" || true)"
+default_weekly_state="$(cron_job_state default "$weekly_job" || true)"
+[ -n "$default_daily_state" ] || default_daily_state="missing"
+[ -n "$default_weekly_state" ] || default_weekly_state="missing"
+
+final_ok="$target_ok"
+final_blocker="$blocker"
+if [ "$target_ok" = "yes" ]; then
+  case "$default_daily_state" in
+    paused|missing) : ;;
+    *)
+      final_ok=no
+      final_blocker="temporary default daily CI cron is still active"
+      ;;
+  esac
+fi
+if [ "$final_ok" = "yes" ]; then
+  case "$default_weekly_state" in
+    paused|missing) : ;;
+    *)
+      final_ok=no
+      final_blocker="temporary default weekly CI cron is still active"
+      ;;
+  esac
+fi
+
+status_line ci_final_argus_only_ready "$final_ok"
+if [ "$final_ok" != "yes" ]; then
+  status_line ci_final_argus_only_blocker "$final_blocker"
+fi
+
 if [ "$require_argus" = "1" ] && [ "$target_ok" != "yes" ]; then
+  exit 2
+fi
+
+if [ "$require_final" = "1" ] && [ "$final_ok" != "yes" ]; then
   exit 2
 fi

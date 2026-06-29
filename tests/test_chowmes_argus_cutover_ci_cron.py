@@ -8,9 +8,16 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 RUNTIME = REPO_ROOT / "scripts" / "chowmes-argus-cutover-ci-cron-runtime"
+WRAPPER = REPO_ROOT / "scripts" / "chowmes-argus-cutover-ci-cron"
 
 
 class ArgusCutoverCiCronRuntimeTests(unittest.TestCase):
+    def test_wrapper_requires_final_argus_only_after_execute(self):
+        text = WRAPPER.read_text()
+
+        self.assertIn("--require-final-argus-only", text)
+        self.assertIn('if [ "$execute_arg" = "--execute" ]; then', text)
+
     def make_fixture(self, *, token=False, gateway="stopped", argus_crons=False):
         temp = tempfile.TemporaryDirectory()
         root = Path(temp.name)

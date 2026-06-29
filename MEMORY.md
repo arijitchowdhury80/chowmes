@@ -4,7 +4,7 @@
 
 - Chowmes is the Hostinger VPS running Hermes for Arijit.
 - Default provider is direct Gemini, not OpenRouter.
-- Model selection policy: Gemini handles Athena/default work and CI synthesis; Algolia inference handles explicit low-risk fast/casual work only. Use `gemini-2.5-flash` for default Telegram, routine synthesis, web extraction, vision, compression, and content-critical work. Use `gemini-2.5-pro` for deep/judge/boardroom/delegated authority work. Use `algolia-inference` only for `/model fast`, `/model casual`, and approved cheap housekeeping lanes.
+- Model selection policy: Gemini handles Athena/default work and CI synthesis; Algolia inference handles explicit low-risk fast/casual work only. Use `gemini-2.5-pro` for Athena/default Telegram, deep/judge/boardroom/delegated authority work, and any response where Athena's voice and judgment matter. Use `gemini-2.5-flash` for CI synthesis, routine synthesis, web extraction, vision, compression, and content-critical work with quality gates. Use `algolia-inference` only for `/model fast`, `/model casual`, and approved cheap housekeeping lanes.
 - OpenRouter remains a historical/backup credential source, but production Chowmes should not route through OpenRouter while the active policy is "forget OpenRouter".
 - Telegram is configured with allowlisted user access.
 - Telegram operator mode is intentional: low turn budget, no TTS, terminal/file/cronjob allowed, no code execution, no delegation, no session search.

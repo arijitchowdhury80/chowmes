@@ -147,14 +147,19 @@ Do not store secrets directly in `config.yaml`; use `.env` when possible.
 Stacking rule:
 
 - Algolia inference handles explicit low-end/fast work and cheap housekeeping.
-- Gemini Flash handles default Athena work and routine but content-critical synthesis.
-- Gemini Pro handles authority.
+- Gemini Pro handles Athena/default conversation, judgment, and authority.
+- Gemini Flash handles routine but content-critical synthesis lanes, including CI unless benchmarked quality tests justify a change.
 - Context length override: `131072`, verified live as of June 29, 2026.
 
-Default workhorse:
+Default Athena:
+
+- Direct Gemini API `gemini-2.5-pro`
+- Use for normal Athena/Hermes conversation, judgment, architecture, strategy, complex debugging, security-sensitive planning, and any response where Athena's voice and authority matter.
+
+Routine workhorse:
 
 - Direct Gemini API `gemini-2.5-flash`
-- Use for normal Athena/Hermes reasoning, project scans, research synthesis, CI synthesis, web extraction, vision, compression, approval/safety, and content-critical auxiliary work.
+- Use for project scans, research synthesis, CI synthesis, web extraction, vision, compression, approval/safety, and content-critical auxiliary work where the output has its own quality gates.
 
 Low-end fast lane:
 
@@ -257,7 +262,7 @@ If Telegram feels slow again, first check:
 
 Telegram operator mode is for everyday interaction plus explicitly approved operational work:
 
-- Direct Gemini `gemini-2.5-flash` by default, with Algolia inference available through `/model fast` and `/model casual` for low-risk speed/cost-sensitive replies.
+- Direct Gemini `gemini-2.5-pro` by default, with Algolia inference available through `/model fast` and `/model casual` for low-risk speed/cost-sensitive replies.
 - low turn budget
 - bounded tools
 - terminal, file, and cronjob allowed

@@ -21,6 +21,7 @@ class CiE2eStatusRuntimeTests(unittest.TestCase):
         valid_profile=True,
         valid_skill=True,
         synthesis_identity="argus",
+        default_state="active",
     ):
         temp = tempfile.TemporaryDirectory()
         root = Path(temp.name)
@@ -122,12 +123,14 @@ class CiE2eStatusRuntimeTests(unittest.TestCase):
                 fi
                 if [ "$1" = "cron" ]; then
                   cat <<'EOF'
+                    57d4ec29e7ad [{default_state}]
                     Name:      competitive-research-daily
                     Schedule:  0 9 * * *
                     Deliver:   telegram
                     Script:    competitive-research-daily.sh
                     Mode:      no-agent (script stdout delivered directly)
                     Last run:  2026-06-29T06:52:45-04:00  ok
+                    d14daa705276 [{default_state}]
                     Name:      competitive-research-weekly
                     Schedule:  0 9 * * 0
                     Deliver:   telegram
@@ -171,6 +174,8 @@ class CiE2eStatusRuntimeTests(unittest.TestCase):
             result = self.run_runtime(env)
         self.assertEqual(result.returncode, 0, result.stdout)
         self.assertIn("ci_current_pipeline_mechanically_healthy=yes", result.stdout)
+        self.assertIn("default_daily_cron_state=active", result.stdout)
+        self.assertIn("default_weekly_cron_state=active", result.stdout)
         self.assertIn("default_daily_delivery_identity_notice=present", result.stdout)
         self.assertIn("default_weekly_delivery_identity_notice=present", result.stdout)
         self.assertIn("argus_profile_contract_ready=yes", result.stdout)
@@ -244,6 +249,32 @@ class CiE2eStatusRuntimeTests(unittest.TestCase):
         self.assertIn("argus_daily_cron=present", result.stdout)
         self.assertIn("argus_weekly_cron=present", result.stdout)
         self.assertIn("ci_target_argus_e2e_ready=yes", result.stdout)
+        self.assertIn("ci_final_argus_only_ready=no", result.stdout)
+        self.assertIn("ci_final_argus_only_blocker=temporary default daily CI cron is still active", result.stdout)
+
+    def test_reports_final_argus_only_ready_when_default_crons_are_paused(self):
+        temp, env = self.make_fixture(token=True, gateway="running", argus_crons=True, default_state="paused")
+        with temp:
+            result = self.run_runtime(env)
+        self.assertEqual(result.returncode, 0, result.stdout)
+        self.assertIn("ci_target_argus_e2e_ready=yes", result.stdout)
+        self.assertIn("default_daily_cron_state=paused", result.stdout)
+        self.assertIn("default_weekly_cron_state=paused", result.stdout)
+        self.assertIn("ci_final_argus_only_ready=yes", result.stdout)
+
+    def test_require_final_argus_only_fails_until_default_crons_are_paused(self):
+        temp, env = self.make_fixture(token=True, gateway="running", argus_crons=True, default_state="active")
+        with temp:
+            result = subprocess.run(
+                [str(RUNTIME)],
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                env={**env, "REQUIRE_FINAL_ARGUS_ONLY": "1"},
+            )
+        self.assertEqual(result.returncode, 2, result.stdout)
+        self.assertIn("ci_target_argus_e2e_ready=yes", result.stdout)
+        self.assertIn("ci_final_argus_only_ready=no", result.stdout)
 
 
 if __name__ == "__main__":
