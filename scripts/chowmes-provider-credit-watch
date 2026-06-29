@@ -154,6 +154,7 @@ def check_algolia_inference() -> int:
         headers={
             "Authorization": "Bearer " + api_key,
             "Content-Type": "application/json",
+            "User-Agent": "Chowmes-Hermes/1.0",
         },
     )
     try:

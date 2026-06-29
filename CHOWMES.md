@@ -29,6 +29,7 @@ Hermes now uses the direct Gemini API through `GEMINI_API_KEY`. OpenRouter remai
 - Provider: `gemini`
 - Context length override: `131072` live as of June 29, 2026
 - Deep/delegated judgment model: `gemini-2.5-pro`
+- Low-end/fast lane provider: `algolia-inference` using `ALGOLIA_INFERENCE_BASE_URL`, `ALGOLIA_INFERENCE_API_KEY`, and `ALGOLIA_INFERENCE_MODEL` in `/opt/data/.env`
 - OpenRouter key location on host: `/root/.hermes/.env`
 - OpenRouter key location in container: `/opt/data/.env`
 - Direct Google/Gemini key: configured on VPS as `GEMINI_API_KEY` in `/opt/data/.env`
@@ -56,15 +57,17 @@ OpenRouter pricing checked on June 16, 2026:
 
 Current routing:
 
-- Use `gemini-2.5-flash` for Athena/default Telegram, everyday reasoning, CI synthesis, web extraction, vision, compression, titles, and other auxiliary tasks.
+- Use `gemini-2.5-flash` for Athena/default Telegram, everyday reasoning, CI synthesis, web extraction, vision, compression, approval/safety, and other content-critical auxiliary tasks.
 - Use `gemini-2.5-pro` for deep/judge/boardroom/delegated work.
+- Use `algolia-inference` for explicit low-end modes and cheap housekeeping tasks only: `/model fast`, `/model casual`, `title_generation`, `triage_specifier`, `profile_describer`, `monitor`, and `skills_hub`.
 - Do not route production Chowmes through OpenRouter while the active policy is "forget OpenRouter".
 - Do not add GLM/Z.ai or direct DeepSeek to live routing until direct `ZAI_API_KEY` / `GLM_API_KEY` or `DEEPSEEK_API_KEY` credentials exist and the provider path has passed a smoke test.
 
 Model aliases configured in Hermes as of June 29, 2026:
 
 ```text
-/model fast        -> gemini:gemini-2.5-flash
+/model fast        -> algolia-inference:${ALGOLIA_INFERENCE_MODEL}
+/model casual      -> algolia-inference:${ALGOLIA_INFERENCE_MODEL}
 /model workhorse   -> gemini:gemini-2.5-flash
 /model repair      -> gemini:gemini-2.5-flash
 /model vision      -> gemini:gemini-2.5-flash

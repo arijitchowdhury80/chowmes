@@ -146,14 +146,22 @@ Do not store secrets directly in `config.yaml`; use `.env` when possible.
 
 Stacking rule:
 
-- Gemini Flash handles volume.
+- Algolia inference handles explicit low-end/fast work and cheap housekeeping.
+- Gemini Flash handles default Athena work and routine but content-critical synthesis.
 - Gemini Pro handles authority.
 - Context length override: `131072`, verified live as of June 29, 2026.
 
 Default workhorse:
 
 - Direct Gemini API `gemini-2.5-flash`
-- Use for normal Athena/Hermes reasoning, project scans, research synthesis, CI synthesis, web extraction, vision, compression, titles, and low-risk auxiliary work.
+- Use for normal Athena/Hermes reasoning, project scans, research synthesis, CI synthesis, web extraction, vision, compression, approval/safety, and content-critical auxiliary work.
+
+Low-end fast lane:
+
+- Algolia inference server through provider id `algolia-inference`.
+- Credentials live in `/opt/data/.env` as `ALGOLIA_INFERENCE_BASE_URL`, `ALGOLIA_INFERENCE_API_KEY`, and `ALGOLIA_INFERENCE_MODEL`.
+- Use for `/model fast`, `/model casual`, `title_generation`, `triage_specifier`, `profile_describer`, `monitor`, and `skills_hub`.
+- Keep Gemini on Athena/default, deep work, CI synthesis, safety/approval, vision, compression, and quality-sensitive reasoning unless a specific smoke test proves the Algolia route is good enough for that lane.
 
 Judgment escalation:
 
