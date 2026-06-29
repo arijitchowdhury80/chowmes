@@ -16,9 +16,11 @@ fi
 python3 - <<'PY'
 import json
 import os
+import re
 import sys
 import urllib.request
 from decimal import Decimal, InvalidOperation
+from pathlib import Path
 
 
 def money(value):
@@ -28,36 +30,99 @@ def money(value):
         return Decimal("0")
 
 
-api_key = os.environ.get("OPENROUTER_API_KEY", "").strip()
-if not api_key:
-    print("Chowmes provider credit watch failed: OPENROUTER_API_KEY is missing.")
-    raise SystemExit(75)
+def active_provider() -> str:
+    override = os.environ.get("CHOWMES_MODEL_PROVIDER", "").strip().lower()
+    if override:
+        return override
+    config = Path("/opt/data/config.yaml")
+    if config.exists():
+        text = config.read_text(errors="replace")
+        in_model = False
+        for raw in text.splitlines():
+            line = raw.rstrip()
+            if line == "model:":
+                in_model = True
+                continue
+            if in_model and line and not line.startswith(" "):
+                in_model = False
+            if in_model:
+                match = re.match(r"\s+provider:\s*['\"]?([^'\"]+)['\"]?\s*$", line)
+                if match:
+                    return match.group(1).strip().lower()
+    return "openrouter"
 
-floor = money(os.environ.get("CHOWMES_OPENROUTER_CREDIT_FLOOR", "5.00"))
-request = urllib.request.Request(
-    "https://openrouter.ai/api/v1/credits",
-    headers={"Authorization": "Bearer " + api_key},
-)
 
-try:
-    with urllib.request.urlopen(request, timeout=15) as response:
-        payload = json.loads(response.read().decode("utf-8"))
-except Exception as exc:
-    print("Chowmes provider credit watch failed.")
-    print(f"Reason: {type(exc).__name__}: {str(exc)[:240]}")
-    raise SystemExit(75)
+def check_gemini() -> int:
+    api_key = (os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY") or "").strip()
+    if not api_key:
+        print("Chowmes provider watch failed: Gemini API key is missing.")
+        print("Effect: Athena, Vulcan, CI synthesis, and Gemini-backed agents may fail.")
+        print("Action: restore GEMINI_API_KEY or GOOGLE_API_KEY in the Hermes runtime environment.")
+        return 75
 
-data = payload.get("data") or payload
-total = money(data.get("total_credits"))
-used = money(data.get("total_usage"))
-remaining = total - used
+    model = os.environ.get("CHOWMES_GEMINI_WATCH_MODEL", "gemini-2.5-flash")
+    payload = {
+        "contents": [{"parts": [{"text": "Reply with OK."}]}],
+        "generationConfig": {"temperature": 0, "maxOutputTokens": 8},
+    }
+    request = urllib.request.Request(
+        f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}",
+        data=json.dumps(payload).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=20) as response:
+            json.loads(response.read().decode("utf-8"))
+    except Exception as exc:
+        print("Chowmes provider watch failed: Gemini API check failed.")
+        print(f"Reason: {type(exc).__name__}: {str(exc)[:240]}")
+        print("Effect: Athena, Vulcan, CI synthesis, and Gemini-backed agents may fail.")
+        print("Action: check Gemini API billing/key/model access before the next scheduled run.")
+        return 75
+    return 0
 
-if remaining < floor:
-    print("Chowmes provider credit alert")
-    print(f"OpenRouter remaining=${remaining:.4f}; floor=${floor:.4f}.")
-    print("Effect: Athena, Vulcan, CI synthesis, and other OpenRouter-backed agents may fail.")
-    print("Action: add OpenRouter credits or switch provider/model before the next scheduled run.")
-    raise SystemExit(75)
 
-# Keep success silent so scheduled checks do not spam Telegram.
+def check_openrouter() -> int:
+    api_key = os.environ.get("OPENROUTER_API_KEY", "").strip()
+    if not api_key:
+        print("Chowmes provider watch failed: OPENROUTER_API_KEY is missing.")
+        return 75
+
+    floor = money(os.environ.get("CHOWMES_OPENROUTER_CREDIT_FLOOR", "5.00"))
+    request = urllib.request.Request(
+        "https://openrouter.ai/api/v1/credits",
+        headers={"Authorization": "Bearer " + api_key},
+    )
+
+    try:
+        with urllib.request.urlopen(request, timeout=15) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+    except Exception as exc:
+        print("Chowmes provider watch failed: OpenRouter credit check failed.")
+        print(f"Reason: {type(exc).__name__}: {str(exc)[:240]}")
+        return 75
+
+    data = payload.get("data") or payload
+    total = money(data.get("total_credits"))
+    used = money(data.get("total_usage"))
+    remaining = total - used
+
+    if remaining < floor:
+        print("Chowmes provider credit alert")
+        print(f"OpenRouter remaining=${remaining:.4f}; floor=${floor:.4f}.")
+        print("Effect: OpenRouter-backed agents may fail.")
+        print("Action: add OpenRouter credits or switch provider/model before the next scheduled run.")
+        return 75
+    return 0
+
+
+provider = active_provider()
+if provider in {"gemini", "google", "google-gemini", "google-ai-studio"}:
+    raise SystemExit(check_gemini())
+if provider == "openrouter":
+    raise SystemExit(check_openrouter())
+
+print(f"Chowmes provider watch failed: unsupported active provider '{provider}'.")
+print("Action: update chowmes-provider-credit-watch to validate this provider before relying on scheduled agents.")
+raise SystemExit(75)
 PY

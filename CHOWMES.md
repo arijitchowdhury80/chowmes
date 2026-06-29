@@ -4,7 +4,7 @@ Chowmes is the Hostinger VPS running Hermes Agent for Telegram and agent work.
 
 ## Current live snapshot
 
-Verified on June 26, 2026 from the Hostinger VPS.
+Verified on June 29, 2026 from the Hostinger VPS.
 
 | Area | Confirmed live state |
 |---|---|
@@ -12,23 +12,23 @@ Verified on June 26, 2026 from the Hostinger VPS.
 | Containers | `hermes`, `caddy`, `scout`, `temporal`, `temporal-ui`, `temporal-db`, `ac2-lab-backend` |
 | Public ports | `22/tcp`, `80/tcp`, `443/tcp` allowed by UFW |
 | Local-only ports | Hermes dashboard `127.0.0.1:9119`, Temporal `127.0.0.1:7233`, Temporal UI `127.0.0.1:8088`, Scout `127.0.0.1:8421`, AC2 lab backend `127.0.0.1:8787` |
-| Active provider/model | OpenRouter `deepseek/deepseek-v4-pro` |
+| Active provider/model | Direct Gemini API `gemini-2.5-flash` |
 | Active context length | `131072` |
 | Active max turns | `6` |
 | Active web backend | `parallel` |
 | Active gateways | Default Athena gateway running; Vulcan profile gateway running |
-| On-demand profiles | Arjuna, Kubera, and Prometheus profiles exist but were not reported as active gateways |
+| On-demand profiles | Arjuna, Kubera, Prometheus, and Strategic profiles exist but are not active gateways |
 
 The older notes below are historical unless they match this verified snapshot. In particular, do not repeat the old "only SSH is public" statement without rechecking UFW and Caddy.
 
 ## Current model setup
 
-Hermes now uses OpenRouter directly. Local Ollama/Gemma on the Mac is disabled and should not be restarted unless explicitly requested.
+Hermes now uses the direct Gemini API through `GEMINI_API_KEY`. OpenRouter remains configured as a historical/backup credential source, but it is not the active Chowmes route as of June 29, 2026. Local Ollama/Gemma on the Mac is disabled and should not be restarted unless explicitly requested.
 
-- Default Telegram/Hermes workhorse model: `deepseek/deepseek-v4-pro`
-- Provider: OpenRouter
-- Context length override: `131072` live as of June 26, 2026
-- Deep/delegated judgment model: `anthropic/claude-sonnet-4.6`
+- Default Telegram/Hermes workhorse model: `gemini-2.5-flash`
+- Provider: `gemini`
+- Context length override: `131072` live as of June 29, 2026
+- Deep/delegated judgment model: `gemini-2.5-pro`
 - OpenRouter key location on host: `/root/.hermes/.env`
 - OpenRouter key location in container: `/opt/data/.env`
 - Direct Google/Gemini key: configured on VPS as `GEMINI_API_KEY` in `/opt/data/.env`
@@ -36,11 +36,11 @@ Hermes now uses OpenRouter directly. Local Ollama/Gemma on the Mac is disabled a
 
 Note: `32768` was tested on June 16, 2026, but Hermes Agent rejected it because the runtime requires at least `64000`. That is a minimum requirement, not the desired cap. A previous target used `1048576`, but the currently verified live value is `131072`; verify before changing.
 
-Verified on June 16, 2026:
+Verified on June 29, 2026:
 
 ```text
-Model:    deepseek/deepseek-v4-pro
-Provider: OpenRouter
+Model:    gemini-2.5-flash
+Provider: gemini
 Telegram: configured and gateway running
 ```
 
@@ -54,30 +54,27 @@ OpenRouter pricing checked on June 16, 2026:
 - `anthropic/claude-opus-4.8`: $5 per 1M input tokens, $25 per 1M output tokens
 - `openai/gpt-5.5`: $5 per 1M input tokens, $30 per 1M output tokens
 
-Recommended routing:
+Current routing:
 
-- Use `deepseek/deepseek-v4-flash` for fast low-risk work: quick Telegram replies, cleanup, extraction, titles, compression, and cheap side tasks.
-- Use `deepseek/deepseek-v4-pro` as the default workhorse for normal Athena/Hermes reasoning, project scans, research synthesis, and bulk serious work.
-- Use `anthropic/claude-sonnet-4.6` for trusted coding, judgment escalation, architecture, strategy, complex debugging, security-sensitive planning, and delegated deep work.
-- Use `moonshotai/kimi-k2.7-code` only as an experimental open coding comparison, not as the trusted Chowmes coding lane.
-- Use `anthropic/claude-opus-4.8` only for final boardroom review of expensive, risky, or company-level decisions.
-- Use `openai/gpt-5.5` as a non-Claude frontier second opinion when useful.
-- Keep `google/gemini-2.5-flash` for vision or multimodal fallback because DeepSeek V4 Pro is text-only on OpenRouter.
+- Use `gemini-2.5-flash` for Athena/default Telegram, everyday reasoning, CI synthesis, web extraction, vision, compression, titles, and other auxiliary tasks.
+- Use `gemini-2.5-pro` for deep/judge/boardroom/delegated work.
+- Do not route production Chowmes through OpenRouter while the active policy is "forget OpenRouter".
+- Do not add GLM/Z.ai or direct DeepSeek to live routing until direct `ZAI_API_KEY` / `GLM_API_KEY` or `DEEPSEEK_API_KEY` credentials exist and the provider path has passed a smoke test.
 
-Model aliases configured in Hermes:
+Model aliases configured in Hermes as of June 29, 2026:
 
 ```text
-/model fast        -> openrouter:deepseek/deepseek-v4-flash
-/model workhorse   -> openrouter:deepseek/deepseek-v4-pro
-/model coding      -> openrouter:anthropic/claude-sonnet-4.6
-/model kimi-code   -> openrouter:moonshotai/kimi-k2.7-code
-/model judge       -> openrouter:anthropic/claude-sonnet-4.6
-/model boardroom   -> openrouter:anthropic/claude-opus-4.8
-/model gpt-review  -> openrouter:openai/gpt-5.5
-/model vision      -> openrouter:google/gemini-2.5-flash
+/model fast        -> gemini:gemini-2.5-flash
+/model workhorse   -> gemini:gemini-2.5-flash
+/model repair      -> gemini:gemini-2.5-flash
+/model vision      -> gemini:gemini-2.5-flash
+/model coding      -> gemini:gemini-2.5-pro
+/model judge       -> gemini:gemini-2.5-pro
+/model boardroom   -> gemini:gemini-2.5-pro
+/model emergency   -> gemini:gemini-2.5-pro
 ```
 
-Operating rule: DeepSeek handles volume, frontier models handle authority. DeepSeek can draft and reason, but production infrastructure, security, credentials, destructive actions, major architecture, and CEO/company strategy need frontier review before being treated as final.
+Operating rule: Gemini Flash handles volume and routine synthesis; Gemini Pro handles authority. Do not confuse "paid key" with "infinite budget"; keep context and tool-loop guardrails active.
 
 ## Telegram operator mode
 

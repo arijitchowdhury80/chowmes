@@ -146,49 +146,25 @@ Do not store secrets directly in `config.yaml`; use `.env` when possible.
 
 Stacking rule:
 
-- DeepSeek handles volume.
-- Frontier models handle authority.
-- Context length override: `131072` for DeepSeek V4 Pro, verified live as of June 26, 2026.
+- Gemini Flash handles volume.
+- Gemini Pro handles authority.
+- Context length override: `131072`, verified live as of June 29, 2026.
 
 Default workhorse:
 
-- OpenRouter `deepseek/deepseek-v4-pro`
-- Use for normal Athena/Hermes reasoning, project scans, research synthesis, and bulk serious work.
-
-Fast/cheap:
-
-- OpenRouter `deepseek/deepseek-v4-flash`
-- Use for quick Telegram replies, extraction, titles, compression, cleanup, and low-risk auxiliary work.
-
-Trusted coding:
-
-- OpenRouter `anthropic/claude-sonnet-4.6`
-- Use for important code changes, debugging, implementation design, and reviews.
-
-Experimental open coding comparison:
-
-- OpenRouter `moonshotai/kimi-k2.7-code`
-- Use only via `/model kimi-code` when deliberately testing Kimi against the trusted coding lane.
+- Direct Gemini API `gemini-2.5-flash`
+- Use for normal Athena/Hermes reasoning, project scans, research synthesis, CI synthesis, web extraction, vision, compression, titles, and low-risk auxiliary work.
 
 Judgment escalation:
 
-- OpenRouter `anthropic/claude-sonnet-4.6`
-- Use for architecture, strategy, complex debugging, security-sensitive planning, and delegated deep work.
+- Direct Gemini API `gemini-2.5-pro`
+- Use for architecture, strategy, complex debugging, security-sensitive planning, boardroom review, and delegated deep work.
 
-Boardroom review:
+Future model candidates:
 
-- OpenRouter `anthropic/claude-opus-4.8`
-- Use only for final review of expensive, risky, or company-level decisions.
-
-GPT second opinion:
-
-- OpenRouter `openai/gpt-5.5`
-- Use when a non-Claude frontier check is useful.
-
-Vision fallback:
-
-- OpenRouter `google/gemini-2.5-flash`
-- Use for vision or multimodal fallback because DeepSeek V4 Pro is text-only on OpenRouter.
+- Z.ai / GLM is supported by Hermes provider id `zai`, aliases `glm`, `z-ai`, `z.ai`, and `zhipu`, but no `ZAI_API_KEY` / `GLM_API_KEY` is currently configured.
+- Direct DeepSeek is supported by Hermes provider id `deepseek`, but no `DEEPSEEK_API_KEY` is currently configured.
+- Do not route production Chowmes through OpenRouter while the active policy is "forget OpenRouter".
 
 Disabled for now:
 
@@ -197,8 +173,8 @@ Disabled for now:
 
 Direct Google:
 
-- `GEMINI_API_KEY` is present on the VPS, but direct Google routing is not active while the live provider remains OpenRouter.
-- Use `provider: google` and `default: gemini-2.5-flash` when the key is configured.
+- `GEMINI_API_KEY` is present on the VPS and is the active route.
+- Use provider id `gemini` in config. `google`, `google-gemini`, and `google-ai-studio` are Hermes aliases, but `gemini` is the canonical live config value.
 - Do not use stale `gemini-1.5-flash` for Chowmes.
 
 ## Web access policy
