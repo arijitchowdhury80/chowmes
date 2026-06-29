@@ -436,8 +436,20 @@ Known failure pattern from June 28, 2026:
 - OpenRouter credits were exhausted. The credit API reported `total_credits=35`, `total_usage=35.258734652`, leaving roughly `-$0.2587`.
 - Athena/default Telegram, Vulcan, and CI synthesis all depended on OpenRouter, so a provider-credit failure affected multiple agents.
 - The gateway originally replied with a generic provider failure. The live gateway was patched so HTTP 402 / insufficient-credit failures return a credit-specific Telegram message.
+- The first credit-specific gateway patch still sounded robotic and could arrive twice because provider failures were delivered once through the status callback path and again as the final response. The live gateway was patched again so Telegram provider-failure status callbacks are suppressed and only the final response is delivered.
 - CI cron jobs originally caught Hermes synthesis failures, fell back to local synthesis, returned success, and could publish weak fallback artifacts. Production daily/weekly wrappers now run a provider preflight and pass `--fail-on-synthesis-error`.
 - The daily Chowmes provider credit watch cron runs at `08:45 America/New_York`, before the 09:00 CI jobs, and delivers a Telegram alert if credits are below the configured floor.
+
+Current user-facing credit failure line:
+
+```text
+Arijit, I’m blocked before I can think: OpenRouter credits are exhausted. Add credits or switch my provider/model, then message me again. I’ve kept the raw provider details in the gateway logs.
+```
+
+Live gateway hotfix backups:
+
+- `/opt/hermes/gateway/run.py.bak.credit-message-20260628231108`
+- `/opt/hermes/gateway/run.py.bak.credit-voice-20260628234617`
 
 Current protective checks:
 
