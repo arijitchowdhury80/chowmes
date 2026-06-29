@@ -1,6 +1,6 @@
 # Chow Tracking
 
-Last updated: 2026-06-26
+Last updated: 2026-06-29
 
 This file is the persistent operational dashboard for Chowmes.
 
@@ -9,19 +9,18 @@ This file is the persistent operational dashboard for Chowmes.
 - Runtime: Hostinger VPS, Hermes in Docker container `hermes`
 - Running containers: `hermes`, `caddy`, `scout`, `temporal`, `temporal-ui`, `temporal-db`, `ac2-lab-backend`
 - Telegram: configured and running
-- Default model provider: OpenRouter
-- Default model: `deepseek/deepseek-v4-pro`
+- Default model provider: direct Gemini
+- Default model: `gemini-2.5-flash`
 - Context length override: `131072` live as of 2026-06-26
-- Direct Google routing: key is present, but active runtime provider remains OpenRouter
-- Deep work / judgment model: `anthropic/claude-sonnet-4.6`
-- Boardroom review model: `anthropic/claude-opus-4.8`
-- GPT second-opinion model: `openai/gpt-5.5`
+- Deep work / judgment model: `gemini-2.5-pro`
+- Boardroom review model: `gemini-2.5-pro`
+- Low-risk fast/casual lane: Algolia inference server
 - Telegram mode: operator mode
 - Local Ollama/Gemma: disabled
 - Media tools: FFmpeg installed on VPS host and Hermes container; yt-dlp installed in Hermes container
 - Local wiki: `/opt/data/workspace/Knowledge`
 - Active gateways: Athena/default and Vulcan. Arjuna, Kubera, and Prometheus exist as profiles but are on demand unless started.
-- Competitive Intelligence: weekly renderer fixed; daily baseline filtering fixed; `ci.sqlite` and `raw/` are preserved by sync guards.
+- Competitive Intelligence: daily and weekly cron jobs are active through the default Hermes/Athena gateway, wrappers run provider preflight plus post-run self-checks, dashboard publishing is wired, and `ci.sqlite` plus `raw/` are preserved by sync guards. Argus exists as the dedicated CI profile, but its gateway remains stopped until Arijit provides the dedicated Argus Telegram bot token/channel.
 
 ## Security Audit
 

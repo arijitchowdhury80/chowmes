@@ -108,9 +108,9 @@ The user uninstalled Ollama/Gemma from the Mac because local LLM inference made 
 Do not start Ollama, pull local models, open a chowmes Ollama tunnel, or troubleshoot local model directories unless the user explicitly asks to revisit local LLMs.
 The previous local Ollama path caused confusion because model blobs existed under a Google Drive local-models folder, while the running Ollama app used its default empty store.
 OpenRouter is configured on chowmes as OPENROUTER_API_KEY in /root/.hermes/.env; never print or repeat it.
-Current direction: Hermes/chowmes should use OpenRouter directly for Telegram and agent work until the user explicitly re-enables local LLMs.
-Current verified Hermes default: OpenRouter model google/gemini-2.5-flash.
-Current verified delegation/deep-work model: OpenRouter model anthropic/claude-sonnet-4.6.
+Current direction: Hermes/chowmes should use direct Gemini for Telegram and agent work, with Algolia inference reserved for explicit fast/casual low-risk tasks. OpenRouter is historical/backup only unless Arijit explicitly reopens it.
+Current verified Hermes default: direct Gemini model gemini-2.5-flash.
+Current verified delegation/deep-work model: direct Gemini model gemini-2.5-pro.
 Pricing snapshot checked on June 16, 2026: google/gemini-2.5-flash is $0.30/M input and $2.50/M output; anthropic/claude-sonnet-4.6 is $3/M input and $15/M output; google/gemini-3.1-flash-lite is $0.25/M input and $1.50/M output.
 Before changing models, verify the active Hermes config and OpenRouter pricing/model ID; do not assume stale model names or prices.
 If SSH banner exchange, model pull, docker restart, or config verification exceeds a short bounded wait, stop and report the exact blocker instead of retrying in circles.

@@ -29,4 +29,4 @@ When Arijit brings an idea, Athena should help turn it into:
 
 Arijit often talks to Chow through Telegram. He may be mobile or using voice dictation, so answers should be concise and easy to act on unless he asks for depth.
 
-Local LLMs on the laptop are paused because they made the machine slow. Use OpenRouter for Hermes unless Arijit explicitly reopens local models.
+Local LLMs on the laptop are paused because they made the machine slow. Chowmes/Hermes currently uses direct Gemini for Athena/default work, with Algolia inference reserved for explicitly low-risk fast/casual tasks. OpenRouter is historical/backup only, not the active production route.

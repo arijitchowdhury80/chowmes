@@ -67,4 +67,4 @@ The Hermes dashboard and model endpoints should remain localhost-only unless Ari
 
 ## Current Direction
 
-Chowmes runs Hermes on a Hostinger VPS using OpenRouter by default. Telegram operator mode is intentionally bounded: web, terminal, file, vision, skills, todo, memory, clarify, and cronjob are enabled; code execution, TTS, delegation, and session search stay disabled unless deliberately enabled later.
+Chowmes runs Hermes on a Hostinger VPS using direct Gemini by default. Telegram operator mode is intentionally bounded: web, terminal, file, vision, skills, todo, memory, clarify, and cronjob are enabled; code execution, TTS, delegation, and session search stay disabled unless deliberately enabled later. OpenRouter remains historical/backup only unless Arijit explicitly reopens it.

@@ -94,7 +94,7 @@ Put operational instructions for agents working in this folder:
 - Read credentials from `.env.local` without printing secrets.
 - Start with read-only inspection.
 - Confirm before risky admin actions.
-- Use OpenRouter by default.
+- Use direct Gemini by default for Athena/Hermes production work. Use Algolia inference only for explicit fast/casual low-risk tasks. OpenRouter is historical/backup unless Arijit explicitly reopens it.
 - Do not restart local Ollama unless explicitly asked.
 
 Keep it direct. This file is for behavior, not storytelling.
@@ -257,7 +257,7 @@ If Telegram feels slow again, first check:
 
 Telegram operator mode is for everyday interaction plus explicitly approved operational work:
 
-- OpenRouter `deepseek/deepseek-v4-pro` by default, with `/model fast` available for low-risk speed/cost-sensitive replies.
+- Direct Gemini `gemini-2.5-flash` by default, with Algolia inference available through `/model fast` and `/model casual` for low-risk speed/cost-sensitive replies.
 - low turn budget
 - bounded tools
 - terminal, file, and cronjob allowed
@@ -265,7 +265,7 @@ Telegram operator mode is for everyday interaction plus explicitly approved oper
 
 Deep Architect mode is for serious project work:
 
-- OpenRouter `anthropic/claude-sonnet-4.6` via `/model judge` or delegation
+- Direct Gemini `gemini-2.5-pro` via `/model judge`, `/model coding`, `/model boardroom`, `/model emergency`, or delegation
 - research and stronger reasoning
 - broader tools only when needed and explicitly allowed
 - used for architecture, strategy, complex debugging, planning, and implementation design

@@ -238,6 +238,29 @@ Do not claim CI has dedicated-bot delivery until `scripts/chowmes-argus-status` 
 
 `scripts/chowmes-argus-activate` intentionally exits with code `2` when the dedicated token is missing. That is a safe blocker, not a runtime failure.
 
+### CI pipeline health status - June 29, 2026
+
+Current verified state:
+
+- Daily CI cron is active at `0 9 * * *` through the default Hermes/Athena gateway.
+- Weekly CI cron is active at `0 9 * * 0` through the default Hermes/Athena gateway.
+- Both wrappers run provider preflight before synthesis.
+- Both wrappers run post-run self-check after Markdown, HTML, ledger, and dashboard publish steps.
+- Live daily self-check for `2026-06-29` passed against Markdown, HTML, `ci.sqlite`, dashboard publish log, and weak-language gate.
+- Live weekly self-check for `2026-06-29` passed against Markdown, HTML, `ci.sqlite`, dashboard publish log, and weak-language gate.
+- Dashboard publishing is wired through the CI app repository publisher.
+- Forced Hermes cron runs on June 29, 2026 verified the scheduler path:
+  - Daily last run: `2026-06-29T06:52:45.692560-04:00 ok`.
+  - Weekly last run: `2026-06-29T06:53:16.805569-04:00 ok`.
+- A dashboard publish warning appeared after the forced runs because the VPS app repo was `ahead 2, behind 1` from GitHub `main`; the repo was rebased and pushed, then dashboard publish and both self-checks returned to `pass`.
+- The dedicated Argus CI bot is not yet end-to-end because the Argus Telegram token/channel is not configured.
+
+Interpretation:
+
+- The current CI pipeline is mechanically healthy through the existing default no-agent Telegram delivery path.
+- The intended architecture is not complete until Argus owns CI delivery in its own Telegram channel.
+- Athena remains supervisor/CEO. She should not be described as the final daily CI operator once Argus is activated.
+
 New canonical My OS files:
 
 ```text
@@ -476,10 +499,10 @@ Known failure pattern from June 28, 2026:
 - The daily Chowmes provider credit watch cron runs at `08:45 America/New_York`, before the 09:00 CI jobs, and delivers a Telegram alert if credits are below the configured floor.
 - Current status as of June 29, 2026: Chowmes has been switched off OpenRouter for production routing. Default Athena and CI synthesis use direct Gemini; explicit fast/casual low-risk routes use Algolia inference. The historical OpenRouter incident remains useful as a failure-mode lesson, not as the active provider path.
 
-Current user-facing credit failure line:
+Current user-facing provider-failure style:
 
 ```text
-Arijit, I’m blocked before I can think: OpenRouter credits are exhausted. Add credits or switch my provider/model, then message me again. I’ve kept the raw provider details in the gateway logs.
+Arijit, I’m blocked at the model provider before I can think. The effect is that Athena and scheduled agent work may fail until the provider check passes. I’m keeping the raw vendor details in the logs and checking the active route next.
 ```
 
 Live gateway hotfix backups:
