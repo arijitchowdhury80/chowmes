@@ -1,0 +1,162 @@
+#!/bin/sh
+set -eu
+
+execute=0
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --execute)
+      execute=1
+      ;;
+    -h|--help)
+      cat <<'EOF'
+Usage: chowmes-argus-migrate-ci-cron-runtime [--execute]
+
+Container-native guarded helper for moving Competitive Intelligence daily and
+weekly cron delivery into the Argus profile.
+
+Default mode is dry-run. It refuses unless:
+- Argus profile and SOUL exist.
+- Argus profile has a dedicated Telegram token key.
+- Argus gateway is already running.
+- Current CI daily/weekly wrappers exist.
+
+It never pauses or removes the current default CI cron jobs.
+EOF
+      exit 0
+      ;;
+    *)
+      echo "unknown argument: $1" >&2
+      exit 2
+      ;;
+  esac
+  shift
+done
+
+profile_dir="${ARGUS_PROFILE_DIR:-/opt/data/profiles/argus}"
+global_script_dir="${GLOBAL_SCRIPT_DIR:-/opt/data/scripts}"
+profile_script_dir="${PROFILE_SCRIPT_DIR:-$profile_dir/scripts}"
+hermes_bin="${HERMES_BIN:-/opt/hermes/.venv/bin/hermes}"
+
+daily_wrapper="$global_script_dir/competitive-research-daily.sh"
+weekly_wrapper="$global_script_dir/competitive-research-weekly.sh"
+
+daily_job="argus-competitive-research-daily"
+weekly_job="argus-competitive-research-weekly"
+
+contains_token_key() {
+  file="$1"
+  if [ ! -f "$file" ]; then
+    return 1
+  fi
+  awk -F= '
+    /^[A-Za-z_][A-Za-z0-9_]*=/ {
+      key=$1
+      if (key ~ /^(TELEGRAM_BOT_TOKEN|ARGUS_BOT_TOKEN|ARGUS_TELEGRAM_BOT_TOKEN)$/) {
+        found=1
+      }
+    }
+    END { exit found ? 0 : 1 }
+  ' "$file"
+}
+
+gateway_state() {
+  output="$("$hermes_bin" -p argus gateway status 2>/dev/null || true)"
+  normalized="$(printf '%s\n' "$output" | tr '[:upper:]' '[:lower:]')"
+  if printf '%s\n' "$normalized" | grep -q "not running"; then
+    echo "stopped"
+    return
+  fi
+  if printf '%s\n' "$normalized" | grep -q "stopped"; then
+    echo "stopped"
+    return
+  fi
+  if printf '%s\n' "$normalized" | grep -q "running"; then
+    echo "running"
+    return
+  fi
+  echo "unknown"
+}
+
+job_exists() {
+  job_name="$1"
+  "$hermes_bin" -p argus cron list 2>/dev/null | grep -Fq "$job_name"
+}
+
+create_job_if_missing() {
+  job_name="$1"
+  schedule="$2"
+  script_name="$3"
+  if job_exists "$job_name"; then
+    echo "cron_present=$job_name"
+    return
+  fi
+  "$hermes_bin" -p argus cron create \
+    --name "$job_name" \
+    --deliver telegram \
+    --script "$script_name" \
+    --no-agent \
+    "$schedule"
+  echo "cron_created=$job_name"
+}
+
+echo "== argus-ci-cron-migration-preflight =="
+
+if [ ! -d "$profile_dir" ]; then
+  echo "argus_cron_migration_ready=no"
+  echo "argus_cron_migration_blocker=Argus profile directory is missing"
+  exit 2
+fi
+
+if [ ! -f "$profile_dir/SOUL.md" ]; then
+  echo "argus_cron_migration_ready=no"
+  echo "argus_cron_migration_blocker=Argus SOUL.md is missing"
+  exit 2
+fi
+
+if ! contains_token_key "$profile_dir/.env"; then
+  echo "argus_cron_migration_ready=no"
+  echo "argus_cron_migration_blocker=dedicated Argus Telegram bot token/channel is not configured"
+  echo "expected_token_keys=TELEGRAM_BOT_TOKEN or ARGUS_TELEGRAM_BOT_TOKEN in $profile_dir/.env"
+  exit 2
+fi
+
+gateway="$(gateway_state)"
+echo "argus_gateway=$gateway"
+if [ "$gateway" != "running" ]; then
+  echo "argus_cron_migration_ready=no"
+  echo "argus_cron_migration_blocker=Argus gateway is not running"
+  exit 2
+fi
+
+for wrapper in "$daily_wrapper" "$weekly_wrapper"; do
+  if [ ! -f "$wrapper" ]; then
+    echo "argus_cron_migration_ready=no"
+    echo "argus_cron_migration_blocker=missing CI wrapper: $wrapper"
+    exit 2
+  fi
+done
+
+echo "argus_cron_migration_ready=yes"
+
+if [ "$execute" != "1" ]; then
+  echo "argus_cron_migration_mode=dry-run"
+  echo "would_copy_profile_scripts=yes"
+  echo "would_create_cron=$daily_job"
+  echo "would_create_cron=$weekly_job"
+  echo "would_pause_default_ci_cron=no"
+  exit 0
+fi
+
+echo "argus_cron_migration_mode=execute"
+mkdir -p "$profile_script_dir"
+cp "$daily_wrapper" "$profile_script_dir/competitive-research-daily.sh"
+cp "$weekly_wrapper" "$profile_script_dir/competitive-research-weekly.sh"
+chmod 755 "$profile_script_dir/competitive-research-daily.sh" "$profile_script_dir/competitive-research-weekly.sh"
+echo "profile_scripts_copied=yes"
+
+create_job_if_missing "$daily_job" "0 9 * * *" "competitive-research-daily.sh"
+create_job_if_missing "$weekly_job" "0 9 * * 0" "competitive-research-weekly.sh"
+
+echo "default_ci_cron_paused=no"
+echo "argus_cron_migration_status=created_or_present"

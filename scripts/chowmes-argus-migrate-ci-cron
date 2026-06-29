@@ -1,0 +1,45 @@
+#!/bin/sh
+set -eu
+
+script_dir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+ssh_helper="$script_dir/chowmes-ssh-helper"
+runtime="$script_dir/chowmes-argus-migrate-ci-cron-runtime"
+execute_arg=""
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --execute)
+      execute_arg="--execute"
+      ;;
+    -h|--help)
+      cat <<'EOF'
+Usage: scripts/chowmes-argus-migrate-ci-cron [--execute]
+
+Guarded migration helper for creating Argus-owned CI daily/weekly cron jobs.
+
+Default mode is dry-run. The helper syncs the container runtime script, then
+refuses unless Argus has a dedicated Telegram token and its gateway is running.
+It never pauses the current default no-agent CI cron jobs.
+EOF
+      exit 0
+      ;;
+    *)
+      echo "unknown argument: $1" >&2
+      exit 2
+      ;;
+  esac
+  shift
+done
+
+if [ ! -f "$runtime" ]; then
+  echo "missing runtime script: $runtime" >&2
+  exit 1
+fi
+
+(
+  cd "$script_dir"
+  COPYFILE_DISABLE=1 tar --no-xattrs -cf - chowmes-argus-migrate-ci-cron-runtime
+) |
+  "$ssh_helper" "sudo docker exec -i hermes /bin/sh -lc 'tar --no-xattrs -xf - -C /opt/data/scripts && rm -f /opt/data/scripts/._chowmes-argus-migrate-ci-cron-runtime && chown hermes:hermes /opt/data/scripts/chowmes-argus-migrate-ci-cron-runtime && chmod 755 /opt/data/scripts/chowmes-argus-migrate-ci-cron-runtime'"
+
+"$ssh_helper" "sudo docker exec -i -u hermes -e HOME=/opt/data hermes /opt/data/scripts/chowmes-argus-migrate-ci-cron-runtime $execute_arg"

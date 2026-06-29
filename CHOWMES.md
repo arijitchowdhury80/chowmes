@@ -230,13 +230,16 @@ Activation sequence after Arijit provides the token/channel:
 1. Add the dedicated Argus Telegram token to `/opt/data/profiles/argus/.env`; do not reuse the Athena/Chowmes token.
 2. Run `scripts/chowmes-argus-activate` without `--execute` to dry-run the preflight.
 3. Run `scripts/chowmes-argus-activate --execute --to telegram[:chat_id]` to start the Argus gateway and send a smoke test.
-4. Create or migrate CI daily/weekly delivery under Argus only after the smoke test passes.
-5. Keep the existing default no-agent CI cron active until Argus delivery is proven.
-6. Pause or remove the default CI delivery only after Argus delivery is verified and documented.
+4. Run `scripts/chowmes-argus-migrate-ci-cron` without `--execute` to dry-run the CI cron migration preflight.
+5. Run `scripts/chowmes-argus-migrate-ci-cron --execute` only after Argus gateway delivery has been smoke-tested.
+6. Keep the existing default no-agent CI cron active until Argus scheduled delivery is proven.
+7. Pause or remove the default CI delivery only after Argus delivery is verified and documented.
 
 Do not claim CI has dedicated-bot delivery until `scripts/chowmes-argus-status` reports Argus activation readiness and a live Telegram smoke test has passed.
 
 `scripts/chowmes-argus-activate` intentionally exits with code `2` when the dedicated token is missing. That is a safe blocker, not a runtime failure.
+
+`scripts/chowmes-argus-migrate-ci-cron` intentionally exits with code `2` when the dedicated token is missing or the Argus gateway is not running. That helper copies the daily/weekly CI wrappers into `/opt/data/profiles/argus/scripts/` and creates Argus-profile cron jobs named `argus-competitive-research-daily` and `argus-competitive-research-weekly` only with explicit `--execute`. It never pauses the current default CI cron jobs.
 
 ### CI pipeline health status - June 29, 2026
 
