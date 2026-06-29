@@ -30,7 +30,7 @@ Current structure:
 - Hermes is the My OS platform/runtime layer.
 - Chowmes is the execution company/runtime.
 - Athena is the CEO agent inside Chowmes.
-- Telegram currently talks to Athena by default. Some ELT roles now have separate Hermes profiles: Vulcan (`vulcan`) for CTO, Arjuna (`arjuna`) for Product / UX Strategy, Kubera (`kubera`) for Revenue / Business, and Prometheus (`prometheus`) for Legal / Risk. Competitive Intelligence now has Argus (`argus`) as its dedicated CI profile; Argus gateway stays stopped until Arijit provides the dedicated Telegram bot token. Their gateways may be stopped until needed unless explicitly exposed through Telegram.
+- Telegram currently talks to Athena by default. Some ELT roles now have separate Hermes profiles: Vulcan (`vulcan`) for CTO, Arjuna (`arjuna`) for Product / UX Strategy, Kubera (`kubera`) for Revenue / Business, and Prometheus (`prometheus`) for Legal / Risk. Competitive Intelligence has Argus (`argus`) as its dedicated CI profile and active Telegram bot. Arjuna, Kubera, Prometheus, and other gateways may be stopped until needed unless explicitly exposed through Telegram.
 - Athena has the company-level ELT available to critique and expand plans.
 - Project workspaces contain execution teams only, recruited by Athena based on the work.
 - `Projects/My OS/index.md` is the canonical model.

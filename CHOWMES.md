@@ -199,48 +199,44 @@ Current existing advisory profiles as of June 20, 2026:
 - Arjuna: Product / UX Strategy, profile `arjuna`.
 - Kubera: Revenue / Business, profile `kubera`.
 - Prometheus: Legal / Risk, profile `prometheus`.
-- Argus: Competitive Intelligence operator/analyst, profile `argus`; gateway stopped until Arijit provides the dedicated Argus Telegram bot token.
+- Argus: Competitive Intelligence operator/analyst, profile `argus`; dedicated Telegram gateway running and owning daily/weekly CI delivery.
 
 COO, CFO, and CMO remain role cards for now. COO becomes live only after recurring operating loops need a separate operator memory.
 
 Do not confuse "gateway stopped" with "profile does not exist." Some advisor gateways may be started only when needed. Athena should answer "Vulcan" when Arijit asks who the CTO is, and should route technical critique to the `vulcan` profile when live collaboration is needed.
 
-### Argus CI bot activation gate
+### Argus CI bot activation state
 
-Argus is the dedicated Competitive Intelligence profile, but not yet the Telegram delivery bot. Before enabling Argus delivery, run:
+Argus is now the dedicated Competitive Intelligence Telegram delivery bot. To verify final state, run:
 
 ```sh
-scripts/chowmes-argus-status
+scripts/chowmes-ci-e2e-status --require-final-argus-only
 ```
 
-Current expected state until Arijit provides the bot token/channel:
+Current verified final state after June 29, 2026 cutover:
 
 ```text
 argus_profile=present
-argus_telegram_token_key=missing
-Gateway: stopped
-competitive-research-daily.sh.self_check=present
-competitive-research-weekly.sh.self_check=present
-latest_audit_status=pass
-argus_activation_ready=no
-argus_activation_blocker=dedicated Argus Telegram bot token/channel is not configured
+argus_telegram_token_key=present
+argus_gateway=running
+argus_daily_cron=present
+argus_weekly_cron=present
+ci_target_argus_e2e_ready=yes
+ci_final_argus_only_ready=yes
 ```
 
-Activation sequence after Arijit provides the token/channel:
+Activation and cutover commands used:
 
-1. Add the dedicated Argus Telegram token to local `.env.local` as `ARGUS_TELEGRAM_BOT_TOKEN` or equivalent; do not reuse the Athena/Chowmes token.
-2. Add optional `ARGUS_TELEGRAM_HOME_CHANNEL` and `ARGUS_TELEGRAM_ALLOWED_USERS`.
-3. Run `scripts/chowmes-argus-complete-activation --env-file .env.local` as a dry-run.
-4. Run `scripts/chowmes-argus-complete-activation --env-file .env.local --to telegram[:chat_id] --execute`.
-5. Keep the existing default no-agent CI cron active until Argus scheduled delivery is proven.
-6. Run `scripts/chowmes-argus-cutover-ci-cron` as a dry-run.
-7. Run `scripts/chowmes-argus-cutover-ci-cron --execute` only after Argus scheduled delivery is verified and documented. This pauses, not deletes, the temporary default CI cron jobs.
+```sh
+scripts/chowmes-argus-complete-activation --env-file .env.local --to telegram --execute
+scripts/chowmes-argus-cutover-ci-cron --execute
+```
 
-Do not claim CI has dedicated-bot delivery until `scripts/chowmes-argus-status` reports Argus activation readiness and a live Telegram smoke test has passed.
+The cutover pauses, not deletes, the temporary default CI cron jobs.
 
 `scripts/chowmes-argus-activate` intentionally exits with code `2` when the dedicated token is missing. That is a safe blocker, not a runtime failure.
 
-`scripts/chowmes-argus-complete-activation` is the preferred one-command activation path after the token exists. In execute mode it installs the Argus Telegram key, starts and smoke-tests the Argus gateway, creates Argus-owned daily/weekly CI cron jobs, then runs `scripts/chowmes-ci-e2e-status --require-argus-e2e`. It dry-runs by default and currently exits `2` at configuration because the local Argus token is missing.
+`scripts/chowmes-argus-complete-activation` is the preferred one-command activation path if Argus ever needs to be reinstalled. In execute mode it installs the Argus Telegram key, starts and smoke-tests the Argus gateway, creates Argus-owned daily/weekly CI cron jobs, then runs `scripts/chowmes-ci-e2e-status --require-argus-e2e`.
 
 `scripts/chowmes-argus-cutover-ci-cron` is the final guarded cutover after Argus E2E delivery is ready. It refuses unless the Argus token, gateway, and Argus daily/weekly cron jobs are present. In execute mode it pauses the temporary default `competitive-research-daily` and `competitive-research-weekly` cron jobs. It does not delete them.
 
@@ -252,8 +248,9 @@ Do not claim CI has dedicated-bot delivery until `scripts/chowmes-argus-status` 
 
 Current verified state:
 
-- Daily CI cron is active at `0 9 * * *` through the default Hermes/Athena gateway.
-- Weekly CI cron is active at `0 9 * * 0` through the default Hermes/Athena gateway.
+- Argus daily CI cron is active at `0 9 * * *` through the dedicated Argus Telegram profile.
+- Argus weekly CI cron is active at `0 9 * * 0` through the dedicated Argus Telegram profile.
+- Temporary default daily/weekly CI cron jobs are paused.
 - Both wrappers run provider preflight before synthesis.
 - Both wrappers run post-run self-check after Markdown, HTML, ledger, and dashboard publish steps.
 - Live daily self-check for `2026-06-29` passed against Markdown, HTML, `ci.sqlite`, dashboard publish log, and weak-language gate.
@@ -265,10 +262,9 @@ Current verified state:
   - Daily last run: `2026-06-29T06:52:45.692560-04:00 ok`.
   - Weekly last run: `2026-06-29T06:53:16.805569-04:00 ok`.
 - A dashboard publish warning appeared after the forced runs because the VPS app repo was `ahead 2, behind 1` from GitHub `main`; the repo was rebased and pushed, then dashboard publish and both self-checks returned to `pass`.
-- The dedicated Argus CI bot is not yet end-to-end because the Argus Telegram token/channel is not configured.
 - `scripts/chowmes-argus-status` is a Mac-side operator helper. Run it from this repository, not from inside `/opt/data/scripts` on the container.
 - `scripts/chowmes-ci-e2e-status` is the canonical current-vs-target health helper. It reports current default CI delivery health, daily/weekly wrapper wiring, latest daily/weekly audit status, Argus profile/persona contract readiness, CI skill Argus ownership/self-review contract readiness, target Argus E2E readiness, and the exact blocker when Argus delivery is not ready.
-- Use `scripts/chowmes-ci-e2e-status --require-argus-e2e` in activation gates. It intentionally exits `2` until the dedicated Argus bot token, Argus gateway, and Argus daily/weekly cron jobs are all present.
+- Use `scripts/chowmes-ci-e2e-status --require-final-argus-only` for the final health gate.
 
 Fresh manual wrapper verification on June 29, 2026:
 
@@ -280,12 +276,11 @@ Fresh manual wrapper verification on June 29, 2026:
 - The same helper reported `argus_profile_contract_ready=yes` and `ci_skill_argus_contract_ready=yes`, proving Argus has the dedicated CI identity/persona contract and the competitive-research skill has the Argus ownership/self-review contract.
 - A later audit found the CI synthesis prompts in `ci_core.py` still said `You are Athena` even though the skill contract said Argus owned CI. This was fixed in both the workspace skill and the standalone `algolia-competitive-intelligence` repo. The readiness helper now reports `ci_synthesis_identity_ready=yes` and fails if synthesis prompts regress to Athena.
 - Current default daily/weekly wrappers now include an explicit Telegram delivery identity notice: Argus generated and reviewed the run, the delivery path is the temporary default Chowmes Telegram gateway, and Athena is supervisor only. `scripts/chowmes-ci-e2e-status` now reports `default_daily_delivery_identity_notice=present` and `default_weekly_delivery_identity_notice=present`.
-- The same helper reported `ci_target_argus_e2e_ready=no` with blocker `dedicated Argus Telegram bot token/channel is not configured`.
+- After Argus activation and cutover, the same helper reports `ci_target_argus_e2e_ready=yes` and `ci_final_argus_only_ready=yes`.
 
 Interpretation:
 
-- The current CI pipeline is mechanically healthy through the existing default no-agent Telegram delivery path.
-- The intended architecture is not complete until Argus owns CI delivery in its own Telegram channel.
+- The final CI delivery architecture is active: Argus owns daily/weekly CI delivery and Athena remains supervisor/CEO.
 - Athena remains supervisor/CEO. She should not be described as the final daily CI operator once Argus is activated.
 
 ### Athena live voice status - June 29, 2026
@@ -581,6 +576,7 @@ Current protective checks:
 - Weekly wrapper: `/opt/data/scripts/competitive-research-weekly.sh`
 - Chowmes credit watch: `/opt/data/scripts/chowmes-provider-credit-watch`
 - Hermes cron job: `chowmes-provider-credit-watch`, schedule `45 8 * * *`, delivery `telegram`
+- Provider watch was converted from a shell wrapper to a Python entrypoint on June 29, 2026 because Hermes cron executed the extensionless script as Python. Verification: direct script exit `0`; cron-triggered last run `2026-06-29T12:46:24.584451-04:00 ok`.
 
 Recovery loop:
 

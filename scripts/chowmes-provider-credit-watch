@@ -1,30 +1,49 @@
-#!/bin/sh
-set -eu
+#!/usr/bin/env python3
+from __future__ import annotations
 
-env_file="${HERMES_ENV_FILE:-/Users/arijitchowdhury/Dropbox/AI-Development/Personal/ChowMes/.env.local}"
-
-if [ -f /opt/data/.env ]; then
-  set -a
-  # shellcheck disable=SC1091
-  . /opt/data/.env
-  set +a
-else
-  ssh_helper="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)/chowmes-ssh-helper"
-  exec "$ssh_helper" --env "$env_file" "sudo docker exec -i hermes /opt/data/scripts/chowmes-provider-credit-watch"
-fi
-
-python3 - <<'PY'
 import json
 import os
 import re
+import subprocess
 import sys
-import urllib.request
 import urllib.error
+import urllib.request
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 
-def money(value):
+REPO_ENV = Path("/Users/arijitchowdhury/Dropbox/AI-Development/Personal/ChowMes/.env.local")
+REMOTE_ENV = Path("/opt/data/.env")
+REMOTE_CONFIG = Path("/opt/data/config.yaml")
+
+
+def load_env_file(path: Path) -> None:
+    if not path.exists():
+        return
+    for raw in path.read_text(errors="replace").splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+        if key and key not in os.environ:
+            os.environ[key] = value
+
+
+def run_remote() -> int:
+    script_dir = Path(__file__).resolve().parent
+    ssh_helper = script_dir / "chowmes-ssh-helper"
+    env_file = os.environ.get("HERMES_ENV_FILE", str(REPO_ENV))
+    if not ssh_helper.exists():
+        print("Chowmes provider watch failed: local SSH helper is missing.")
+        print(f"Action: run from the ChowMes repository or check {ssh_helper}.")
+        return 75
+    command = "sudo docker exec -i hermes /opt/data/scripts/chowmes-provider-credit-watch"
+    return subprocess.call([str(ssh_helper), "--env", env_file, command])
+
+
+def money(value) -> Decimal:
     try:
         return Decimal(str(value))
     except (InvalidOperation, ValueError):
@@ -35,9 +54,8 @@ def active_provider() -> str:
     override = os.environ.get("CHOWMES_MODEL_PROVIDER", "").strip().lower()
     if override:
         return override
-    config = Path("/opt/data/config.yaml")
-    if config.exists():
-        text = config.read_text(errors="replace")
+    if REMOTE_CONFIG.exists():
+        text = REMOTE_CONFIG.read_text(errors="replace")
         in_model = False
         for raw in text.splitlines():
             line = raw.rstrip()
@@ -182,20 +200,29 @@ def check_algolia_inference() -> int:
     return 0
 
 
-provider = active_provider()
-if os.environ.get("CHOWMES_CHECK_ALGOLIA_INFERENCE", "").strip().lower() in {"1", "true", "yes"}:
-    algolia_status = check_algolia_inference()
-    if algolia_status:
-        raise SystemExit(algolia_status)
+def main() -> int:
+    if REMOTE_ENV.exists():
+        load_env_file(REMOTE_ENV)
+    elif os.environ.get("CHOWMES_PROVIDER_WATCH_NO_REMOTE") != "1":
+        return run_remote()
 
-if provider in {"gemini", "google", "google-gemini", "google-ai-studio"}:
-    raise SystemExit(check_gemini())
-if provider == "openrouter":
-    raise SystemExit(check_openrouter())
-if provider in {"algolia-inference", "algolia_inference", "algolia"}:
-    raise SystemExit(check_algolia_inference())
+    provider = active_provider()
+    if os.environ.get("CHOWMES_CHECK_ALGOLIA_INFERENCE", "").strip().lower() in {"1", "true", "yes"}:
+        algolia_status = check_algolia_inference()
+        if algolia_status:
+            return algolia_status
 
-print(f"Chowmes provider watch failed: unsupported active provider '{provider}'.")
-print("Action: update chowmes-provider-credit-watch to validate this provider before relying on scheduled agents.")
-raise SystemExit(75)
-PY
+    if provider in {"gemini", "google", "google-gemini", "google-ai-studio"}:
+        return check_gemini()
+    if provider == "openrouter":
+        return check_openrouter()
+    if provider in {"algolia-inference", "algolia_inference", "algolia"}:
+        return check_algolia_inference()
+
+    print(f"Chowmes provider watch failed: unsupported active provider '{provider}'.")
+    print("Action: update chowmes-provider-credit-watch to validate this provider before relying on scheduled agents.")
+    return 75
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
