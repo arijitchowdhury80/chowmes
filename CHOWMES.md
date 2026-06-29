@@ -274,6 +274,7 @@ Fresh manual wrapper verification on June 29, 2026:
 - Weekly wrapper executed manually on the VPS and passed self-check and Argus post-run review.
 - `scripts/chowmes-ci-e2e-status` reported `ci_current_pipeline_mechanically_healthy=yes`.
 - The same helper reported `argus_profile_contract_ready=yes` and `ci_skill_argus_contract_ready=yes`, proving Argus has the dedicated CI identity/persona contract and the competitive-research skill has the Argus ownership/self-review contract.
+- A later audit found the CI synthesis prompts in `ci_core.py` still said `You are Athena` even though the skill contract said Argus owned CI. This was fixed in both the workspace skill and the standalone `algolia-competitive-intelligence` repo. The readiness helper now reports `ci_synthesis_identity_ready=yes` and fails if synthesis prompts regress to Athena.
 - The same helper reported `ci_target_argus_e2e_ready=no` with blocker `dedicated Argus Telegram bot token/channel is not configured`.
 
 Interpretation:

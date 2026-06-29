@@ -220,6 +220,7 @@ fi
 ci_skill_argus_contract_ready=yes
 ci_skill_argus_contract_missing=""
 skill_file="$skill_root/SKILL.md"
+skill_core="$skill_root/scripts/ci_core.py"
 for marker in \
   "Operational owner: Argus" \
   "Athena supervises quality and escalation" \
@@ -241,6 +242,23 @@ done
 status_line ci_skill_argus_contract_ready "$ci_skill_argus_contract_ready"
 if [ "$ci_skill_argus_contract_ready" != "yes" ]; then
   status_line ci_skill_argus_contract_missing "$ci_skill_argus_contract_missing"
+fi
+
+ci_synthesis_identity_ready=yes
+ci_synthesis_identity_problem=""
+if ! file_has "$skill_core" "You are Argus"; then
+  ci_synthesis_identity_ready=no
+  ci_synthesis_identity_problem="missing Argus synthesis prompt"
+elif file_has "$skill_core" "You are Athena"; then
+  ci_synthesis_identity_ready=no
+  ci_synthesis_identity_problem="synthesis prompt still names Athena as CI writer"
+elif ! file_has "$skill_core" "Athena supervises quality and escalation"; then
+  ci_synthesis_identity_ready=no
+  ci_synthesis_identity_problem="synthesis prompt does not preserve Athena supervisor role"
+fi
+status_line ci_synthesis_identity_ready "$ci_synthesis_identity_ready"
+if [ "$ci_synthesis_identity_ready" != "yes" ]; then
+  status_line ci_synthesis_identity_problem "$ci_synthesis_identity_problem"
 fi
 
 if [ -f "$profile_dir/.env" ]; then
@@ -284,6 +302,9 @@ elif [ "$argus_profile_contract_ready" != "yes" ]; then
 elif [ "$ci_skill_argus_contract_ready" != "yes" ]; then
   target_ok=no
   blocker="competitive-research skill is missing required Argus ownership/self-review contract markers"
+elif [ "$ci_synthesis_identity_ready" != "yes" ]; then
+  target_ok=no
+  blocker="competitive-research synthesis prompt is not routed through Argus"
 elif ! contains_token_key "$profile_dir/.env"; then
   target_ok=no
   blocker="dedicated Argus Telegram bot token/channel is not configured"

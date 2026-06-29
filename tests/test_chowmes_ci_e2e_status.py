@@ -12,7 +12,16 @@ RUNTIME = REPO_ROOT / "scripts" / "chowmes-ci-e2e-status-runtime"
 
 
 class CiE2eStatusRuntimeTests(unittest.TestCase):
-    def make_fixture(self, *, token=False, gateway="stopped", argus_crons=False, valid_profile=True, valid_skill=True):
+    def make_fixture(
+        self,
+        *,
+        token=False,
+        gateway="stopped",
+        argus_crons=False,
+        valid_profile=True,
+        valid_skill=True,
+        synthesis_identity="argus",
+    ):
         temp = tempfile.TemporaryDirectory()
         root = Path(temp.name)
         profile = root / "profiles" / "argus"
@@ -38,7 +47,7 @@ class CiE2eStatusRuntimeTests(unittest.TestCase):
         (profile / ".env").write_text("TELEGRAM_BOT_TOKEN=test\n" if token else "GEMINI_API_KEY=test\n")
 
         skill = root / "skill"
-        skill.mkdir()
+        (skill / "scripts").mkdir(parents=True)
         (skill / "SKILL.md").write_text(
             (
                 "\n".join(
@@ -57,6 +66,14 @@ class CiE2eStatusRuntimeTests(unittest.TestCase):
             if valid_skill
             else "# Competitive Research\n"
         )
+        if synthesis_identity == "argus":
+            (skill / "scripts" / "ci_core.py").write_text(
+                "prompt = 'You are Argus. Athena supervises quality and escalation.'\n"
+            )
+        elif synthesis_identity == "athena":
+            (skill / "scripts" / "ci_core.py").write_text("prompt = 'You are Athena, writing CI.'\n")
+        else:
+            (skill / "scripts" / "ci_core.py").write_text("prompt = 'Generic CI writer.'\n")
 
         scripts = root / "scripts"
         scripts.mkdir()
@@ -155,6 +172,7 @@ class CiE2eStatusRuntimeTests(unittest.TestCase):
         self.assertIn("ci_current_pipeline_mechanically_healthy=yes", result.stdout)
         self.assertIn("argus_profile_contract_ready=yes", result.stdout)
         self.assertIn("ci_skill_argus_contract_ready=yes", result.stdout)
+        self.assertIn("ci_synthesis_identity_ready=yes", result.stdout)
         self.assertIn("ci_target_argus_e2e_ready=no", result.stdout)
         self.assertIn("ci_target_argus_e2e_blocker=dedicated Argus Telegram bot token/channel is not configured", result.stdout)
 
@@ -182,6 +200,19 @@ class CiE2eStatusRuntimeTests(unittest.TestCase):
             result.stdout,
         )
 
+    def test_blocks_target_when_synthesis_prompt_still_names_athena(self):
+        temp, env = self.make_fixture(token=True, gateway="running", argus_crons=True, synthesis_identity="athena")
+        with temp:
+            result = self.run_runtime(env)
+        self.assertEqual(result.returncode, 0, result.stdout)
+        self.assertIn("ci_synthesis_identity_ready=no", result.stdout)
+        self.assertIn("ci_synthesis_identity_problem=missing Argus synthesis prompt", result.stdout)
+        self.assertIn("ci_target_argus_e2e_ready=no", result.stdout)
+        self.assertIn(
+            "ci_target_argus_e2e_blocker=competitive-research synthesis prompt is not routed through Argus",
+            result.stdout,
+        )
+
     def test_require_argus_e2e_fails_when_target_path_not_ready(self):
         temp, env = self.make_fixture(token=False)
         with temp:
@@ -204,6 +235,7 @@ class CiE2eStatusRuntimeTests(unittest.TestCase):
         self.assertIn("ci_current_pipeline_mechanically_healthy=yes", result.stdout)
         self.assertIn("argus_profile_contract_ready=yes", result.stdout)
         self.assertIn("ci_skill_argus_contract_ready=yes", result.stdout)
+        self.assertIn("ci_synthesis_identity_ready=yes", result.stdout)
         self.assertIn("argus_telegram_token_key=present", result.stdout)
         self.assertIn("argus_gateway=running", result.stdout)
         self.assertIn("argus_daily_cron=present", result.stdout)
