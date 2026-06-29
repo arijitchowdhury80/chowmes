@@ -1,0 +1,117 @@
+#!/bin/sh
+set -eu
+
+script_dir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+ssh_helper="$script_dir/chowmes-ssh-helper"
+
+"$ssh_helper" 'sudo docker exec -i -u hermes -e HOME=/opt/data hermes /bin/sh -s' <<'REMOTE'
+set -eu
+
+profile_dir="/opt/data/profiles/argus"
+ci_root="/opt/data/knowledge/obsidian/MyOS/Projects/Competitive Intelligence"
+skill_root="$ci_root/skills/competitive-research"
+artifact_root="$ci_root/artifacts/competitive-research"
+
+status_line() {
+  printf '%s=%s\n' "$1" "$2"
+}
+
+contains_token_key() {
+  env_file="$1"
+  if [ ! -f "$env_file" ]; then
+    return 1
+  fi
+  awk -F= '
+    /^[A-Za-z_][A-Za-z0-9_]*=/ {
+      key=$1
+      if (key ~ /^(TELEGRAM_BOT_TOKEN|ARGUS_BOT_TOKEN|ARGUS_TELEGRAM_BOT_TOKEN)$/) {
+        found=1
+      }
+    }
+    END { exit found ? 0 : 1 }
+  ' "$env_file"
+}
+
+echo "== argus-profile =="
+if [ -d "$profile_dir" ]; then
+  status_line argus_profile present
+else
+  status_line argus_profile missing
+fi
+
+if [ -f "$profile_dir/SOUL.md" ]; then
+  status_line argus_soul present
+  grep -n "Current Activation State" "$profile_dir/SOUL.md" | sed -n '1,3p' || true
+else
+  status_line argus_soul missing
+fi
+
+if [ -f "$profile_dir/.env" ]; then
+  status_line argus_env present
+  if contains_token_key "$profile_dir/.env"; then
+    status_line argus_telegram_token_key present
+  else
+    status_line argus_telegram_token_key missing
+  fi
+else
+  status_line argus_env missing
+  status_line argus_telegram_token_key missing
+fi
+
+echo "== argus-gateway =="
+/opt/hermes/.venv/bin/hermes profile show argus 2>/dev/null | sed -n '1,20p' || true
+
+echo "== ci-cron =="
+/opt/hermes/.venv/bin/hermes cron list | sed -n '/competitive-research-daily/,+7p;/competitive-research-weekly/,+7p'
+
+echo "== ci-wrapper-wiring =="
+for wrapper in /opt/data/scripts/competitive-research-daily.sh /opt/data/scripts/competitive-research-weekly.sh; do
+  name="$(basename "$wrapper")"
+  if [ -f "$wrapper" ]; then
+    if grep -q "ci_run_self_check.py" "$wrapper"; then
+      status_line "$name.self_check" present
+    else
+      status_line "$name.self_check" missing
+    fi
+  else
+    status_line "$name" missing
+  fi
+done
+
+echo "== ci-skill =="
+if [ -f "$skill_root/SKILL.md" ]; then
+  grep -n "version:\|author:\|Operational owner:" "$skill_root/SKILL.md" | sed -n '1,8p'
+else
+  status_line ci_skill missing
+fi
+
+echo "== latest-audit =="
+if [ -d "$artifact_root/run-audits" ]; then
+  latest="$(ls -1 "$artifact_root/run-audits"/*.json 2>/dev/null | sort | tail -1 || true)"
+  if [ -n "$latest" ]; then
+    status_line latest_audit "$latest"
+    /opt/hermes/.venv/bin/python - "$latest" <<'PY'
+import json
+import sys
+from pathlib import Path
+path = Path(sys.argv[1])
+data = json.loads(path.read_text())
+print("latest_audit_status=%s" % data.get("status", "unknown"))
+print("latest_audit_cadence=%s" % data.get("cadence", "unknown"))
+print("latest_audit_date=%s" % data.get("date", "unknown"))
+PY
+  else
+    status_line latest_audit missing
+  fi
+else
+  status_line run_audits_dir missing
+fi
+
+echo "== activation-readiness =="
+if [ -d "$profile_dir" ] && [ -f "$profile_dir/SOUL.md" ] && [ -f "$profile_dir/.env" ] && contains_token_key "$profile_dir/.env"; then
+  status_line argus_activation_ready yes
+else
+  status_line argus_activation_ready no
+  echo "argus_activation_blocker=dedicated Argus Telegram bot token/channel is not configured"
+fi
+REMOTE

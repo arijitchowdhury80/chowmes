@@ -204,6 +204,38 @@ COO, CFO, and CMO remain role cards for now. COO becomes live only after recurri
 
 Do not confuse "gateway stopped" with "profile does not exist." Some advisor gateways may be started only when needed. Athena should answer "Vulcan" when Arijit asks who the CTO is, and should route technical critique to the `vulcan` profile when live collaboration is needed.
 
+### Argus CI bot activation gate
+
+Argus is the dedicated Competitive Intelligence profile, but not yet the Telegram delivery bot. Before enabling Argus delivery, run:
+
+```sh
+scripts/chowmes-argus-status
+```
+
+Current expected state until Arijit provides the bot token/channel:
+
+```text
+argus_profile=present
+argus_telegram_token_key=missing
+Gateway: stopped
+competitive-research-daily.sh.self_check=present
+competitive-research-weekly.sh.self_check=present
+latest_audit_status=pass
+argus_activation_ready=no
+argus_activation_blocker=dedicated Argus Telegram bot token/channel is not configured
+```
+
+Activation sequence after Arijit provides the token/channel:
+
+1. Add the dedicated Argus Telegram token to `/opt/data/profiles/argus/.env`; do not reuse the Athena/Chowmes token.
+2. Start the Argus gateway with the `argus` profile.
+3. Smoke-test Argus Telegram delivery in the dedicated channel.
+4. Create or migrate CI daily/weekly delivery under Argus only after the smoke test passes.
+5. Keep the existing default no-agent CI cron active until Argus delivery is proven.
+6. Pause or remove the default CI delivery only after Argus delivery is verified and documented.
+
+Do not claim CI has dedicated-bot delivery until `scripts/chowmes-argus-status` reports Argus activation readiness and a live Telegram smoke test has passed.
+
 New canonical My OS files:
 
 ```text
