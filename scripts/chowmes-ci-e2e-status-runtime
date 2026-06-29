@@ -117,6 +117,24 @@ wrapper_has() {
   [ -f "$wrapper" ] && grep -Fq "$needle" "$wrapper"
 }
 
+wrapper_has_delivery_identity() {
+  cadence="$1"
+  wrapper="$2"
+  case "$cadence" in
+    daily)
+      wrapper_has "$wrapper" "Argus daily pulse" &&
+        wrapper_has "$wrapper" "Athena supervises quality; she is not the daily operator."
+      ;;
+    weekly)
+      wrapper_has "$wrapper" "Argus weekly synthesis" &&
+        wrapper_has "$wrapper" "Athena supervises quality; she is not the weekly operator."
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
 file_has() {
   file="$1"
   needle="$2"
@@ -182,7 +200,7 @@ for cadence in daily weekly; do
     wrapper_has "$wrapper" "ci_run_self_check.py" && status_line "default_${cadence}_self_check" present || status_line "default_${cadence}_self_check" missing
     wrapper_has "$wrapper" "ci_run_review.py" && status_line "default_${cadence}_post_review" present || status_line "default_${cadence}_post_review" missing
     wrapper_has "$wrapper" "publish-dashboard.py" && status_line "default_${cadence}_dashboard_publish" present || status_line "default_${cadence}_dashboard_publish" missing
-    wrapper_has "$wrapper" "dedicated Argus Telegram gateway" && status_line "default_${cadence}_delivery_identity_notice" present || status_line "default_${cadence}_delivery_identity_notice" missing
+    wrapper_has_delivery_identity "$cadence" "$wrapper" && status_line "default_${cadence}_delivery_identity_notice" present || status_line "default_${cadence}_delivery_identity_notice" missing
   else
     status_line "default_${cadence}_wrapper" missing
   fi
@@ -197,11 +215,11 @@ cron_has_job default "$weekly_job" || current_ok=no
 wrapper_has "$daily_wrapper" "ci-provider-preflight.py" || current_ok=no
 wrapper_has "$daily_wrapper" "ci_run_self_check.py" || current_ok=no
 wrapper_has "$daily_wrapper" "ci_run_review.py" || current_ok=no
-wrapper_has "$daily_wrapper" "dedicated Argus Telegram gateway" || current_ok=no
+wrapper_has_delivery_identity daily "$daily_wrapper" || current_ok=no
 wrapper_has "$weekly_wrapper" "ci-provider-preflight.py" || current_ok=no
 wrapper_has "$weekly_wrapper" "ci_run_self_check.py" || current_ok=no
 wrapper_has "$weekly_wrapper" "ci_run_review.py" || current_ok=no
-wrapper_has "$weekly_wrapper" "dedicated Argus Telegram gateway" || current_ok=no
+wrapper_has_delivery_identity weekly "$weekly_wrapper" || current_ok=no
 status_line ci_current_pipeline_mechanically_healthy "$current_ok"
 
 echo "== target-argus-ci-delivery =="

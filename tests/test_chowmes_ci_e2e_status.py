@@ -90,6 +90,16 @@ class CiE2eStatusRuntimeTests(unittest.TestCase):
         scripts = root / "scripts"
         scripts.mkdir()
         for cadence in ["daily", "weekly"]:
+            if cadence == "daily":
+                identity_lines = [
+                    "Argus daily pulse",
+                    "Athena supervises quality; she is not the daily operator.",
+                ]
+            else:
+                identity_lines = [
+                    "Argus weekly synthesis",
+                    "Athena supervises quality; she is not the weekly operator.",
+                ]
             (scripts / f"competitive-research-{cadence}.sh").write_text(
                 "\n".join(
                     [
@@ -97,7 +107,7 @@ class CiE2eStatusRuntimeTests(unittest.TestCase):
                         "ci_run_self_check.py",
                         "ci_run_review.py",
                         "publish-dashboard.py",
-                        "dedicated Argus Telegram gateway",
+                        *identity_lines,
                     ]
                 )
                 + "\n"
