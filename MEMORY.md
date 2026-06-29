@@ -3,10 +3,9 @@
 ## Operating Facts
 
 - Chowmes is the Hostinger VPS running Hermes for Arijit.
-- Default provider is OpenRouter.
-- Model selection policy: DeepSeek handles volume, frontier models handle authority. Use `deepseek/deepseek-v4-flash` for fast low-risk work, `deepseek/deepseek-v4-pro` for bulk serious work, `anthropic/claude-sonnet-4.6` for trusted coding and high-stakes judgment, and `moonshotai/kimi-k2.7-code` only as an experimental open coding comparison via `/model kimi-code`.
-- Default normal/workhorse model is `deepseek/deepseek-v4-pro`.
-- Deep work / judgment escalation model is `anthropic/claude-sonnet-4.6`; final boardroom review can use `anthropic/claude-opus-4.8`; GPT second opinion can use `openai/gpt-5.5`.
+- Default provider is direct Gemini, not OpenRouter.
+- Model selection policy: Gemini handles Athena/default work and CI synthesis; Algolia inference handles explicit low-risk fast/casual work only. Use `gemini-2.5-flash` for default Telegram, routine synthesis, web extraction, vision, compression, and content-critical work. Use `gemini-2.5-pro` for deep/judge/boardroom/delegated authority work. Use `algolia-inference` only for `/model fast`, `/model casual`, and approved cheap housekeeping lanes.
+- OpenRouter remains a historical/backup credential source, but production Chowmes should not route through OpenRouter while the active policy is "forget OpenRouter".
 - Telegram is configured with allowlisted user access.
 - Telegram operator mode is intentional: low turn budget, no TTS, terminal/file/cronjob allowed, no code execution, no delegation, no session search.
 - Local Ollama/Gemma is disabled because it slowed the laptop.
@@ -18,7 +17,7 @@
 
 - My OS is the one operating system. Do not introduce Work OS, Company OS, Founder OS, or other `Something-OS` names unless Arijit explicitly asks. Old WorkOS, Company-OS, Founder-OS, ArijitOS-style notes, and the old `Projects/MyOS` folder were consolidated into `Projects/My OS/` on 2026-06-18. Archived source material lives under `_Archive/myos-consolidation-2026-06-18/` and should not be loaded as current context by default.
 - Hermes is the My OS platform/runtime layer. Chowmes is the execution company/runtime. Athena is the CEO agent inside Chowmes.
-- Telegram currently talks to Athena, the primary Hermes agent. Some ELT roles now exist as separate Hermes profiles: Vulcan (`vulcan`) is CTO, Arjuna (`arjuna`) is Product / UX Strategy, Kubera (`kubera`) is Revenue / Business, and Prometheus (`prometheus`) is Legal / Risk. Say "existing profile" for the roster and "running gateway" for current exposure. A stopped gateway does not mean the profile does not exist.
+- Telegram currently talks to Athena, the primary Hermes agent. Some ELT roles now exist as separate Hermes profiles: Vulcan (`vulcan`) is CTO, Arjuna (`arjuna`) is Product / UX Strategy, Kubera (`kubera`) is Revenue / Business, and Prometheus (`prometheus`) is Legal / Risk. Competitive Intelligence now has Argus (`argus`) as its dedicated CI profile; Argus gateway is stopped until Arijit provides the dedicated Telegram bot token. Say "existing profile" for the roster and "running gateway" for current exposure. A stopped gateway does not mean the profile does not exist.
 - Athena has a company-level ELT available for strategic critique. The ELT does not live inside every workspace. CTO questions should route to Vulcan when live CTO judgment is needed; Athena should not say the CTO is only a role card.
 - In the live Chowmes container, Hermes profile homes are under `/opt/data/profiles/<slug>`; for example Vulcan's profile home is `/opt/data/profiles/vulcan`.
 - Each project gets its own workspace only when durable context and execution justify it. Each workspace receives execution roles recruited by Athena based on the job: PM, architect, developer, QA, researcher, analyst, writer, designer, DevOps, sales enablement, product marketing, or other specialists.
@@ -29,7 +28,7 @@
 - Prefer Hermes profiles before creating more Telegram bots. A dedicated Telegram bot is justified only when a workspace needs a distinct prompt, toolset, cadence, permission level, artifact destination, or high-frequency interaction.
 - Current active workspace test beds: PRISM, Competitive Intelligence, and CurioQuest. My OS owns the operating model and cross-project decisions. Chowmes owns runtime/admin. Content Engine remains proposed, not active.
 - PRISM workspace home: `/opt/data/knowledge/obsidian/MyOS/Projects/PRISM/index.md`.
-- Competitive Intelligence workspace home: `/opt/data/knowledge/obsidian/MyOS/Projects/Competitive Intelligence/index.md`. Its canonical executable skill lives at `/opt/data/knowledge/obsidian/MyOS/Projects/Competitive Intelligence/skills/competitive-research`; `/opt/data/skills/competitive-research` is only a Hermes compatibility link. The workspace owns executable source, artifacts, product logic, source strategy, quality model, and roadmap.
+- Competitive Intelligence workspace home: `/opt/data/knowledge/obsidian/MyOS/Projects/Competitive Intelligence/index.md`. Its canonical executable skill lives at `/opt/data/knowledge/obsidian/MyOS/Projects/Competitive Intelligence/skills/competitive-research`; `/opt/data/skills/competitive-research` is only a Hermes compatibility link. The workspace owns executable source, artifacts, product logic, source strategy, quality model, and roadmap. Argus owns the CI operating loop; Athena supervises.
 - CurioQuest workspace home: `/opt/data/knowledge/obsidian/MyOS/Projects/CurioQuest/index.md`.
 - Canonical vault home for the model is `/opt/data/knowledge/obsidian/MyOS/Projects/My OS/index.md` when synced to the VPS, and `/Users/arijitchowdhury/Dropbox/AI-Development/Personal/Obsidian-Vault/MyOS/Projects/My OS/index.md` locally. Use `MyOS.md` only as a root pointer.
 - Chat is the interface; vault notes and workspace state are the source of truth. Working logs and raw transcripts are archives, not default context. Promote durable decisions into canonical notes.

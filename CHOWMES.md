@@ -17,7 +17,7 @@ Verified on June 29, 2026 from the Hostinger VPS.
 | Active max turns | `6` |
 | Active web backend | `parallel` |
 | Active gateways | Default Athena gateway running; Vulcan profile gateway running |
-| On-demand profiles | Arjuna, Kubera, Prometheus, and Strategic profiles exist but are not active gateways |
+| On-demand profiles | Arjuna, Kubera, Prometheus, Strategic, and Argus profiles exist but are not active gateways |
 
 The older notes below are historical unless they match this verified snapshot. In particular, do not repeat the old "only SSH is public" statement without rechecking UFW and Caddy.
 
@@ -198,6 +198,7 @@ Current existing advisory profiles as of June 20, 2026:
 - Arjuna: Product / UX Strategy, profile `arjuna`.
 - Kubera: Revenue / Business, profile `kubera`.
 - Prometheus: Legal / Risk, profile `prometheus`.
+- Argus: Competitive Intelligence operator/analyst, profile `argus`; gateway stopped until Arijit provides the dedicated Argus Telegram bot token.
 
 COO, CFO, and CMO remain role cards for now. COO becomes live only after recurring operating loops need a separate operator memory.
 
@@ -360,10 +361,10 @@ Check the active model config:
 /Users/arijitchowdhury/.codex/skills/hostinger-vps-ssh/scripts/ssh-hermes-vps "sudo docker exec hermes python3 -c 'import yaml,json; c=yaml.safe_load(open(\"/opt/data/config.yaml\")); print(json.dumps({\"model\": c.get(\"model\"), \"delegation\": c.get(\"delegation\")}, indent=2))'"
 ```
 
-Run a tiny OpenRouter smoke test:
+Run a tiny Gemini smoke test:
 
 ```sh
-/Users/arijitchowdhury/.codex/skills/hostinger-vps-ssh/scripts/ssh-hermes-vps "sudo docker exec hermes hermes -z 'Reply exactly: openrouter hermes online'"
+/Users/arijitchowdhury/.codex/skills/hostinger-vps-ssh/scripts/ssh-hermes-vps "sudo docker exec -u hermes -e HOME=/opt/data hermes /opt/hermes/.venv/bin/hermes -z 'Reply exactly: gemini hermes online'"
 ```
 
 ## Fresh Telegram session
@@ -439,6 +440,7 @@ Known failure pattern from June 28, 2026:
 - The first credit-specific gateway patch still sounded robotic and could arrive twice because provider failures were delivered once through the status callback path and again as the final response. The live gateway was patched again so Telegram provider-failure status callbacks are suppressed and only the final response is delivered.
 - CI cron jobs originally caught Hermes synthesis failures, fell back to local synthesis, returned success, and could publish weak fallback artifacts. Production daily/weekly wrappers now run a provider preflight and pass `--fail-on-synthesis-error`.
 - The daily Chowmes provider credit watch cron runs at `08:45 America/New_York`, before the 09:00 CI jobs, and delivers a Telegram alert if credits are below the configured floor.
+- Current status as of June 29, 2026: Chowmes has been switched off OpenRouter for production routing. Default Athena and CI synthesis use direct Gemini; explicit fast/casual low-risk routes use Algolia inference. The historical OpenRouter incident remains useful as a failure-mode lesson, not as the active provider path.
 
 Current user-facing credit failure line:
 

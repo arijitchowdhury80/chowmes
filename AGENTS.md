@@ -30,7 +30,7 @@ Current structure:
 - Hermes is the My OS platform/runtime layer.
 - Chowmes is the execution company/runtime.
 - Athena is the CEO agent inside Chowmes.
-- Telegram currently talks to Athena by default. Some ELT roles now have separate Hermes profiles: Vulcan (`vulcan`) for CTO, Arjuna (`arjuna`) for Product / UX Strategy, Kubera (`kubera`) for Revenue / Business, and Prometheus (`prometheus`) for Legal / Risk. Their gateways may be stopped until needed unless explicitly exposed through Telegram.
+- Telegram currently talks to Athena by default. Some ELT roles now have separate Hermes profiles: Vulcan (`vulcan`) for CTO, Arjuna (`arjuna`) for Product / UX Strategy, Kubera (`kubera`) for Revenue / Business, and Prometheus (`prometheus`) for Legal / Risk. Competitive Intelligence now has Argus (`argus`) as its dedicated CI profile; Argus gateway stays stopped until Arijit provides the dedicated Telegram bot token. Their gateways may be stopped until needed unless explicitly exposed through Telegram.
 - Athena has the company-level ELT available to critique and expand plans.
 - Project workspaces contain execution teams only, recruited by Athena based on the work.
 - `Projects/My OS/index.md` is the canonical model.
@@ -89,11 +89,12 @@ These are role definitions and routing rules plus the current live-profile roste
 
 Current default model:
 
-- Provider: OpenRouter
-- Normal Telegram/default model: `deepseek/deepseek-v4-pro`
-- Fast/cheap model: `deepseek/deepseek-v4-flash`
-- Deep/delegated work model: `anthropic/claude-sonnet-4.6`
-- Vision/multimodal fallback model: `google/gemini-2.5-flash`
+- Provider: direct Gemini API.
+- Normal Telegram/default model: `gemini-2.5-flash`.
+- Fast/cheap model: `algolia-inference` through `/model fast` and `/model casual` only.
+- Deep/delegated work model: `gemini-2.5-pro`.
+- CI synthesis model: `gemini-2.5-flash` unless benchmarked quality tests justify a change.
+- OpenRouter is not the active production route.
 
 Local model status:
 
