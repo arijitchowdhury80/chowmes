@@ -1,5 +1,6 @@
 import json
 import os
+import shlex
 import subprocess
 import tempfile
 import textwrap
@@ -60,7 +61,7 @@ class CiE2eStatusRuntimeTests(unittest.TestCase):
                         "ci_run_review.py",
                         "## Argus CI Agent Mandate",
                         "Current live delivery mode is Argus-owned Telegram delivery through the `argus` Hermes profile",
-                        "The old default daily/weekly CI cron jobs are paused, not deleted.",
+                        "The old default daily/weekly CI cron jobs have been removed from Athena/default cron state.",
                     ]
                 )
                 + "\n"
@@ -101,6 +102,27 @@ class CiE2eStatusRuntimeTests(unittest.TestCase):
             )
 
         hermes = root / "fake-hermes"
+        default_cron_lines = [] if default_state == "" else [
+            f"57d4ec29e7ad [{default_state}]",
+            "Name:      competitive-research-daily",
+            "Schedule:  0 9 * * *",
+            "Deliver:   telegram",
+            "Script:    competitive-research-daily.sh",
+            "Mode:      no-agent (script stdout delivered directly)",
+            "Last run:  2026-06-29T06:52:45-04:00  ok",
+            f"d14daa705276 [{default_state}]",
+            "Name:      competitive-research-weekly",
+            "Schedule:  0 9 * * 0",
+            "Deliver:   telegram",
+            "Script:    competitive-research-weekly.sh",
+            "Mode:      no-agent (script stdout delivered directly)",
+            "Last run:  2026-06-29T06:53:16-04:00  ok",
+        ]
+        default_cron_output = (
+            ":"
+            if not default_cron_lines
+            else "printf '%s\\n' " + " ".join(shlex.quote(line) for line in default_cron_lines)
+        )
         hermes.write_text(
             textwrap.dedent(
                 f"""\
@@ -123,22 +145,7 @@ class CiE2eStatusRuntimeTests(unittest.TestCase):
                   exit 0
                 fi
                 if [ "$1" = "cron" ]; then
-                  cat <<'EOF'
-                    57d4ec29e7ad [{default_state}]
-                    Name:      competitive-research-daily
-                    Schedule:  0 9 * * *
-                    Deliver:   telegram
-                    Script:    competitive-research-daily.sh
-                    Mode:      no-agent (script stdout delivered directly)
-                    Last run:  2026-06-29T06:52:45-04:00  ok
-                    d14daa705276 [{default_state}]
-                    Name:      competitive-research-weekly
-                    Schedule:  0 9 * * 0
-                    Deliver:   telegram
-                    Script:    competitive-research-weekly.sh
-                    Mode:      no-agent (script stdout delivered directly)
-                    Last run:  2026-06-29T06:53:16-04:00  ok
-                EOF
+{textwrap.indent(default_cron_output.rstrip(), "                  ")}
                   exit 0
                 fi
                 exit 0
@@ -261,6 +268,16 @@ class CiE2eStatusRuntimeTests(unittest.TestCase):
         self.assertIn("ci_target_argus_e2e_ready=yes", result.stdout)
         self.assertIn("default_daily_cron_state=paused", result.stdout)
         self.assertIn("default_weekly_cron_state=paused", result.stdout)
+        self.assertIn("ci_final_argus_only_ready=yes", result.stdout)
+
+    def test_reports_final_argus_only_ready_when_default_crons_are_removed(self):
+        temp, env = self.make_fixture(token=True, gateway="running", argus_crons=True, default_state="")
+        with temp:
+            result = self.run_runtime(env)
+        self.assertEqual(result.returncode, 0, result.stdout)
+        self.assertIn("ci_target_argus_e2e_ready=yes", result.stdout)
+        self.assertIn("default_daily_cron=missing", result.stdout)
+        self.assertIn("default_weekly_cron=missing", result.stdout)
         self.assertIn("ci_final_argus_only_ready=yes", result.stdout)
 
     def test_require_final_argus_only_fails_until_default_crons_are_paused(self):

@@ -232,13 +232,13 @@ scripts/chowmes-argus-complete-activation --env-file .env.local --to telegram --
 scripts/chowmes-argus-cutover-ci-cron --execute
 ```
 
-The cutover pauses, not deletes, the temporary default CI cron jobs.
+The cutover originally paused the temporary default CI cron jobs. On June 29, 2026, Arijit explicitly asked to remove Athena/default daily and weekly CI cron definitions, and they were removed. The provider-credit watch remains under default Chowmes because it is platform health, not CI delivery.
 
 `scripts/chowmes-argus-activate` intentionally exits with code `2` when the dedicated token is missing. That is a safe blocker, not a runtime failure.
 
 `scripts/chowmes-argus-complete-activation` is the preferred one-command activation path if Argus ever needs to be reinstalled. In execute mode it installs the Argus Telegram key, starts and smoke-tests the Argus gateway, creates Argus-owned daily/weekly CI cron jobs, then runs `scripts/chowmes-ci-e2e-status --require-argus-e2e`.
 
-`scripts/chowmes-argus-cutover-ci-cron` is the final guarded cutover after Argus E2E delivery is ready. It refuses unless the Argus token, gateway, and Argus daily/weekly cron jobs are present. In execute mode it pauses the temporary default `competitive-research-daily` and `competitive-research-weekly` cron jobs. It does not delete them.
+`scripts/chowmes-argus-cutover-ci-cron` is the guarded cutover helper after Argus E2E delivery is ready. It refuses unless the Argus token, gateway, and Argus daily/weekly cron jobs are present. The helper pauses the temporary default `competitive-research-daily` and `competitive-research-weekly` cron jobs; after Arijit's explicit removal instruction, those paused defaults were removed with `hermes cron remove`.
 
 `scripts/chowmes-argus-configure-telegram` installs only Argus Telegram keys from a local env file and never prints secret values. Expected local keys are `ARGUS_TELEGRAM_BOT_TOKEN` or `ARGUS_BOT_TOKEN` or `TELEGRAM_BOT_TOKEN_ARGUS`; optional channel keys are `ARGUS_TELEGRAM_HOME_CHANNEL` and `ARGUS_TELEGRAM_ALLOWED_USERS`. It refuses to overwrite an existing Argus token unless `--force` is supplied.
 
@@ -250,7 +250,7 @@ Current verified state:
 
 - Argus daily CI cron is active at `0 9 * * *` through the dedicated Argus Telegram profile.
 - Argus weekly CI cron is active at `0 9 * * 0` through the dedicated Argus Telegram profile.
-- Temporary default daily/weekly CI cron jobs are paused.
+- Temporary default daily/weekly CI cron jobs were removed from Athena/default cron state.
 - Both wrappers run provider preflight before synthesis.
 - Both wrappers run post-run self-check after Markdown, HTML, ledger, and dashboard publish steps.
 - Live daily self-check for `2026-06-29` passed against Markdown, HTML, `ci.sqlite`, dashboard publish log, and weak-language gate.
@@ -264,7 +264,7 @@ Current verified state:
 - A dashboard publish warning appeared after the forced runs because the VPS app repo was `ahead 2, behind 1` from GitHub `main`; the repo was rebased and pushed, then dashboard publish and both self-checks returned to `pass`.
 - `scripts/chowmes-argus-status` is a Mac-side operator helper. Run it from this repository, not from inside `/opt/data/scripts` on the container.
 - `scripts/chowmes-ci-e2e-status` is the canonical current-vs-target health helper. It reports current default CI delivery health, daily/weekly wrapper wiring, latest daily/weekly audit status, Argus profile/persona contract readiness, CI skill Argus ownership/self-review contract readiness, target Argus E2E readiness, and the exact blocker when Argus delivery is not ready.
-- Use `scripts/chowmes-ci-e2e-status --require-final-argus-only` for the final health gate.
+- Use `scripts/chowmes-ci-e2e-status --require-final-argus-only` for the final health gate. In the final state, default daily/weekly CI cron jobs should be `missing`, while Argus daily/weekly cron jobs should be `present`.
 
 Fresh manual wrapper verification on June 29, 2026:
 

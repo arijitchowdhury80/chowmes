@@ -253,7 +253,7 @@ for marker in \
   "ci_run_review.py" \
   "Argus CI Agent Mandate" \
   "Current live delivery mode is Argus-owned Telegram delivery" \
-  "old default daily/weekly CI cron jobs are paused"
+  "old default daily/weekly CI cron jobs have been removed"
 do
   if ! file_has "$skill_file" "$marker"; then
     ci_skill_argus_contract_ready=no
