@@ -1,0 +1,176 @@
+#!/bin/sh
+set -eu
+
+execute=0
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --execute)
+      execute=1
+      ;;
+    -h|--help)
+      cat <<'EOF'
+Usage: chowmes-argus-cutover-ci-cron-runtime [--execute]
+
+Container-native guarded helper for pausing the temporary default CI delivery
+after Argus-owned CI delivery is fully ready.
+EOF
+      exit 0
+      ;;
+    *)
+      echo "unknown argument: $1" >&2
+      exit 2
+      ;;
+  esac
+  shift
+done
+
+profile_dir="${ARGUS_PROFILE_DIR:-/opt/data/profiles/argus}"
+hermes_bin="${HERMES_BIN:-/opt/hermes/.venv/bin/hermes}"
+
+contains_token_key() {
+  file="$1"
+  if [ ! -f "$file" ]; then
+    return 1
+  fi
+  awk -F= '
+    /^[A-Za-z_][A-Za-z0-9_]*=/ {
+      key=$1
+      if (key ~ /^(TELEGRAM_BOT_TOKEN|ARGUS_BOT_TOKEN|ARGUS_TELEGRAM_BOT_TOKEN)$/) {
+        found=1
+      }
+    }
+    END { exit found ? 0 : 1 }
+  ' "$file"
+}
+
+gateway_state() {
+  output="$("$hermes_bin" -p argus gateway status 2>/dev/null || true)"
+  normalized="$(printf '%s\n' "$output" | tr '[:upper:]' '[:lower:]')"
+  if printf '%s\n' "$normalized" | grep -q "not running"; then
+    echo "stopped"
+    return
+  fi
+  if printf '%s\n' "$normalized" | grep -q "stopped"; then
+    echo "stopped"
+    return
+  fi
+  if printf '%s\n' "$normalized" | grep -q "running"; then
+    echo "running"
+    return
+  fi
+  echo "unknown"
+}
+
+cron_text() {
+  profile="$1"
+  if [ "$profile" = "argus" ]; then
+    "$hermes_bin" -p argus cron list 2>/dev/null || true
+  else
+    "$hermes_bin" cron list 2>/dev/null || true
+  fi
+}
+
+cron_has_job() {
+  profile="$1"
+  job="$2"
+  cron_text "$profile" | grep -Fq "Name:      $job"
+}
+
+default_job_id() {
+  job="$1"
+  cron_text default | awk -v job="$job" '
+    /^[[:space:]]*[[:alnum:]]+[[:space:]]+\[[^]]+\][[:space:]]*$/ {
+      current = $1
+      state = $2
+      gsub(/[\[\]]/, "", state)
+      next
+    }
+    $1 == "Name:" && $2 == job {
+      print current ":" state
+      exit
+    }
+  '
+}
+
+echo "== argus-cutover-preflight =="
+
+if [ ! -d "$profile_dir" ]; then
+  echo "argus_cutover_ready=no"
+  echo "argus_cutover_blocker=Argus profile directory is missing"
+  exit 2
+fi
+
+if ! contains_token_key "$profile_dir/.env"; then
+  echo "argus_cutover_ready=no"
+  echo "argus_cutover_blocker=dedicated Argus Telegram bot token/channel is not configured"
+  exit 2
+fi
+
+argus_gateway="$(gateway_state)"
+echo "argus_gateway=$argus_gateway"
+if [ "$argus_gateway" != "running" ]; then
+  echo "argus_cutover_ready=no"
+  echo "argus_cutover_blocker=Argus gateway is not running"
+  exit 2
+fi
+
+if ! cron_has_job argus "argus-competitive-research-daily"; then
+  echo "argus_cutover_ready=no"
+  echo "argus_cutover_blocker=Argus daily CI cron is missing"
+  exit 2
+fi
+
+if ! cron_has_job argus "argus-competitive-research-weekly"; then
+  echo "argus_cutover_ready=no"
+  echo "argus_cutover_blocker=Argus weekly CI cron is missing"
+  exit 2
+fi
+
+daily_pair="$(default_job_id competitive-research-daily || true)"
+weekly_pair="$(default_job_id competitive-research-weekly || true)"
+
+if [ -z "$daily_pair" ]; then
+  echo "default_daily_cron=missing"
+else
+  echo "default_daily_cron=$daily_pair"
+fi
+
+if [ -z "$weekly_pair" ]; then
+  echo "default_weekly_cron=missing"
+else
+  echo "default_weekly_cron=$weekly_pair"
+fi
+
+echo "argus_cutover_ready=yes"
+
+if [ "$execute" != "1" ]; then
+  echo "argus_cutover_mode=dry-run"
+  [ -n "$daily_pair" ] && echo "would_pause_default_cron=${daily_pair%%:*}"
+  [ -n "$weekly_pair" ] && echo "would_pause_default_cron=${weekly_pair%%:*}"
+  exit 0
+fi
+
+echo "argus_cutover_mode=execute"
+
+pause_if_active() {
+  pair="$1"
+  label="$2"
+  [ -n "$pair" ] || {
+    echo "${label}_pause=missing"
+    return
+  }
+  job_id="${pair%%:*}"
+  state="${pair#*:}"
+  if [ "$state" = "paused" ]; then
+    echo "${label}_pause=already_paused"
+    return
+  fi
+  "$hermes_bin" cron pause "$job_id"
+  echo "${label}_pause=paused"
+}
+
+pause_if_active "$daily_pair" default_daily
+pause_if_active "$weekly_pair" default_weekly
+
+echo "argus_cutover_status=temporary_default_ci_cron_paused"

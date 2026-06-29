@@ -232,13 +232,16 @@ Activation sequence after Arijit provides the token/channel:
 3. Run `scripts/chowmes-argus-complete-activation --env-file .env.local` as a dry-run.
 4. Run `scripts/chowmes-argus-complete-activation --env-file .env.local --to telegram[:chat_id] --execute`.
 5. Keep the existing default no-agent CI cron active until Argus scheduled delivery is proven.
-6. Pause or remove the default CI delivery only after Argus delivery is verified and documented.
+6. Run `scripts/chowmes-argus-cutover-ci-cron` as a dry-run.
+7. Run `scripts/chowmes-argus-cutover-ci-cron --execute` only after Argus scheduled delivery is verified and documented. This pauses, not deletes, the temporary default CI cron jobs.
 
 Do not claim CI has dedicated-bot delivery until `scripts/chowmes-argus-status` reports Argus activation readiness and a live Telegram smoke test has passed.
 
 `scripts/chowmes-argus-activate` intentionally exits with code `2` when the dedicated token is missing. That is a safe blocker, not a runtime failure.
 
 `scripts/chowmes-argus-complete-activation` is the preferred one-command activation path after the token exists. In execute mode it installs the Argus Telegram key, starts and smoke-tests the Argus gateway, creates Argus-owned daily/weekly CI cron jobs, then runs `scripts/chowmes-ci-e2e-status --require-argus-e2e`. It dry-runs by default and currently exits `2` at configuration because the local Argus token is missing.
+
+`scripts/chowmes-argus-cutover-ci-cron` is the final guarded cutover after Argus E2E delivery is ready. It refuses unless the Argus token, gateway, and Argus daily/weekly cron jobs are present. In execute mode it pauses the temporary default `competitive-research-daily` and `competitive-research-weekly` cron jobs. It does not delete them.
 
 `scripts/chowmes-argus-configure-telegram` installs only Argus Telegram keys from a local env file and never prints secret values. Expected local keys are `ARGUS_TELEGRAM_BOT_TOKEN` or `ARGUS_BOT_TOKEN` or `TELEGRAM_BOT_TOKEN_ARGUS`; optional channel keys are `ARGUS_TELEGRAM_HOME_CHANNEL` and `ARGUS_TELEGRAM_ALLOWED_USERS`. It refuses to overwrite an existing Argus token unless `--force` is supplied.
 

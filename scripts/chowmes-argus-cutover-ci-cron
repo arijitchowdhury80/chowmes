@@ -1,0 +1,51 @@
+#!/bin/sh
+set -eu
+
+script_dir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+ssh_helper="$script_dir/chowmes-ssh-helper"
+runtime="$script_dir/chowmes-argus-cutover-ci-cron-runtime"
+execute_arg=""
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --execute)
+      execute_arg="--execute"
+      ;;
+    -h|--help)
+      cat <<'EOF'
+Usage: scripts/chowmes-argus-cutover-ci-cron [--execute]
+
+Guarded final cutover for Competitive Intelligence delivery.
+
+Default mode is dry-run. The helper refuses unless Argus E2E delivery is ready:
+- Argus profile/token/gateway are present.
+- Argus daily and weekly CI cron jobs are present.
+
+When executed, it pauses the temporary default CI cron jobs:
+- competitive-research-daily
+- competitive-research-weekly
+
+It does not delete jobs. Pausing is reversible.
+EOF
+      exit 0
+      ;;
+    *)
+      echo "unknown argument: $1" >&2
+      exit 2
+      ;;
+  esac
+  shift
+done
+
+if [ ! -f "$runtime" ]; then
+  echo "missing runtime script: $runtime" >&2
+  exit 1
+fi
+
+(
+  cd "$script_dir"
+  COPYFILE_DISABLE=1 tar --no-xattrs -cf - chowmes-argus-cutover-ci-cron-runtime
+) |
+  "$ssh_helper" "sudo docker exec -i hermes /bin/sh -lc 'tar --no-xattrs -xf - -C /opt/data/scripts && rm -f /opt/data/scripts/._chowmes-argus-cutover-ci-cron-runtime && chown hermes:hermes /opt/data/scripts/chowmes-argus-cutover-ci-cron-runtime && chmod 755 /opt/data/scripts/chowmes-argus-cutover-ci-cron-runtime'"
+
+"$ssh_helper" "sudo docker exec -i -u hermes -e HOME=/opt/data hermes /opt/data/scripts/chowmes-argus-cutover-ci-cron-runtime $execute_arg"
