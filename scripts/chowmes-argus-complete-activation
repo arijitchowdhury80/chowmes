@@ -1,0 +1,100 @@
+#!/bin/sh
+set -eu
+
+script_dir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+
+env_file=".env.local"
+target="telegram"
+execute=0
+force=0
+skip_configure=0
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --env-file)
+      shift
+      if [ "$#" -eq 0 ]; then
+        echo "--env-file requires a path" >&2
+        exit 2
+      fi
+      env_file="$1"
+      ;;
+    --to)
+      shift
+      if [ "$#" -eq 0 ]; then
+        echo "--to requires a delivery target" >&2
+        exit 2
+      fi
+      target="$1"
+      ;;
+    --execute)
+      execute=1
+      ;;
+    --force)
+      force=1
+      ;;
+    --skip-configure)
+      skip_configure=1
+      ;;
+    -h|--help)
+      cat <<'EOF'
+Usage: scripts/chowmes-argus-complete-activation [--env-file .env.local] [--to telegram[:chat_id]] [--execute] [--force] [--skip-configure]
+
+One guarded activation path for the final Argus CI bot architecture.
+
+Default mode is dry-run. In execute mode it performs the full sequence:
+1. Install dedicated Argus Telegram keys from the local env file.
+2. Start the Argus gateway and send a smoke test.
+3. Create Argus-owned daily/weekly CI cron jobs.
+4. Require full Argus E2E readiness.
+
+Use --skip-configure only when /opt/data/profiles/argus/.env already contains
+the dedicated Argus Telegram token. Use --force only to intentionally replace
+an existing Argus token during the configure step.
+EOF
+      exit 0
+      ;;
+    *)
+      echo "unknown argument: $1" >&2
+      exit 2
+      ;;
+  esac
+  shift
+done
+
+run_step() {
+  name="$1"
+  shift
+  echo "== $name =="
+  "$@"
+}
+
+if [ "$execute" = "1" ]; then
+  echo "argus_complete_activation_mode=execute"
+else
+  echo "argus_complete_activation_mode=dry-run"
+fi
+
+configure_args=""
+[ "$execute" = "1" ] && configure_args="$configure_args --execute"
+[ "$force" = "1" ] && configure_args="$configure_args --force"
+
+if [ "$skip_configure" != "1" ]; then
+  # shellcheck disable=SC2086
+  run_step "argus-configure-telegram" "$script_dir/chowmes-argus-configure-telegram" --env-file "$env_file" $configure_args
+else
+  echo "== argus-configure-telegram =="
+  echo "argus_configure_telegram=skipped"
+fi
+
+if [ "$execute" != "1" ]; then
+  echo "argus_complete_activation_dry_run_note=configuration was not written, so activation and cron migration are not executed in this dry run"
+  echo "next_execute_command=scripts/chowmes-argus-complete-activation --env-file $env_file --to $target --execute"
+  exit 0
+fi
+
+run_step "argus-activate" "$script_dir/chowmes-argus-activate" --execute --to "$target"
+run_step "argus-migrate-ci-cron" "$script_dir/chowmes-argus-migrate-ci-cron" --execute
+run_step "argus-e2e-status" "$script_dir/chowmes-ci-e2e-status" --require-argus-e2e
+
+echo "argus_complete_activation=passed"
