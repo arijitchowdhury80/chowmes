@@ -228,13 +228,15 @@ argus_activation_blocker=dedicated Argus Telegram bot token/channel is not confi
 Activation sequence after Arijit provides the token/channel:
 
 1. Add the dedicated Argus Telegram token to `/opt/data/profiles/argus/.env`; do not reuse the Athena/Chowmes token.
-2. Start the Argus gateway with the `argus` profile.
-3. Smoke-test Argus Telegram delivery in the dedicated channel.
+2. Run `scripts/chowmes-argus-activate` without `--execute` to dry-run the preflight.
+3. Run `scripts/chowmes-argus-activate --execute --to telegram[:chat_id]` to start the Argus gateway and send a smoke test.
 4. Create or migrate CI daily/weekly delivery under Argus only after the smoke test passes.
 5. Keep the existing default no-agent CI cron active until Argus delivery is proven.
 6. Pause or remove the default CI delivery only after Argus delivery is verified and documented.
 
 Do not claim CI has dedicated-bot delivery until `scripts/chowmes-argus-status` reports Argus activation readiness and a live Telegram smoke test has passed.
+
+`scripts/chowmes-argus-activate` intentionally exits with code `2` when the dedicated token is missing. That is a safe blocker, not a runtime failure.
 
 New canonical My OS files:
 

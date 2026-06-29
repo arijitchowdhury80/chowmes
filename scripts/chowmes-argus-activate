@@ -1,0 +1,113 @@
+#!/bin/sh
+set -eu
+
+script_dir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+ssh_helper="$script_dir/chowmes-ssh-helper"
+
+execute=0
+target="telegram"
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --execute)
+      execute=1
+      ;;
+    --to)
+      shift
+      if [ "$#" -eq 0 ]; then
+        echo "--to requires a delivery target" >&2
+        exit 2
+      fi
+      target="$1"
+      ;;
+    -h|--help)
+      cat <<'EOF'
+Usage: scripts/chowmes-argus-activate [--execute] [--to telegram[:chat_id]]
+
+Guarded activation helper for the Argus Competitive Intelligence profile.
+
+Default mode is a dry run. It verifies that the Argus profile has a dedicated
+Telegram token key configured and prints what would happen. It does not start
+the gateway unless --execute is supplied.
+
+This script does not migrate CI cron jobs. Keep the current default no-agent CI
+cron active until Argus gateway delivery has been smoke-tested.
+EOF
+      exit 0
+      ;;
+    *)
+      echo "unknown argument: $1" >&2
+      exit 2
+      ;;
+  esac
+  shift
+done
+
+"$ssh_helper" "EXECUTE='$execute' TARGET='$target' sudo docker exec -i -u hermes -e HOME=/opt/data -e EXECUTE='$execute' -e TARGET='$target' hermes /bin/sh -s" <<'REMOTE'
+set -eu
+
+profile_dir="/opt/data/profiles/argus"
+env_file="$profile_dir/.env"
+execute="${EXECUTE:-0}"
+target="${TARGET:-telegram}"
+
+contains_token_key() {
+  file="$1"
+  if [ ! -f "$file" ]; then
+    return 1
+  fi
+  awk -F= '
+    /^[A-Za-z_][A-Za-z0-9_]*=/ {
+      key=$1
+      if (key ~ /^(TELEGRAM_BOT_TOKEN|ARGUS_BOT_TOKEN|ARGUS_TELEGRAM_BOT_TOKEN)$/) {
+        found=1
+      }
+    }
+    END { exit found ? 0 : 1 }
+  ' "$file"
+}
+
+echo "== argus-activation-preflight =="
+
+if [ ! -d "$profile_dir" ]; then
+  echo "argus_activation_ready=no"
+  echo "argus_activation_blocker=Argus profile directory is missing"
+  exit 2
+fi
+
+if [ ! -f "$profile_dir/SOUL.md" ]; then
+  echo "argus_activation_ready=no"
+  echo "argus_activation_blocker=Argus SOUL.md is missing"
+  exit 2
+fi
+
+if ! contains_token_key "$env_file"; then
+  echo "argus_activation_ready=no"
+  echo "argus_activation_blocker=dedicated Argus Telegram bot token/channel is not configured"
+  echo "expected_token_keys=TELEGRAM_BOT_TOKEN or ARGUS_TELEGRAM_BOT_TOKEN in /opt/data/profiles/argus/.env"
+  exit 2
+fi
+
+echo "argus_activation_ready=yes"
+echo "argus_gateway_before=$(/opt/hermes/.venv/bin/hermes -p argus gateway status 2>/dev/null | tr '\n' ' ' | sed 's/[[:space:]][[:space:]]*/ /g')"
+
+if [ "$execute" != "1" ]; then
+  echo "argus_activation_mode=dry-run"
+  echo "would_start_gateway=yes"
+  echo "would_send_smoke_to=$target"
+  echo "would_migrate_cron=no"
+  exit 0
+fi
+
+echo "argus_activation_mode=execute"
+/opt/hermes/.venv/bin/hermes -p argus gateway start
+
+echo "== argus-send-smoke =="
+/opt/hermes/.venv/bin/hermes -p argus send --to "$target" "Argus activation smoke: CI profile gateway can deliver to this channel."
+
+echo "== argus-gateway-after =="
+/opt/hermes/.venv/bin/hermes -p argus gateway status
+
+echo "argus_activation_smoke=passed"
+echo "next_step=after this passes, create or migrate CI daily/weekly delivery under Argus; keep default CI cron until Argus scheduled delivery is proven"
+REMOTE
