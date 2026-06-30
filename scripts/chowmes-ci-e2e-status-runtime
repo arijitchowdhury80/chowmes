@@ -211,6 +211,82 @@ print(json.loads(Path(sys.argv[1]).read_text()).get("status", "unknown"))
 PY
 }
 
+delivery_status() {
+  cadence="$1"
+  db="$artifact_root/ci.sqlite"
+  if [ ! -f "$db" ]; then
+    status_line "latest_${cadence}_delivery_record" missing
+    status_line "latest_${cadence}_delivery_status" missing
+    return
+  fi
+  "$python_bin" - "$db" "$cadence" <<'PY' 2>/dev/null || {
+import sqlite3
+import sys
+from pathlib import Path
+
+db = Path(sys.argv[1])
+cadence = sys.argv[2]
+conn = sqlite3.connect(db)
+conn.row_factory = sqlite3.Row
+try:
+    row = conn.execute(
+        """
+        select id, status, report_id, dashboard_url, updated_at, markdown_path, html_path
+        from bot_deliveries
+        where cadence = ? and bot_profile = 'argus' and channel = 'telegram'
+        order by id desc
+        limit 1
+        """,
+        (cadence,),
+    ).fetchone()
+except sqlite3.Error:
+    row = None
+if not row:
+    print(f"latest_{cadence}_delivery_record=missing")
+    print(f"latest_{cadence}_delivery_status=missing")
+else:
+    print(f"latest_{cadence}_delivery_record=present")
+    print(f"latest_{cadence}_delivery_status={row['status'] or 'unknown'}")
+    print(f"latest_{cadence}_delivery_report_id={row['report_id'] or 'unknown'}")
+    print(f"latest_{cadence}_delivery_dashboard={row['dashboard_url'] or 'missing'}")
+    print(f"latest_{cadence}_delivery_markdown={row['markdown_path'] or 'missing'}")
+    print(f"latest_{cadence}_delivery_html={row['html_path'] or 'missing'}")
+PY
+    status_line "latest_${cadence}_delivery_record" missing
+    status_line "latest_${cadence}_delivery_status" unreadable
+  }
+}
+
+latest_delivery_status_value() {
+  cadence="$1"
+  db="$artifact_root/ci.sqlite"
+  if [ ! -f "$db" ]; then
+    echo "missing"
+    return
+  fi
+  "$python_bin" - "$db" "$cadence" <<'PY' 2>/dev/null || echo "unreadable"
+import sqlite3
+import sys
+from pathlib import Path
+
+conn = sqlite3.connect(Path(sys.argv[1]))
+try:
+    row = conn.execute(
+        """
+        select status
+        from bot_deliveries
+        where cadence = ? and bot_profile = 'argus' and channel = 'telegram'
+        order by id desc
+        limit 1
+        """,
+        (sys.argv[2],),
+    ).fetchone()
+except sqlite3.Error:
+    row = None
+print(row[0] if row else "missing")
+PY
+}
+
 echo "== current-default-ci-delivery =="
 daily_job="competitive-research-daily"
 weekly_job="competitive-research-weekly"
@@ -255,6 +331,11 @@ audit_status daily
 audit_status weekly
 latest_daily_audit_status_value="$(latest_audit_status_value daily)"
 latest_weekly_audit_status_value="$(latest_audit_status_value weekly)"
+echo "== ci-delivery-observability =="
+delivery_status daily
+delivery_status weekly
+latest_daily_delivery_status_value="$(latest_delivery_status_value daily)"
+latest_weekly_delivery_status_value="$(latest_delivery_status_value weekly)"
 
 current_ok=yes
 cron_has_job default "$daily_job" || current_ok=no
@@ -466,6 +547,24 @@ fi
 if [ "$final_ok" = "yes" ] && [ "$latest_weekly_audit_status_value" != "pass" ]; then
   final_ok=no
   final_blocker="latest weekly CI audit is not passing: $latest_weekly_audit_status_value"
+fi
+if [ "$final_ok" = "yes" ]; then
+  case "$latest_daily_delivery_status_value" in
+    queued_for_telegram|sent_by_hermes) : ;;
+    *)
+      final_ok=no
+      final_blocker="latest daily Telegram delivery ledger row is missing or failed: $latest_daily_delivery_status_value"
+      ;;
+  esac
+fi
+if [ "$final_ok" = "yes" ]; then
+  case "$latest_weekly_delivery_status_value" in
+    queued_for_telegram|sent_by_hermes) : ;;
+    *)
+      final_ok=no
+      final_blocker="latest weekly Telegram delivery ledger row is missing or failed: $latest_weekly_delivery_status_value"
+      ;;
+  esac
 fi
 
 status_line ci_final_argus_only_ready "$final_ok"

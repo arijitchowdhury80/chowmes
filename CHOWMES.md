@@ -308,6 +308,18 @@ Interpretation:
 - The final CI delivery architecture is active: Argus owns daily/weekly CI delivery and Athena remains supervisor/CEO.
 - Athena remains supervisor/CEO. She should not be described as the final daily CI operator once Argus is activated.
 
+Argus CI root-fix recovery and verification on June 29, 2026 evening / June 30 UTC:
+
+- The CI code is on GitHub at `arijitchowdhury80/algolia-competitive-intelligence`, commit `468ce4b`.
+- Argus `SOUL.md` was restored as the source of truth for voice. It now includes the hard response spine, anti-robot contract, and calibration examples for quiet days, weak signals, unsupported battlecard requests, dashboard failures, casual Arijit replies, and strategic weekly readouts.
+- A deployment mistake damaged the mounted Hermes home. Recovery recreated the Hermes container, restored the app repo, Chowmes identity files, Argus profile, provider env, Telegram owner approval, CI workspace, CI skill, Argus cron jobs, and restored June 27 baseline artifacts from `/tmp/ci-v1-artifacts-2026-06-27.tar.gz`.
+- Daily and weekly forced runs completed after recovery. Latest daily and weekly audits are `pass`; `bot_deliveries` has Argus Telegram rows for both daily and weekly; `action_items` is empty because the restored run had zero material semantic deltas.
+- `scripts/chowmes-ci-e2e-status --require-final-argus-only` returns `ci_final_argus_only_ready=yes` and now prints delivery observability rows from `bot_deliveries`.
+- `https://ci.chowmes.com/` returns HTTP 200. `https://ci.chowmes.com/data/semantic-dashboard.json` includes `daily_state`, `weekly_state`, delivery status, action queue, source health, suppressed diagnostics, and public-source coverage limits with `private_sources_connected=false`.
+- Dashboard publishing now defaults to local static export with `--no-git` from the wrapper. Set `DASHBOARD_GIT_PUBLISH=1` only after a valid GitHub deploy credential is restored on the VPS. Code changes are pushed from the local workstation; anonymous VPS push is not available even though the repository is public.
+- `scripts/chowmes-health-check --repair --send-test` passed after provider env and Telegram owner approval were restored.
+- Fresh Argus voice smoke passed with direct Gemini: quiet-day response started with useful truth, did not use generic assistant filler, and preserved Argus's skeptical/operator voice.
+
 ### Athena live voice status - June 29, 2026
 
 Confirmed root cause of the robotic provider-failure messages: the model-provider error copy was hardcoded in `/opt/hermes/gateway/run.py`, so those Telegram bubbles bypassed `SOUL.md` entirely.
