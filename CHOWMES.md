@@ -273,6 +273,7 @@ Current verified state:
 - Caddy routes `ci.chowmes.com` to the loopback-only static service `127.0.0.1:8662`.
 - The static service is `ci-dashboard-static.service`, enabled under systemd, serving `/root/.hermes/apps/algolia-competitive-intelligence/apps/dashboard/public`.
 - Verification on June 29, 2026 returned HTTP `200`, Let's Encrypt certificate `CN=ci.chowmes.com`, DNS `72.61.72.147`, and dashboard `generated_at=2026-06-29T19:31:08`.
+- The old Vercel project `algolia-competitive-intelligence` was deleted after Arijit's explicit confirmation to avoid stale-dashboard confusion. Keep `ci.chowmes.com` as the active public dashboard route until the serving architecture is deliberately revisited.
 - GitHub sync check on June 29, 2026: the VPS CI app repo was clean at `main...origin/main`; its local `core.sshCommand` was corrected from missing `/opt/data/secrets/algolia_ci_dashboard_deploy_key` to existing `/root/.hermes/secrets/algolia_ci_dashboard_deploy_key`; `git fetch origin --prune` and `git push --dry-run origin main` both returned exit `0`.
 - Forced Hermes cron runs on June 29, 2026 verified the scheduler path:
   - Daily last run: `2026-06-29T06:52:45.692560-04:00 ok`.
