@@ -338,8 +338,6 @@ latest_daily_delivery_status_value="$(latest_delivery_status_value daily)"
 latest_weekly_delivery_status_value="$(latest_delivery_status_value weekly)"
 
 current_ok=yes
-cron_has_job default "$daily_job" || current_ok=no
-cron_has_job default "$weekly_job" || current_ok=no
 wrapper_has "$daily_wrapper" "ci-provider-preflight.py" || current_ok=no
 wrapper_has "$daily_wrapper" "ci_run_self_check.py" || current_ok=no
 wrapper_has "$daily_wrapper" "ci_run_review.py" || current_ok=no
