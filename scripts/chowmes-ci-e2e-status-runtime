@@ -111,6 +111,34 @@ cron_last_run_for_job() {
   '
 }
 
+cron_mode_for_job() {
+  profile="$1"
+  job="$2"
+  cron_text "$profile" | awk -v job="$job" '
+    $1 == "Name:" && $2 == job { inside = 1; next }
+    inside && $1 == "Name:" { inside = 0 }
+    inside && $1 == "Mode:" {
+      sub("^[[:space:]]*Mode:[[:space:]]*", "")
+      print
+      exit
+    }
+  '
+}
+
+cron_skills_for_job() {
+  profile="$1"
+  job="$2"
+  cron_text "$profile" | awk -v job="$job" '
+    $1 == "Name:" && $2 == job { inside = 1; next }
+    inside && $1 == "Name:" { inside = 0 }
+    inside && $1 == "Skills:" {
+      sub("^[[:space:]]*Skills:[[:space:]]*", "")
+      print
+      exit
+    }
+  '
+}
+
 wrapper_has() {
   wrapper="$1"
   needle="$2"
@@ -166,6 +194,23 @@ PY
   }
 }
 
+latest_audit_status_value() {
+  cadence="$1"
+  dir="$artifact_root/run-audits"
+  latest="$(ls -1 "$dir"/*-"$cadence".json 2>/dev/null | sort | tail -1 || true)"
+  if [ -z "$latest" ]; then
+    echo "missing"
+    return
+  fi
+  "$python_bin" - "$latest" <<'PY' 2>/dev/null || echo "unreadable"
+import json
+import sys
+from pathlib import Path
+
+print(json.loads(Path(sys.argv[1]).read_text()).get("status", "unknown"))
+PY
+}
+
 echo "== current-default-ci-delivery =="
 daily_job="competitive-research-daily"
 weekly_job="competitive-research-weekly"
@@ -208,6 +253,8 @@ done
 
 audit_status daily
 audit_status weekly
+latest_daily_audit_status_value="$(latest_audit_status_value daily)"
+latest_weekly_audit_status_value="$(latest_audit_status_value weekly)"
 
 current_ok=yes
 cron_has_job default "$daily_job" || current_ok=no
@@ -220,6 +267,8 @@ wrapper_has "$weekly_wrapper" "ci-provider-preflight.py" || current_ok=no
 wrapper_has "$weekly_wrapper" "ci_run_self_check.py" || current_ok=no
 wrapper_has "$weekly_wrapper" "ci_run_review.py" || current_ok=no
 wrapper_has_delivery_identity weekly "$weekly_wrapper" || current_ok=no
+[ "$latest_daily_audit_status_value" = "pass" ] || current_ok=no
+[ "$latest_weekly_audit_status_value" = "pass" ] || current_ok=no
 status_line ci_current_pipeline_mechanically_healthy "$current_ok"
 
 echo "== target-argus-ci-delivery =="
@@ -330,12 +379,15 @@ status_line argus_gateway "$argus_gateway"
 
 if cron_has_job argus "argus-competitive-research-daily"; then
   status_line argus_daily_cron present
+  status_line argus_daily_cron_mode "$(cron_mode_for_job argus "argus-competitive-research-daily" || true)"
+  status_line argus_daily_cron_skills "$(cron_skills_for_job argus "argus-competitive-research-daily" || true)"
 else
   status_line argus_daily_cron missing
 fi
 
 if cron_has_job argus "argus-competitive-research-weekly"; then
   status_line argus_weekly_cron present
+  status_line argus_weekly_cron_mode "$(cron_mode_for_job argus "argus-competitive-research-weekly" || true)"
 else
   status_line argus_weekly_cron missing
 fi
@@ -366,9 +418,15 @@ elif [ "$argus_gateway" != "running" ]; then
 elif ! cron_has_job argus "argus-competitive-research-daily"; then
   target_ok=no
   blocker="Argus daily CI cron is missing"
+elif ! cron_mode_for_job argus "argus-competitive-research-daily" | grep -Fq "no-agent"; then
+  target_ok=no
+  blocker="Argus daily CI cron is not in no-agent script delivery mode"
 elif ! cron_has_job argus "argus-competitive-research-weekly"; then
   target_ok=no
   blocker="Argus weekly CI cron is missing"
+elif ! cron_mode_for_job argus "argus-competitive-research-weekly" | grep -Fq "no-agent"; then
+  target_ok=no
+  blocker="Argus weekly CI cron is not in no-agent script delivery mode"
 fi
 
 status_line ci_target_argus_e2e_ready "$target_ok"
@@ -400,6 +458,14 @@ if [ "$final_ok" = "yes" ]; then
       final_blocker="temporary default weekly CI cron is still active"
       ;;
   esac
+fi
+if [ "$final_ok" = "yes" ] && [ "$latest_daily_audit_status_value" != "pass" ]; then
+  final_ok=no
+  final_blocker="latest daily CI audit is not passing: $latest_daily_audit_status_value"
+fi
+if [ "$final_ok" = "yes" ] && [ "$latest_weekly_audit_status_value" != "pass" ]; then
+  final_ok=no
+  final_blocker="latest weekly CI audit is not passing: $latest_weekly_audit_status_value"
 fi
 
 status_line ci_final_argus_only_ready "$final_ok"

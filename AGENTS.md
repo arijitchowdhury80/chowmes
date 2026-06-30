@@ -10,7 +10,7 @@ Start with read-only inspection. Confirm with the user before changing firewall 
 
 ## Chowmes Operating Rules
 
-Athena, also called Athena is the user's private Hermes agent on the Hostinger VPS. Chowmes is the host/runtime name. Treat Athena as Arijit's AI employee, co-founder partner, and senior software architect, not as a chatbot.
+Chowmes is the Hostinger VPS and DNS/service umbrella. Hermes is the runtime software. MyOS-Core is the primary Hermes instance on the Chowmes host, using the default `/opt/data` Hermes home. Athena, also called Athena, is the CEO/default agent inside MyOS-Core. Treat Athena as Arijit's AI employee, co-founder partner, and senior software architect, not as a chatbot.
 
 Core working posture:
 
@@ -27,12 +27,14 @@ My OS is the one operating system. Do not treat Work OS, Company OS, MyOS Founde
 
 Current structure:
 
-- Hermes is the My OS platform/runtime layer.
-- Chowmes is the execution company/runtime.
-- Athena is the CEO agent inside Chowmes.
+- Chowmes is the server/host and service umbrella, not the name of the primary Hermes instance.
+- Hermes is the runtime software.
+- MyOS-Core is the primary Hermes instance on Chowmes for Athena, the ELT profiles, Argus, Competitive Intelligence delivery, operating memory, and company-level orchestration.
+- Athena is the CEO/default agent inside MyOS-Core.
 - Telegram currently talks to Athena by default. Some ELT roles now have separate Hermes profiles: Vulcan (`vulcan`) for CTO, Arjuna (`arjuna`) for Product / UX Strategy, Kubera (`kubera`) for Revenue / Business, and Prometheus (`prometheus`) for Legal / Risk. Competitive Intelligence has Argus (`argus`) as its dedicated CI profile and active Telegram bot. Arjuna, Kubera, Prometheus, and other gateways may be stopped until needed unless explicitly exposed through Telegram.
 - Athena has the company-level ELT available to critique and expand plans.
-- Project workspaces contain execution teams only, recruited by Athena based on the work.
+- MyOS-Core functions contain execution teams only when needed, recruited by Athena based on the work.
+- PRISM and CurioQuest are external systems/products, not MyOS-Core workspaces. PRISM now runs its own independent Hermes and webapp. CurioQuest is also outside MyOS-Core for now.
 - `Projects/My OS/index.md` is the canonical model.
 - `MyOS.md` is a root pointer kept for link stability.
 - Old WorkOS, Company-OS, Founder-OS, ArijitOS-style notes, and the old `Projects/MyOS` folder were consolidated into `Projects/My OS/`.
@@ -59,18 +61,18 @@ For larger ideas, use the planning sequence:
 
 Default routing:
 
-- My OS: company operating model, priorities, architecture, cross-project decisions.
-- Chowmes: Hermes runtime, Telegram, skills, cron, permissions, health checks.
-- PRISM: active test-bed workspace for Algolia audit pipeline, Discovery OS, sales enablement.
-- Competitive Intelligence: active pilot workspace for CI reports, source coverage, Algolia pack, and future generic CI engine.
-- CurioQuest: active test-bed workspace for the personalized curriculum-aligned STEM story/activity book product.
+- MyOS-Core: company operating model, priorities, architecture, agent roster, operating memory, ELT profiles, and cross-system decisions.
+- Chowmes: server, DNS/service umbrella, Docker, networking, permissions, health checks, and VPS administration.
+- Competitive Intelligence: MyOS-Core function for CI reports, source coverage, Algolia pack, and future generic CI engine. Argus owns the operating loop.
+- PRISM: external system with its own Hermes and webapp, not a MyOS-Core workspace.
+- CurioQuest: external product/system for now, not a MyOS-Core workspace.
 - Content Engine: content creation, repurposing, publishing, editorial calendar.
 
-Workspace homes:
+Canonical homes:
 
-- PRISM: `/opt/data/knowledge/obsidian/MyOS/Projects/PRISM/index.md`
-- Competitive Intelligence: `/opt/data/knowledge/obsidian/MyOS/Projects/Competitive Intelligence/index.md`
-- CurioQuest: `/opt/data/knowledge/obsidian/MyOS/Projects/CurioQuest/index.md`
+- MyOS-Core model: `/opt/data/knowledge/obsidian/MyOS/Projects/My OS/index.md`
+- Competitive Intelligence function: `/opt/data/knowledge/obsidian/MyOS/Projects/Competitive Intelligence/index.md`
+- External-system reference notes may exist for PRISM, Scout, and CurioQuest, but they should not be treated as execution workspaces inside MyOS-Core.
 
 For Competitive Intelligence, the executable skill belongs inside the workspace at `/opt/data/knowledge/obsidian/MyOS/Projects/Competitive Intelligence/skills/competitive-research`. `/opt/data/skills/competitive-research` is only a compatibility link for Hermes skill discovery. Do not keep duplicate executable copies under Chowmes; cron wrappers in `/opt/data/scripts/` should call the workspace path directly.
 

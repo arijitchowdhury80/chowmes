@@ -1,6 +1,6 @@
-# Chowmes Hermes Runbook
+# Chowmes / MyOS-Core Runbook
 
-Chowmes is the Hostinger VPS running Hermes Agent for Telegram and agent work.
+Chowmes is the Hostinger VPS and DNS/service umbrella. Hermes is the runtime software. MyOS-Core is the primary Hermes instance on Chowmes for Athena, ELT profiles, Argus, Competitive Intelligence delivery, operating memory, and company-level orchestration.
 
 ## Current live snapshot
 
@@ -9,15 +9,16 @@ Verified on June 29, 2026 from the Hostinger VPS.
 | Area | Confirmed live state |
 |---|---|
 | Host | `chowmes` |
+| Primary Hermes instance | `MyOS-Core` using `/opt/data` |
 | Containers | `hermes`, `caddy`, `scout`, `temporal`, `temporal-ui`, `temporal-db`, `ac2-lab-backend` |
 | Public ports | `22/tcp`, `80/tcp`, `443/tcp` allowed by UFW |
-| Local-only ports | Hermes dashboard `127.0.0.1:9119`, Temporal `127.0.0.1:7233`, Temporal UI `127.0.0.1:8088`, Scout `127.0.0.1:8421`, AC2 lab backend `127.0.0.1:8787` |
+| Local-only ports | Hermes dashboard `127.0.0.1:9119`, Temporal `127.0.0.1:7233`, Temporal UI `127.0.0.1:8088`, Scout `127.0.0.1:8421`, CI dashboard static service `127.0.0.1:8662`, AC2 lab backend `127.0.0.1:8787` |
 | Active provider/model | Direct Gemini API `gemini-2.5-pro` |
 | Active context length | `131072` |
 | Active max turns | `6` |
 | Active web backend | `parallel` |
-| Active gateways | Default Athena gateway running; Vulcan profile gateway running |
-| On-demand profiles | Arjuna, Kubera, Prometheus, Strategic, and Argus profiles exist but are not active gateways |
+| Active gateways | Default Athena gateway running; Argus profile gateway running; Vulcan profile gateway running |
+| On-demand profiles | Arjuna, Kubera, Prometheus, and Strategic profiles exist but are not active gateways |
 
 The older notes below are historical unless they match this verified snapshot. In particular, do not repeat the old "only SSH is public" statement without rechecking UFW and Caddy.
 
@@ -176,9 +177,9 @@ daily resume: 0 material signals, quality 1.00
 weekly wrapper: Markdown, HTML, and PDF generated
 ```
 
-## My OS team and agent structure
+## MyOS-Core team and agent structure
 
-Current canonical My OS notes live in the Obsidian vault under:
+Current canonical MyOS-Core operating notes live in the Obsidian vault under:
 
 ```text
 MyOS/Projects/My OS/
@@ -191,6 +192,15 @@ As of June 19, 2026, the current decision is:
 - Some ELT roles have become live Hermes profiles because they need persistent role memory, evolving judgment, and repeated founder/advisor dialogue.
 - Persistent memory and independent judgment alone can justify a live profile; distinct tools are not required.
 - Workspaces still receive execution roles, not their own mini C-suite.
+
+Naming boundary as of June 29, 2026:
+
+- Chowmes is the host/service umbrella.
+- Hermes is the runtime software.
+- MyOS-Core is the primary Hermes instance on Chowmes.
+- PRISM is an external system with its own independent Hermes and webapp, not a MyOS-Core workspace.
+- CurioQuest is an external product/system for now, not a MyOS-Core workspace.
+- Competitive Intelligence is a MyOS-Core function owned by Argus and supervised by Athena.
 
 Current existing advisory profiles as of June 20, 2026:
 
@@ -258,6 +268,12 @@ Current verified state:
 - Argus post-run review is wired after the self-check. It writes `run-reviews/YYYY-MM-DD-{cadence}.json`, Markdown, and `run-reviews/argus-learning-log.md`.
 - The first live Argus review found a quiet-day `missing_links` quality warning; the CI quality gate was patched so full-coverage quiet days are not falsely penalized while material reports still require links. The rerun produced daily quality score `1.00`, self-check `pass`, and Argus review `healthy`.
 - Dashboard publishing is wired through the CI app repository publisher.
+- Public CI dashboard is served at `https://ci.chowmes.com/`.
+- Hostinger DNS has `A ci -> 72.61.72.147` with TTL `300`.
+- Caddy routes `ci.chowmes.com` to the loopback-only static service `127.0.0.1:8662`.
+- The static service is `ci-dashboard-static.service`, enabled under systemd, serving `/root/.hermes/apps/algolia-competitive-intelligence/apps/dashboard/public`.
+- Verification on June 29, 2026 returned HTTP `200`, Let's Encrypt certificate `CN=ci.chowmes.com`, DNS `72.61.72.147`, and dashboard `generated_at=2026-06-29T19:31:08`.
+- GitHub sync check on June 29, 2026: the VPS CI app repo was clean at `main...origin/main`; its local `core.sshCommand` was corrected from missing `/opt/data/secrets/algolia_ci_dashboard_deploy_key` to existing `/root/.hermes/secrets/algolia_ci_dashboard_deploy_key`; `git fetch origin --prune` and `git push --dry-run origin main` both returned exit `0`.
 - Forced Hermes cron runs on June 29, 2026 verified the scheduler path:
   - Daily last run: `2026-06-29T06:52:45.692560-04:00 ok`.
   - Weekly last run: `2026-06-29T06:53:16.805569-04:00 ok`.
@@ -277,6 +293,14 @@ Fresh manual wrapper verification on June 29, 2026:
 - A later audit found the CI synthesis prompts in `ci_core.py` still said `You are Athena` even though the skill contract said Argus owned CI. This was fixed in both the workspace skill and the standalone `algolia-competitive-intelligence` repo. The readiness helper now reports `ci_synthesis_identity_ready=yes` and fails if synthesis prompts regress to Athena.
 - Current daily/weekly wrappers now include an explicit Telegram delivery identity notice: Argus generated and reviewed the run, the delivery path is the dedicated Argus Telegram gateway, and Athena is supervisor only. `scripts/chowmes-ci-e2e-status` reports `default_daily_delivery_identity_notice=present` and `default_weekly_delivery_identity_notice=present` when those wrapper markers are present.
 - After Argus activation and cutover, the same helper reports `ci_target_argus_e2e_ready=yes` and `ci_final_argus_only_ready=yes`.
+
+Argus repair and verification on June 29, 2026 evening:
+
+- Latest interactive Argus Telegram session before reset was `20260629_152426_096f06`, titled `Introduction to Argus Competitive Intelligence Agent #3`, with `input_tokens=103587`, `output_tokens=594`, `api_call_count=5`, `tool_call_count=14`, `cache_read_tokens=160932`, and unknown dollar cost because Gemini billing metadata was unavailable in Hermes. Argus Telegram usage for the day was 3 sessions, 176 messages, 56 tool calls, `1,390,304` input tokens, `15,247` output tokens, and `1,879,148` total tokens.
+- Root causes found: the daily wrapper parsed only `Markdown saved:` / `HTML saved:` lines while a prior patch made the run output JSON paths, the final readiness helper did not fail on latest audit failures, Argus memory still contained stale OpenRouter/DeepSeek routing, and the daily cron was still prompt-mediated with stale `{raw_script_output}` prompt text while weekly was already `no-agent`.
+- Fixes applied: daily and weekly wrappers now extract artifact paths from either legacy lines or JSON, self-check failure fails closed, `scripts/chowmes-ci-e2e-status --require-final-argus-only` now requires latest daily and weekly audits to pass and requires Argus daily/weekly cron mode to be `no-agent`, Argus memory now names direct Gemini routing, and the daily cron was changed to `no-agent` with no skills.
+- Verification evidence: forced daily wrapper returned exit 0, daily self-check returned `pass`, Argus daily review returned `healthy`, dashboard publish log said `Dashboard publish: committed and pushed`, forced daily cron output was `Mode: no_agent (script)` with `prompt_leak=absent`, and `scripts/chowmes-ci-e2e-status --require-final-argus-only` returned `ci_final_argus_only_ready=yes`.
+- After the memory/skill changes, `scripts/chow-fresh-argus-telegram-session` deleted the stale Telegram session and left `/opt/data/profiles/argus/sessions/sessions.json` empty. A fresh Argus prompt smoke test passed the voice gate and avoided banned generic phrases.
 
 Interpretation:
 

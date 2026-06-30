@@ -19,9 +19,9 @@ Use a small set of focused files:
 
 Avoid creating duplicate instruction files such as `.cursorrules` or `CLAUDE.md` unless a specific tool needs them. Too many overlapping instruction files make the agent inconsistent.
 
-## Active Chowmes runtime
+## Active MyOS-Core runtime
 
-The active Telegram agent runs on the Hostinger VPS.
+The active Telegram agent runs in MyOS-Core, the primary Hermes instance on the Chowmes Hostinger VPS. Chowmes is the host/service umbrella; Hermes is the runtime software.
 
 - Container path for Hermes home: `/opt/data`
 - Host path for Hermes home: `/root/.hermes`
