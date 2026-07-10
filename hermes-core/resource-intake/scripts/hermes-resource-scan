@@ -1,0 +1,195 @@
+#!/usr/bin/env python3
+"""Create a conservative intake report for external Hermes resources."""
+
+import argparse
+import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+from urllib.parse import urlparse
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_OUTPUT_DIR = REPO_ROOT / ".artifacts" / "hermes-resource-intake"
+
+RISK_PATTERNS = {
+    "AGENTS.md": "agent_instruction",
+    "CLAUDE.md": "agent_instruction",
+    ".hermes.md": "agent_instruction",
+    "SKILL.md": "skill_file",
+    "mcp.json": "mcp_config",
+    ".mcp.json": "mcp_config",
+    "install.sh": "install_script",
+    "setup.sh": "install_script",
+    "Dockerfile": "container_build",
+    "docker-compose.yml": "container_orchestration",
+    "package.json": "package_manifest",
+    "pyproject.toml": "package_manifest",
+    "requirements.txt": "package_manifest",
+}
+
+
+def is_url(target: str) -> bool:
+    parsed = urlparse(target)
+    return parsed.scheme in {"http", "https"} and bool(parsed.netloc)
+
+
+def slugify(value: str) -> str:
+    if is_url(value):
+        parsed = urlparse(value)
+        value = f"{parsed.netloc}{parsed.path}"
+    slug = re.sub(r"[^A-Za-z0-9._-]+", "-", value.strip("/ "))
+    return slug.strip("-")[:80] or "resource"
+
+
+def is_broad_path(path: Path) -> bool:
+    resolved = path.resolve()
+    blocked = {
+        Path("/").resolve(),
+        Path.home().resolve(),
+        Path.home().parent.resolve(),
+    }
+    return resolved in blocked
+
+
+def collect_local_flags(path: Path) -> list[str]:
+    flags: set[str] = set()
+    for root, dirs, files in os.walk(path):
+        dirs[:] = [
+            d
+            for d in dirs
+            if d not in {".git", "node_modules", "__pycache__", ".pytest_cache", ".mypy_cache"}
+        ]
+        rel_root = Path(root).relative_to(path)
+        for filename in files:
+            risk_type = RISK_PATTERNS.get(filename)
+            if risk_type:
+                rel = Path(filename) if rel_root == Path(".") else rel_root / filename
+                flags.add(f"{risk_type}:{rel.as_posix()}")
+    return sorted(flags)
+
+
+def find_executable(name: str) -> str | None:
+    found = shutil.which(name)
+    if found:
+        return found
+    local = REPO_ROOT / ".tools" / "bin" / name
+    if local.exists():
+        return str(local)
+    return None
+
+
+def medusa_status(target: str, run_medusa: bool, no_medusa: bool, report_dir: Path) -> dict[str, object]:
+    if no_medusa:
+        return {"medusa_status": "skipped", "reason": "--no-medusa"}
+    medusa = find_executable("medusa")
+    if not medusa:
+        return {"medusa_status": "missing", "reason": "medusa executable not found"}
+    if not run_medusa:
+        return {"medusa_status": "available_not_run", "reason": "pass --run-medusa to execute"}
+
+    output = report_dir / "medusa-output.txt"
+    if is_url(target):
+        command = [medusa, "scan", "--git", target]
+    else:
+        command = [medusa, "scan", target]
+    try:
+        result = subprocess.run(
+            command,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            timeout=300,
+        )
+    except subprocess.TimeoutExpired as exc:
+        output.write_text((exc.stdout or "")[:20000])
+        return {"medusa_status": "timeout", "exit_code": None, "output": str(output)}
+
+    output.write_text(result.stdout[:20000])
+    return {"medusa_status": "ran", "exit_code": result.returncode, "output": str(output)}
+
+
+def write_markdown(report: dict[str, object], path: Path) -> None:
+    flags = report["risk_flags"] or ["none"]
+    lines = [
+        "# Hermes Resource Scan",
+        "",
+        f"Target: `{report['target']}`",
+        f"Target type: `{report['target_type']}`",
+        f"Created: `{report['created_at']}`",
+        "",
+        "## Scanner",
+        "",
+        f"- Medusa status: `{report['scanner']['medusa_status']}`",
+        "",
+        "## Risk Flags",
+        "",
+    ]
+    lines.extend(f"- `{flag}`" for flag in flags)
+    lines.extend(
+        [
+            "",
+            "## Gate",
+            "",
+            "This report is an intake artifact only. It does not approve installation or live Hermes changes.",
+        ]
+    )
+    path.write_text("\n".join(lines) + "\n")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Create a safe Hermes external-resource intake report.")
+    parser.add_argument("target", help="Local path or HTTPS GitHub/resource URL to assess.")
+    parser.add_argument("--output-dir", default=str(DEFAULT_OUTPUT_DIR))
+    parser.add_argument("--allow-broad-scan", action="store_true")
+    parser.add_argument("--run-medusa", action="store_true", help="Run medusa if available.")
+    parser.add_argument("--no-medusa", action="store_true", help="Record medusa as skipped.")
+    args = parser.parse_args()
+
+    target = args.target
+    target_type = "url" if is_url(target) else "local_path"
+    if target_type == "local_path":
+        target_path = Path(target).expanduser()
+        if not target_path.exists():
+            print("target_exists=no")
+            print(f"target={target_path}")
+            return 2
+        if is_broad_path(target_path) and not args.allow_broad_scan:
+            print("refusing_broad_scan=yes")
+            print(f"target={target_path.resolve()}")
+            print("Pass --allow-broad-scan only after explicit approval.")
+            return 2
+        risk_flags = collect_local_flags(target_path)
+    else:
+        risk_flags = ["remote_resource:manual_clone_or_medusa_git_scan_required"]
+
+    report_dir = Path(args.output_dir) / f"{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}-{slugify(target)}"
+    report_dir.mkdir(parents=True, exist_ok=True)
+
+    report = {
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "target": target,
+        "target_type": target_type,
+        "risk_flags": risk_flags,
+        "scanner": medusa_status(target, args.run_medusa, args.no_medusa, report_dir),
+        "approval_status": "not_approved",
+        "live_runtime_change": "none",
+    }
+    json_path = report_dir / "hermes-resource-scan.json"
+    md_path = report_dir / "hermes-resource-scan.md"
+    json_path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
+    write_markdown(report, md_path)
+
+    print(f"scan_report_json={json_path}")
+    print(f"scan_report_md={md_path}")
+    print(f"medusa_status={report['scanner']['medusa_status']}")
+    print("approval_status=not_approved")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

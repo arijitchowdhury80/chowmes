@@ -9,6 +9,11 @@
 .chowmes-*.log
 .chowmes-*.pid
 
+# Private local security and intake reports
+.artifacts/
+.tools/
+.medusa/
+
 # Local caches and generated noise
 __pycache__/
 *.py[cod]

@@ -1,0 +1,191 @@
+#!/usr/bin/env python3
+"""Create a conservative installed-component inventory report for Hermes resources."""
+
+import argparse
+import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+from urllib.parse import urlparse
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_OUTPUT_DIR = REPO_ROOT / ".artifacts" / "hermes-resource-intake"
+
+INVENTORY_PATTERNS = {
+    "package.json": "package_manifest",
+    "pnpm-lock.yaml": "package_lock",
+    "package-lock.json": "package_lock",
+    "yarn.lock": "package_lock",
+    "pyproject.toml": "package_manifest",
+    "requirements.txt": "package_manifest",
+    "uv.lock": "package_lock",
+    "Cargo.toml": "package_manifest",
+    "Cargo.lock": "package_lock",
+    "go.mod": "package_manifest",
+    "go.sum": "package_lock",
+    "mcp.json": "mcp_config",
+    ".mcp.json": "mcp_config",
+    "SKILL.md": "skill_file",
+    "AGENTS.md": "agent_instruction",
+    "CLAUDE.md": "agent_instruction",
+}
+
+
+def is_url(target: str) -> bool:
+    parsed = urlparse(target)
+    return parsed.scheme in {"http", "https"} and bool(parsed.netloc)
+
+
+def slugify(value: str) -> str:
+    if is_url(value):
+        parsed = urlparse(value)
+        value = f"{parsed.netloc}{parsed.path}"
+    slug = re.sub(r"[^A-Za-z0-9._-]+", "-", value.strip("/ "))
+    return slug.strip("-")[:80] or "inventory"
+
+
+def is_broad_path(path: Path) -> bool:
+    resolved = path.resolve()
+    return resolved in {Path("/").resolve(), Path.home().resolve(), Path.home().parent.resolve()}
+
+
+def collect_inventory_hints(path: Path) -> list[str]:
+    hints: set[str] = set()
+    for root, dirs, files in os.walk(path):
+        dirs[:] = [
+            d
+            for d in dirs
+            if d not in {".git", "node_modules", "__pycache__", ".pytest_cache", ".mypy_cache"}
+        ]
+        rel_root = Path(root).relative_to(path)
+        for filename in files:
+            hint_type = INVENTORY_PATTERNS.get(filename)
+            if hint_type:
+                rel = Path(filename) if rel_root == Path(".") else rel_root / filename
+                hints.add(f"{hint_type}:{rel.as_posix()}")
+    return sorted(hints)
+
+
+def find_executable(name: str) -> str | None:
+    found = shutil.which(name)
+    if found:
+        return found
+    local = REPO_ROOT / ".tools" / "bin" / name
+    if local.exists():
+        return str(local)
+    return None
+
+
+def bumblebee_status(target: str, run_bumblebee: bool, no_bumblebee: bool, report_dir: Path) -> dict[str, object]:
+    if no_bumblebee:
+        return {"bumblebee_status": "skipped", "reason": "--no-bumblebee"}
+    bumblebee = find_executable("bumblebee")
+    if not bumblebee:
+        return {"bumblebee_status": "missing", "reason": "bumblebee executable not found"}
+    if not run_bumblebee:
+        return {"bumblebee_status": "available_not_run", "reason": "pass --run-bumblebee to execute"}
+    if is_url(target):
+        return {"bumblebee_status": "not_run", "reason": "bumblebee expects local paths"}
+
+    output = report_dir / "bumblebee-output.ndjson"
+    command = [bumblebee, "scan", "--profile", "project", "--root", target]
+    try:
+        result = subprocess.run(
+            command,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            timeout=300,
+        )
+    except subprocess.TimeoutExpired as exc:
+        output.write_text((exc.stdout or "")[:20000])
+        return {"bumblebee_status": "timeout", "exit_code": None, "output": str(output)}
+
+    output.write_text(result.stdout[:20000])
+    return {"bumblebee_status": "ran", "exit_code": result.returncode, "output": str(output)}
+
+
+def write_markdown(report: dict[str, object], path: Path) -> None:
+    hints = report["inventory_hints"] or ["none"]
+    lines = [
+        "# Hermes Inventory Scan",
+        "",
+        f"Target: `{report['target']}`",
+        f"Target type: `{report['target_type']}`",
+        f"Created: `{report['created_at']}`",
+        "",
+        "## Scanner",
+        "",
+        f"- Bumblebee status: `{report['scanner']['bumblebee_status']}`",
+        "",
+        "## Inventory Hints",
+        "",
+    ]
+    lines.extend(f"- `{hint}`" for hint in hints)
+    lines.extend(
+        [
+            "",
+            "## Gate",
+            "",
+            "This report inventories exposure hints only. It does not approve installation or runtime changes.",
+        ]
+    )
+    path.write_text("\n".join(lines) + "\n")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Create a safe Hermes inventory intake report.")
+    parser.add_argument("target", help="Local path or HTTPS URL to inventory.")
+    parser.add_argument("--output-dir", default=str(DEFAULT_OUTPUT_DIR))
+    parser.add_argument("--allow-broad-scan", action="store_true")
+    parser.add_argument("--run-bumblebee", action="store_true", help="Run bumblebee if available.")
+    parser.add_argument("--no-bumblebee", action="store_true", help="Record bumblebee as skipped.")
+    args = parser.parse_args()
+
+    target = args.target
+    target_type = "url" if is_url(target) else "local_path"
+    if target_type == "local_path":
+        target_path = Path(target).expanduser()
+        if not target_path.exists():
+            print("target_exists=no")
+            print(f"target={target_path}")
+            return 2
+        if is_broad_path(target_path) and not args.allow_broad_scan:
+            print("refusing_broad_scan=yes")
+            print(f"target={target_path.resolve()}")
+            print("Pass --allow-broad-scan only after explicit approval.")
+            return 2
+        inventory_hints = collect_inventory_hints(target_path)
+    else:
+        inventory_hints = ["remote_resource:clone_before_local_inventory"]
+
+    report_dir = Path(args.output_dir) / f"{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}-{slugify(target)}"
+    report_dir.mkdir(parents=True, exist_ok=True)
+    report = {
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "target": target,
+        "target_type": target_type,
+        "inventory_hints": inventory_hints,
+        "scanner": bumblebee_status(target, args.run_bumblebee, args.no_bumblebee, report_dir),
+        "approval_status": "not_approved",
+        "live_runtime_change": "none",
+    }
+    json_path = report_dir / "hermes-inventory-scan.json"
+    md_path = report_dir / "hermes-inventory-scan.md"
+    json_path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
+    write_markdown(report, md_path)
+
+    print(f"inventory_report_json={json_path}")
+    print(f"inventory_report_md={md_path}")
+    print(f"bumblebee_status={report['scanner']['bumblebee_status']}")
+    print("approval_status=not_approved")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
