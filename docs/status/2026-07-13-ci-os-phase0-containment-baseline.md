@@ -363,6 +363,31 @@ global outbound TCP/22 blocking from the Codex runtime, and a dead VPS IP. The
 remaining blocker is port-22 filtering or non-exposure on the Hostinger/VPS
 side for this source path before `sshd` sees the connection.
 
+At approximately `2026-07-13T15:10Z`, Hostinger console diagnostics showed the
+public SSH path is deliberately source-restricted:
+
+```text
+sshd listens on 0.0.0.0:22 and [::]:22
+UFW allows 22/tcp from 172.126.44.66 only for the normal Mac path
+Temporary UFW allows for Codex SSH egress were tested and then removed
+Tailscale on this Mac is unavailable because macOS blocks the Tailscale network
+extension with OSSystemExtensionErrorForbiddenBySystemPolicy
+```
+
+The server was returned to its narrow access posture:
+
+```text
+80/tcp allow anywhere
+443/tcp allow anywhere
+22/tcp allow from 172.126.44.66
+4719/tcp allow on tailscale0
+```
+
+Decision: stop spending CI-OS execution time on travel-network SSH plumbing.
+Continue local CI-OS source work only. Deployed release-record creation and
+full live parity verification are deferred until Arijit is back on a working
+SSH path or Tailscale is repaired on this Mac.
+
 ## Next Phase 0 Work Only
 
 Do not begin Phase 1 yet.
