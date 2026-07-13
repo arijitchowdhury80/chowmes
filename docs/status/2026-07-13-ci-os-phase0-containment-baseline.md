@@ -1,16 +1,17 @@
 # CI-OS Phase 0 Containment Baseline
 
 Date: 2026-07-13
-Status: Phase 0 active, gate not passed
+Status: Phase 0 active, source-control blocker cleared, deployed-release mapping still incomplete
 Goal: Complete the CI-OS Algolia pilot through the approved phase-gated plan.
 
 ## Boundary
 
 This artifact records the current Phase 0 baseline only. No CI-OS business
 logic was changed, no generated files were deleted, no user changes were
-reverted, and no server state was modified. The only CI-OS package repo change
-made during this continuation was source-control hygiene: ignore generated
-runtime artifacts and remove tracked Mac metadata from Git's source set.
+reverted, and no server state was modified. The CI-OS package repo changes made
+during this continuation were source-control hygiene, commit separation,
+development-loop bootstrap, and publication of the Phase 0 branch/tags to the
+user-confirmed package remote.
 
 Hermes remains the runtime OS. CI-OS remains a separately versioned extension.
 This baseline does not authorize Hermes core changes.
@@ -21,11 +22,13 @@ This baseline does not authorize Hermes core changes.
 
 - Path: `/Users/arijitchowdhury/Dropbox/AI-Development/Personal/ChowMes`
 - Branch: `codex/hermes-resource-intake`
-- HEAD: `7bf51a8f09b913514780533fc5c4054adfab669a`
+- HEAD: `1951342c6509fd724584565447e9e61f5a919efa`
 - Upstream: `origin/codex/hermes-resource-intake`
-- Ahead/behind: `+0 -0`
-- Tracked changes: 2 files, `32 insertions, 1 deletion`
-- Untracked source-control candidates: 62
+- Ahead/behind: `+1 -0`
+- Tracked changes outside this artifact before this update: 2 files,
+  `CHOW_TRACKING.md` and `README.md`
+- Untracked source-control candidates: 62, pre-existing coordination/mockup
+  artifacts
 
 ChowMes currently holds the coordination artifacts, public status docs, mockup
 lock, and CI-OS extension-boundary manifest. It is not the package source.
@@ -36,7 +39,11 @@ lock, and CI-OS extension-boundary manifest. It is not the package source.
 - Branch: `codex/ci-os-phase0-baseline`
 - HEAD: `13731acc5d875a09ba736adcf411ca3c604e4f69`
 - Base before Phase 0 hygiene: `453849cb0bd4a7d59799e8deb3f76e41173d1fe6`
-- Git remote: none configured
+- Git remote: `origin`
+  `https://github.com/arijitchowdhury80/algolia-competitive-intelligence.git`
+- Authoritative Phase 0 source branch:
+  `origin/codex/ci-os-phase0-baseline` ->
+  `13731acc5d875a09ba736adcf411ca3c604e4f69`
 - Phase 0 local commit series:
   - `b5787b1 chore: quarantine generated artifacts`
   - `a87b4e0 chore: bootstrap development-loop state`
@@ -50,15 +57,22 @@ lock, and CI-OS extension-boundary manifest. It is not the package source.
 - Local tags:
   - `ci-os-pre-phase0-recovery-2026-07-13` -> `453849c`
   - `ci-os-phase0-clean-baseline-2026-07-13` -> `13731ac`
+- Published tags:
+  - `ci-os-pre-phase0-recovery-2026-07-13` ->
+    `453849cb0bd4a7d59799e8deb3f76e41173d1fe6`
+  - `ci-os-phase0-clean-baseline-2026-07-13` ->
+    `13731acc5d875a09ba736adcf411ca3c604e4f69`
 - Remaining tracked changes after commit series: 0
 - Untracked source-control candidates after commit series: 0
 - Clean source archive checksum from `git archive --format=tar HEAD`:
   `77621f7a81bc0f77c263e23a7e06cc06126ba5149741383fc57baa1202f9dd5d`
 - Tracked file count: 474
 
-The CI-OS repo now has a clean local review branch and reviewable commit
-series, but the release ownership problem is still real: there is no configured
-remote for this package repo.
+The CI-OS repo now has a clean published review branch and reviewable commit
+series. The repository ownership blocker is resolved by the user-confirmed
+GitHub repository. The remaining Phase 0 question is narrower: whether the
+currently deployed `/root/.hermes/apps/cios` package can be mapped to this
+commit or to a reproducible release bundle beyond sampled checksum parity.
 
 Development-loop project state now exists under `.development-loop/project/`
 and points back to the approved CI-OS completion plan rather than creating a
@@ -241,9 +255,10 @@ Sampled live checksums match the clean local branch checksums for:
 - `deploy/cios-daily.sh`
 
 This proves sampled file parity, not a complete reproducible release. The
-deployed package still cannot be mapped to a commit because the app directory
-has no Git metadata and the local package repo has no authoritative remote or
-published release tag.
+deployed package still cannot be fully mapped to a commit because the app
+directory has no Git metadata and no release manifest on the host. The package
+source of truth is now authoritative, but the deployed directory itself is not
+yet a clean release bundle.
 
 ### Ownership and metadata concerns
 
@@ -285,20 +300,30 @@ non-final because the release and ownership baseline are not clean.
 Gate: one clean, reviewable branch represents the retained CI-OS
 implementation, and no unknown untracked source files remain.
 
-Result: not passed.
+Result: not passed yet.
+
+Source-control subgate: passed.
+
+- The retained CI-OS implementation is clean locally.
+- The retained branch is published to the user-confirmed authoritative remote.
+- The pre-recovery and clean-baseline tags are published to the same remote.
+- Remote ref verification on 2026-07-13 returned the expected commit IDs:
+  - `refs/heads/codex/ci-os-phase0-baseline` ->
+    `13731acc5d875a09ba736adcf411ca3c604e4f69`
+  - `refs/tags/ci-os-phase0-clean-baseline-2026-07-13` ->
+    `13731acc5d875a09ba736adcf411ca3c604e4f69`
+  - `refs/tags/ci-os-pre-phase0-recovery-2026-07-13` ->
+    `453849cb0bd4a7d59799e8deb3f76e41173d1fe6`
 
 Blocking facts:
 
-1. The package repo has no configured remote and no release ownership record.
-2. The package repo source tree is clean, but only locally.
-3. The retained source has been split into reviewable local commits, but those
-   commits have not been pushed or attached to an authoritative release owner.
-4. Generated output and local metadata are ignored and no longer pollute Git
+1. The deployed app has no Git metadata, mixed ownership, local machine
+   metadata, and only sampled checksum parity with the clean published branch.
+2. No release manifest currently exists on the host that maps
+   `/root/.hermes/apps/cios` to the published branch, tag, or source archive
+   checksum.
+3. Generated output and local metadata are ignored and no longer pollute Git
    status.
-5. The deployed app has no Git metadata, mixed ownership, local machine
-   metadata, and only sampled checksum parity with the clean local branch.
-6. A local branch, local tags, and source archive checksum exist, but no
-   authoritative remote/release identity exists yet.
 
 ## Next Phase 0 Work Only
 
@@ -306,9 +331,6 @@ Do not begin Phase 1 yet.
 
 Next containment slice:
 
-1. Decide the CI-OS package remote and release ownership model.
-2. Push or otherwise publish the local Phase 0 branch and tags to that
-   authority.
-3. Create a deployed release record that maps `/root/.hermes/apps/cios` to the
+1. Create a deployed release record that maps `/root/.hermes/apps/cios` to the
    authoritative commit/tag/archive checksum.
-4. Only then re-evaluate the Phase 0 gate for advancement to Phase 1.
+2. Only then re-evaluate the Phase 0 gate for advancement to Phase 1.
