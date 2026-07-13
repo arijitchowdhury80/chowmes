@@ -12,6 +12,13 @@ INVENTORY_SCAN = REPO_ROOT / "scripts" / "hermes-inventory-scan"
 LEDGER = REPO_ROOT / "docs" / "hermes-external-resource-ledger.md"
 CHECKLIST = REPO_ROOT / "docs" / "hermes-skill-intake-checklist.md"
 THREAT_MODEL = REPO_ROOT / "docs" / "hermes-resource-threat-model.md"
+EVAL_GATE = REPO_ROOT / "docs" / "hermes-eval-gate.md"
+SECURITY_GATE = REPO_ROOT / "docs" / "hermes-security-gate.md"
+SKILL_BEHAVIOR_GATE = REPO_ROOT / "docs" / "hermes-skill-behavior-gate.md"
+MEMORY_GATE = REPO_ROOT / "docs" / "hermes-memory-gate.md"
+VOICE_GATE = REPO_ROOT / "docs" / "hermes-voice-gate.md"
+RUNTIME_GATE = REPO_ROOT / "docs" / "hermes-runtime-gate.md"
+GATE_SCHEMA = REPO_ROOT / "docs" / "hermes-eval-gate-schema.json"
 
 
 class HermesResourceIntakeTests(unittest.TestCase):
@@ -143,6 +150,51 @@ class HermesResourceIntakeTests(unittest.TestCase):
         self.assertIn("Rollback", checklist)
         self.assertIn("Trust Boundary", threat_model)
         self.assertIn("No Live Runtime Change", threat_model)
+
+    def test_eval_gate_docs_define_all_layers_and_reuse_existing_skill_verifier(self):
+        docs = {
+            "security": SECURITY_GATE,
+            "skill_behavior": SKILL_BEHAVIOR_GATE,
+            "memory": MEMORY_GATE,
+            "voice": VOICE_GATE,
+            "runtime": RUNTIME_GATE,
+        }
+        overview = EVAL_GATE.read_text()
+
+        for gate_id, path in docs.items():
+            self.assertTrue(path.exists(), f"{path} is missing")
+            content = path.read_text()
+            self.assertIn(f"Gate ID: `{gate_id}`", content)
+            self.assertIn("Required Evidence", content)
+            self.assertIn("Pass Criteria", content)
+            self.assertIn("Rollback", content)
+            self.assertIn(str(path.name), overview)
+
+        security = SECURITY_GATE.read_text()
+        self.assertIn("/Users/arijitchowdhury/.agents/skills/skill-verifier", security)
+        self.assertIn("Do not replace `skill-verifier`", security)
+        self.assertIn("Medusa", security)
+        self.assertIn("Bumblebee", security)
+
+    def test_eval_gate_schema_requires_gate_evidence_and_resource_coverage(self):
+        schema = json.loads(GATE_SCHEMA.read_text())
+
+        self.assertEqual(schema["schema_version"], 1)
+        self.assertEqual(
+            [gate["id"] for gate in schema["gates"]],
+            ["security", "skill_behavior", "memory", "voice", "runtime"],
+        )
+        for gate in schema["gates"]:
+            self.assertIn("required_evidence", gate)
+            self.assertIn("pass_criteria", gate)
+            self.assertIn("rollback", gate)
+            self.assertGreaterEqual(len(gate["required_evidence"]), 2)
+
+        resources = {resource["name"]: resource for resource in schema["resources"]}
+        self.assertEqual(resources["Honcho Memory"]["required_gates"], ["security", "memory", "voice", "runtime"])
+        self.assertEqual(resources["Sentry Skills"]["required_gates"], ["security", "skill_behavior", "runtime"])
+        self.assertEqual(resources["Hermes Agent Self-Evolution"]["required_gates"], ["security", "skill_behavior", "voice", "runtime"])
+        self.assertEqual(resources["GBrain"]["required_gates"], ["security", "memory", "runtime"])
 
 
 if __name__ == "__main__":

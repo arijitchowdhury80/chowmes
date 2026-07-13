@@ -46,3 +46,19 @@ No item moves beyond `study` or `scan` unless its report names:
 - `hermes-core/resource-intake/scripts/hermes-inventory-scan`: creates a Bumblebee-oriented inventory report.
 - `hermes-core/resource-intake/docs/hermes-skill-intake-checklist.md`: defines approval gates for skills.
 - `hermes-core/resource-intake/docs/hermes-resource-threat-model.md`: defines first-layer threat model and non-goals.
+
+## Phase 2 Eval Gate Contract
+
+Required gates now live in `hermes-core/resource-intake/docs/hermes-eval-gate-schema.json`.
+The human-readable gate docs are:
+
+- `hermes-eval-gate.md`
+- `hermes-security-gate.md`
+- `hermes-skill-behavior-gate.md`
+- `hermes-memory-gate.md`
+- `hermes-voice-gate.md`
+- `hermes-runtime-gate.md`
+
+The schema is the enforceable resource-to-gate map. This keeps
+`skill-verifier` focused as the security scanner while Hermes adds behavior,
+memory, voice, and runtime gates around it.

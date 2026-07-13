@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "status": "phase-2-control-contract",
+  "gates": [
+    {
+      "id": "security",
+      "doc": "hermes-security-gate.md",
+      "required_evidence": [
+        "skill-verifier report when the resource is a skill, agent workflow, MCP tool, or executable repo",
+        "hermes-resource-scan report with Medusa status or blocker",
+        "hermes-inventory-scan report with Bumblebee status or blocker"
+      ],
+      "pass_criteria": [
+        "no unresolved critical finding",
+        "no secret values written to output or reports",
+        "permissions match stated purpose"
+      ],
+      "rollback": "Reject resource, keep it study-only, and remove unapproved local copies."
+    },
+    {
+      "id": "skill_behavior",
+      "doc": "hermes-skill-behavior-gate.md",
+      "required_evidence": [
+        "behavior eval set with expected outputs",
+        "negative trigger eval set",
+        "baseline and candidate score report"
+      ],
+      "pass_criteria": [
+        "candidate improves or preserves behavior quality",
+        "negative trigger cases stay quiet",
+        "skill does not conflict with Hermes operating rules"
+      ],
+      "rollback": "Revert prompt, description, routing metadata, or keep candidate explicit-only."
+    },
+    {
+      "id": "memory",
+      "doc": "hermes-memory-gate.md",
+      "required_evidence": [
+        "real Chowmes/MyOS recall prompts",
+        "baseline and candidate answers",
+        "profile isolation and sensitive leakage checks"
+      ],
+      "pass_criteria": [
+        "candidate improves recall measurably",
+        "no cross-profile sensitive leakage",
+        "prompt growth stays within budget"
+      ],
+      "rollback": "Disable memory pilot and restore previous memory routing."
+    },
+    {
+      "id": "voice",
+      "doc": "hermes-voice-gate.md",
+      "required_evidence": [
+        "persona smoke prompts",
+        "fresh-session or fresh-prompt transcript",
+        "role-boundary review"
+      ],
+      "pass_criteria": [
+        "profile preserves intended role and tone",
+        "profile does not claim unapproved tools or authority",
+        "fresh output confirms the intended context is loaded"
+      ],
+      "rollback": "Restore previous profile files and reset the affected session."
+    },
+    {
+      "id": "runtime",
+      "doc": "hermes-runtime-gate.md",
+      "required_evidence": [
+        "health-check output",
+        "gateway status",
+        "Telegram delivery evidence when in scope"
+      ],
+      "pass_criteria": [
+        "affected gateway is running",
+        "fresh-session path uses intended context",
+        "endpoints remain private unless separately approved"
+      ],
+      "rollback": "Restore backed-up files, restart only affected services, and rerun health checks."
+    }
+  ],
+  "resources": [
+    {
+      "name": "Honcho Memory",
+      "required_gates": ["security", "memory", "voice", "runtime"]
+    },
+    {
+      "name": "Hermes Skills System",
+      "required_gates": ["security", "skill_behavior", "runtime"]
+    },
+    {
+      "name": "Medusa",
+      "required_gates": ["security", "runtime"]
+    },
+    {
+      "name": "Sentry Skills",
+      "required_gates": ["security", "skill_behavior", "runtime"]
+    },
+    {
+      "name": "Hermes Agent Self-Evolution",
+      "required_gates": ["security", "skill_behavior", "voice", "runtime"]
+    },
+    {
+      "name": "Bumblebee",
+      "required_gates": ["security", "runtime"]
+    },
+    {
+      "name": "GBrain",
+      "required_gates": ["security", "memory", "runtime"]
+    },
+    {
+      "name": "Turbovec",
+      "required_gates": ["security", "memory", "runtime"]
+    },
+    {
+      "name": "Open Design",
+      "required_gates": ["security", "skill_behavior", "runtime"]
+    }
+  ]
+}

@@ -14,6 +14,13 @@ touch Athena, Argus, Telegram, gateway config, or runtime memory.
 - `docs/hermes-external-resource-ledger.md`: source, license, decision, and gate ledger.
 - `docs/hermes-resource-threat-model.md`: trust boundary and hard stops.
 - `docs/hermes-skill-intake-checklist.md`: approval checklist for skills/plugins.
+- `docs/hermes-eval-gate.md`: multi-layer promotion gate around existing security and eval tools.
+- `docs/hermes-eval-gate-schema.json`: machine-readable gate requirements for each resource.
+- `docs/hermes-security-gate.md`: security gate using `skill-verifier`, Medusa, and Bumblebee evidence.
+- `docs/hermes-skill-behavior-gate.md`: behavior and trigger-readiness gate for skills.
+- `docs/hermes-memory-gate.md`: recall, privacy, isolation, and prompt-budget gate for memory pilots.
+- `docs/hermes-voice-gate.md`: persona and role-boundary regression gate.
+- `docs/hermes-runtime-gate.md`: live Hermes, gateway, and Telegram readiness gate.
 - `scripts/hermes-resource-scan`: Medusa-oriented resource scan wrapper.
 - `scripts/hermes-inventory-scan`: Bumblebee-oriented inventory scan wrapper.
 - `tests/test_hermes_resource_intake.py`: regression tests for the first-layer gate.

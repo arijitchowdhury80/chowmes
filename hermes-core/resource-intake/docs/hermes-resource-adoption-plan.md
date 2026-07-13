@@ -20,7 +20,8 @@ Recommended near-term additions:
 - Adopt `medusa` as a local and CI security gate, but do not vendor or embed it because it is AGPL-3.0.
 - Adopt `bumblebee` as a read-only inventory and exposure scanner for developer/package/MCP/skill state.
 - Add a Hermes skill intake workflow using the native Hermes skills model, with Sentry skills as examples to study and selectively port.
-- Pilot Honcho in a non-default profile or tools-only mode for memory quality evaluation.
+- Pilot Honcho in a non-default profile or tools-only mode after the Hermes
+  memory gate has recall, privacy, profile-isolation, and prompt-budget evals.
 - Study GBrain as the stronger long-term model for Obsidian-backed operating memory, but do not replace the current vault/MEMORY.md system yet.
 - Use Hermes self-evolution only for scored prompt/skill experiments after tests and voice-quality benchmarks exist.
 - Use Open Design locally for dashboards, decks, and artifacts after security review, not as a production Hermes dependency.
@@ -237,13 +238,16 @@ Risks:
 
 Recommendation:
 
-- Use only after a Hermes evaluation harness exists.
+- Use only after the Hermes Eval Gate is formalized around the existing
+  `skill-verifier` security gate and the existing benchmark/trigger-eval
+  pattern proven by prior skill work.
 - Start with one noncritical skill, not `SOUL.md`, live gateway code, or Argus production CI.
 - Every evolved variant must land as a PR or patch proposal, with human review.
 
 Implementation gate:
 
-- Required first: tests for skill behavior, prompt-size limits, voice/style regression checks, security checks, and rollback.
+- Required first: tests for skill behavior, prompt-size limits, voice/style
+  regression checks, security checks, and rollback.
 
 ### 6. Perplexity Bumblebee
 
@@ -546,7 +550,7 @@ Acceptance:
 - Obsidian remains source of truth or the new source-of-truth boundary is explicitly approved.
 - Export/rollback works.
 
-### Phase 5: Self-evolution only after eval harness
+### Phase 5: Self-evolution only after Hermes Eval Gate coverage
 
 Deliverables:
 
@@ -556,7 +560,8 @@ Deliverables:
   - stale OpenRouter/Gemini routing memory
   - wrapper syntax errors
   - weak or industrial dashboard copy
-- Add benchmark scripts for style, security, prompt size, skill trigger precision, and task success.
+- Extend the existing gate patterns with benchmark scripts for style, security,
+  prompt size, skill trigger precision, and task success.
 - Run self-evolution against one noncritical skill.
 
 Acceptance:
