@@ -117,11 +117,75 @@ The last recorded cron error is still the pre-repair 2026-07-13 09:00 ET
 permission failure against old root-owned output. The next scheduled run must
 replace that evidence.
 
+## Immediate Hermes-Triggered Run
+
+At Arijit's request, the CI-OS cron job was triggered immediately through Hermes
+from inside the `hermes` container:
+
+```text
+docker exec -u hermes hermes sh -lc 'cd /opt/data; /opt/hermes/.venv/bin/hermes cron run 107e64d347d9; /opt/hermes/.venv/bin/hermes cron tick'
+```
+
+Result:
+
+```text
+id=107e64d347d9
+name=cios-v2-daily
+last_run_at=2026-07-13T13:59:18.539902-04:00
+last_status=error
+last_error_first_line=Script exited with code 2
+permission_denied_in_error=False
+blocked_missing_demand_in_error=True
+next_run=2026-07-14T09:00:00-04:00
+```
+
+Public and run-bound status after the triggered run:
+
+```text
+/root/.hermes/apps/cios/out/argus-public-run-status.json
+status=blocked_on_evidence
+publish_status=blocked
+generated_at=2026-07-13T17:59:18.481566Z
+next_hermes_action=configure_ga4_or_upload_demand_export
+
+/root/.hermes/apps/cios/out/argus-data-plane-manifest.json
+status=blocked_on_evidence
+generated_at=2026-07-13T17:59:18.403504Z
+next_hermes_action=configure_ga4_or_upload_demand_export
+
+/root/.hermes/apps/algolia-competitive-intelligence/apps/dashboard/public/data/argus-latest-run-status.json
+status=blocked_on_evidence
+publish_status=blocked
+generated_at=2026-07-13T17:59:18.481566Z
+next_hermes_action=configure_ga4_or_upload_demand_export
+```
+
+Ownership and cleanup after the triggered run:
+
+```text
+OWNERS
+     62 hermes:hermes
+ORPHANS
+```
+
+Interpretation:
+
+- The old permission-denied failure was not reproduced.
+- Hermes executed the CI-OS job as the `hermes` runtime user.
+- The run reached live source and product-market processing.
+- The run correctly blocked because no inward demand source is ready.
+- The blocked status is expected until GA4 is configured or a GA / Looker export
+  is uploaded.
+- This immediate triggered run is useful evidence, but it is not the same as two
+  consecutive healthy scheduled runs.
+
 ## Remaining Phase 1 Work
 
 - Let the next real scheduled Hermes run execute with the repaired runtime owner.
-- Investigate the 90-second smoke timeout using the stage ledger rather than
-  lowering the gate.
+- Investigate whether Phase 1 should count a controlled
+  `blocked_missing_demand_source` run as execution-health success while leaving
+  Phase 4 locked, or whether Phase 1 must require an exit-0 run before demand is
+  connected.
 - Prove two consecutive scheduled Hermes runs complete without root
   intervention, permission errors, timeout, orphan work, or stale-public
   fallback.
