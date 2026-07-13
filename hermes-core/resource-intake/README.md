@@ -15,6 +15,7 @@ touch Athena, Argus, Telegram, gateway config, or runtime memory.
 - `docs/hermes-resource-threat-model.md`: trust boundary and hard stops.
 - `docs/hermes-skill-intake-checklist.md`: approval checklist for skills/plugins.
 - `docs/hermes-eval-gate.md`: multi-layer promotion gate around existing security and eval tools.
+- `docs/hermes-eval-gate-execution-plan.md`: step-by-step automation plan with verification and self-patching loops.
 - `docs/hermes-eval-gate-schema.json`: machine-readable gate requirements for each resource.
 - `docs/hermes-security-gate.md`: security gate using `skill-verifier`, Medusa, and Bumblebee evidence.
 - `docs/hermes-skill-behavior-gate.md`: behavior and trigger-readiness gate for skills.

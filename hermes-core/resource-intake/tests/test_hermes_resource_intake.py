@@ -19,6 +19,7 @@ MEMORY_GATE = REPO_ROOT / "docs" / "hermes-memory-gate.md"
 VOICE_GATE = REPO_ROOT / "docs" / "hermes-voice-gate.md"
 RUNTIME_GATE = REPO_ROOT / "docs" / "hermes-runtime-gate.md"
 GATE_SCHEMA = REPO_ROOT / "docs" / "hermes-eval-gate-schema.json"
+EXECUTION_PLAN = REPO_ROOT / "docs" / "hermes-eval-gate-execution-plan.md"
 
 
 class HermesResourceIntakeTests(unittest.TestCase):
@@ -195,6 +196,40 @@ class HermesResourceIntakeTests(unittest.TestCase):
         self.assertEqual(resources["Sentry Skills"]["required_gates"], ["security", "skill_behavior", "runtime"])
         self.assertEqual(resources["Hermes Agent Self-Evolution"]["required_gates"], ["security", "skill_behavior", "voice", "runtime"])
         self.assertEqual(resources["GBrain"]["required_gates"], ["security", "memory", "runtime"])
+
+    def test_eval_gate_execution_plan_defines_goal_loops_measurements_and_done(self):
+        plan = EXECUTION_PLAN.read_text()
+
+        self.assertTrue(plan.startswith("# Hermes Eval Gate Automation Implementation Plan"))
+        for required in [
+            "**Goal:**",
+            "**Architecture:**",
+            "**Tech Stack:**",
+            "## Execution Goal",
+            "## Execution Loop",
+            "## Self-Patching Loop",
+            "## Measurement Matrix",
+            "## Definition Of Done",
+            "### Task 1: Gate Plan Guardrails",
+            "### Task 2: Gate Evidence Model",
+            "### Task 3: Gate Check CLI",
+            "### Task 4: Resource Promotion Enforcement",
+            "### Task 5: Report Aggregation",
+            "### Task 6: Vault And Release Record",
+        ]:
+            self.assertIn(required, plan)
+
+        for command in [
+            "python3 -m py_compile",
+            "python3 -m pytest hermes-core/resource-intake/tests/test_hermes_resource_intake.py -q",
+            "python3 -m json.tool hermes-core/resource-intake/docs/hermes-eval-gate-schema.json",
+            "git diff --check -- hermes-core/resource-intake",
+        ]:
+            self.assertIn(command, plan)
+
+        self.assertIn("maximum of 3 patch attempts", plan)
+        self.assertIn("stop and escalate", plan)
+        self.assertIn("No resource moves to `pilot`, `live-candidate`, or `live`", plan)
 
 
 if __name__ == "__main__":
