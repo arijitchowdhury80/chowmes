@@ -339,6 +339,30 @@ ssh_diagnose_tcp_errno=EAGAIN
 No server state was changed. Phase 0 remains blocked on creating or verifying a
 deployed release record once SSH reachability returns.
 
+At `2026-07-13T13:48:11Z`, follow-up connectivity triage narrowed the failure
+to inbound SSH reachability for the ChowMes host path, not bad credentials or a
+dead server:
+
+```text
+Configured SSH target: 72.61.72.147:22
+Configured SSH user: chowmesadmin
+SSH key file: present, mode 600
+Codex IPv4 egress: 172.58.1.223
+github.com:22: succeeded
+72.61.72.147:80: succeeded
+72.61.72.147:443: succeeded
+72.61.72.147:22: timed out before SSH banner/auth
+72.61.72.147:2222,2022,2200: timed out
+2.57.91.91:80: succeeded
+2.57.91.91:443: succeeded
+2.57.91.91:22: timed out
+```
+
+The evidence rules out a missing local key, an SSH authentication failure,
+global outbound TCP/22 blocking from the Codex runtime, and a dead VPS IP. The
+remaining blocker is port-22 filtering or non-exposure on the Hostinger/VPS
+side for this source path before `sshd` sees the connection.
+
 ## Next Phase 0 Work Only
 
 Do not begin Phase 1 yet.
