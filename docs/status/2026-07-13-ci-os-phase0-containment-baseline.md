@@ -325,6 +325,20 @@ Blocking facts:
 3. Generated output and local metadata are ignored and no longer pollute Git
    status.
 
+### Latest release-record attempt
+
+At `2026-07-13T13:36:05Z`, a read-only attempt to inspect the VPS app tree for
+full tracked-file parity did not reach the host:
+
+```text
+ssh: connect to host 72.61.72.147 port 22: Operation timed out
+ssh_diagnose_tcp_status=timeout
+ssh_diagnose_tcp_errno=EAGAIN
+```
+
+No server state was changed. Phase 0 remains blocked on creating or verifying a
+deployed release record once SSH reachability returns.
+
 ## Next Phase 0 Work Only
 
 Do not begin Phase 1 yet.
