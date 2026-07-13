@@ -1,4 +1,6 @@
 import json
+import importlib.machinery
+import importlib.util
 import os
 import subprocess
 import tempfile
@@ -9,6 +11,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 RESOURCE_SCAN = REPO_ROOT / "scripts" / "hermes-resource-scan"
 INVENTORY_SCAN = REPO_ROOT / "scripts" / "hermes-inventory-scan"
+EVAL_GATE_CHECK = REPO_ROOT / "scripts" / "hermes-eval-gate-check"
 LEDGER = REPO_ROOT / "docs" / "hermes-external-resource-ledger.md"
 CHECKLIST = REPO_ROOT / "docs" / "hermes-skill-intake-checklist.md"
 THREAT_MODEL = REPO_ROOT / "docs" / "hermes-resource-threat-model.md"
@@ -20,6 +23,15 @@ VOICE_GATE = REPO_ROOT / "docs" / "hermes-voice-gate.md"
 RUNTIME_GATE = REPO_ROOT / "docs" / "hermes-runtime-gate.md"
 GATE_SCHEMA = REPO_ROOT / "docs" / "hermes-eval-gate-schema.json"
 EXECUTION_PLAN = REPO_ROOT / "docs" / "hermes-eval-gate-execution-plan.md"
+EVIDENCE_FORMAT = REPO_ROOT / "docs" / "hermes-eval-evidence-format.md"
+
+
+def load_eval_gate_module():
+    loader = importlib.machinery.SourceFileLoader("hermes_eval_gate_check", str(EVAL_GATE_CHECK))
+    spec = importlib.util.spec_from_loader(loader.name, loader)
+    module = importlib.util.module_from_spec(spec)
+    loader.exec_module(module)
+    return module
 
 
 class HermesResourceIntakeTests(unittest.TestCase):
@@ -230,6 +242,48 @@ class HermesResourceIntakeTests(unittest.TestCase):
         self.assertIn("maximum of 3 patch attempts", plan)
         self.assertIn("stop and escalate", plan)
         self.assertIn("No resource moves to `pilot`, `live-candidate`, or `live`", plan)
+
+    def test_eval_evidence_format_documents_required_manifest_fields(self):
+        content = EVIDENCE_FORMAT.read_text()
+
+        for required in [
+            "resource",
+            "target_state",
+            "approval_owner",
+            "rollback",
+            "gates",
+            "status",
+            "evidence",
+            "verification_commands",
+            "Sentry Skills",
+        ]:
+            self.assertIn(required, content)
+
+    def test_eval_gate_validator_blocks_partial_sentry_skills_evidence(self):
+        module = load_eval_gate_module()
+        schema = module.load_schema(GATE_SCHEMA)
+        evidence = {
+            "resource": "Sentry Skills",
+            "target_state": "pilot",
+            "approval_owner": "Arijit",
+            "rollback": "keep study-only",
+            "gates": {
+                "security": {
+                    "status": "pass",
+                    "evidence": ["security-report.md"],
+                    "verification_commands": ["skill-verifier local-path"],
+                }
+            },
+        }
+
+        result = module.validate_evidence(schema, evidence)
+
+        self.assertEqual(result["resource"], "Sentry Skills")
+        self.assertEqual(result["target_state"], "pilot")
+        self.assertEqual(result["required_gates"], ["security", "skill_behavior", "runtime"])
+        self.assertEqual(result["verdict"], "block")
+        self.assertEqual(result["missing_gates"], ["skill_behavior", "runtime"])
+        self.assertEqual(result["failed_gates"], [])
 
 
 if __name__ == "__main__":

@@ -16,6 +16,7 @@ touch Athena, Argus, Telegram, gateway config, or runtime memory.
 - `docs/hermes-skill-intake-checklist.md`: approval checklist for skills/plugins.
 - `docs/hermes-eval-gate.md`: multi-layer promotion gate around existing security and eval tools.
 - `docs/hermes-eval-gate-execution-plan.md`: step-by-step automation plan with verification and self-patching loops.
+- `docs/hermes-eval-evidence-format.md`: JSON manifest contract for gate evidence.
 - `docs/hermes-eval-gate-schema.json`: machine-readable gate requirements for each resource.
 - `docs/hermes-security-gate.md`: security gate using `skill-verifier`, Medusa, and Bumblebee evidence.
 - `docs/hermes-skill-behavior-gate.md`: behavior and trigger-readiness gate for skills.
@@ -24,6 +25,7 @@ touch Athena, Argus, Telegram, gateway config, or runtime memory.
 - `docs/hermes-runtime-gate.md`: live Hermes, gateway, and Telegram readiness gate.
 - `scripts/hermes-resource-scan`: Medusa-oriented resource scan wrapper.
 - `scripts/hermes-inventory-scan`: Bumblebee-oriented inventory scan wrapper.
+- `scripts/hermes-eval-gate-check`: evidence validator library; CLI behavior is planned next.
 - `tests/test_hermes_resource_intake.py`: regression tests for the first-layer gate.
 
 ## Local Tooling
