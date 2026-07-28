@@ -1,7 +1,7 @@
 ---
 title: CI-OS Project Status
 type: project-status
-status: phase-4-audience-demand
+status: phase-5-argus-intelligence
 updated: 2026-07-28
 ---
 
@@ -19,7 +19,7 @@ CI-OS is an Algolia-first Competitive Intelligence Operating System operated by 
 
 The target output is an evidence-backed recommendation for Product, Product Marketing, Sales, Content, or executive teams.
 
-Current product completion is approximately **45 percent**. The engineering scaffold is approximately **75 percent** complete. CI-OS is **not launch-ready**.
+Current product completion is approximately **55 percent**. The engineering scaffold is approximately **80 percent** complete. CI-OS is **not launch-ready**.
 
 ## What Has Been Built
 
@@ -48,26 +48,26 @@ Current product completion is approximately **45 percent**. The engineering scaf
 | Source coverage | Current with one fetch failure | Latest Hermes wrapper run reported 42 active sources, 41 fetched, and 1 failed source fetch. |
 | Product reality | Passed for Phase 3 | Product Muscle queue is now `0` after verified Google Vertex AI Search, Lucidworks, Meilisearch, Bloomreach, and Athos evidence work. The latest served semantic dashboard has 12 feature-comparison rows and explicit unknown states where proof is absent. |
 | Market conversation | Present | 500 themes and 2 current candidate patterns. |
-| Audience demand | Connected but not action-grade | Fresh semantic data reports `demand_plane_status=processed` and `demand_signal_count=100`, but no topic crossed the rising-demand threshold. A planned-demand evaluation inspected 12 active Argus topics and 11,057 Looker metric rows; no active planned topic had matching current demand rows. The evaluator now emits one amendment candidate: Agent Studio, with 1,619 current sessions versus 751 previous sessions. The current next action is `upload_trended_planned_demand_export` or explicitly amend the demand plan. |
-| Recommendations | Blocked | 0 current recommendations because the current demand feed is not yet action-grade. |
+| Audience demand | Passed with limited confidence | Agent Studio was explicitly accepted into the Argus demand plan, imported into the demand ledger, and refreshed. The live run now reports 101 demand signals, 1 rising demand topic, and partial plan coverage. Confidence remains limited because the accepted trend compares comparable but not identical Looker export families. |
+| Recommendations | Phase 5 review active | The live run now has 1 recommendation: turn the shipped Agent Studio capability into an evidence-backed market narrative before the demand window cools. Human acceptance is still required before Phase 5 can pass. |
 | Learning | Unproven | No learning effect visible in the current run. |
-| Production UI | Market Field live gate passed | Market Field-first UX is live at `https://ci.chowmes.com/` and passed live click validation on release `cios-20260728T101358Z-manual-fa2f31f`; broader Product IA remains pending. |
-| Launch readiness | Not ready | Product Muscle and Market Field publication are live-verified, but Audience Demand, Argus recommendation quality, broader IA, and final E2E gates remain open. |
+| Production UI | Market Field live gate passed | Market Field-first UX is live at `https://ci.chowmes.com/` and passed live click validation on release `cios-20260728T102723Z-manual-d6d4b6e`; broader Product IA remains pending. |
+| Launch readiness | Not ready | Product Muscle, Audience Demand, and Market Field publication are live-verified, but Argus recommendation acceptance, broader IA, and final E2E gates remain open. |
 
 ## What Comes Next
 
-1. Replace or enrich the manual Audience Demand feed with planned topic mapping plus previous-period or `change_pct` values for the active Argus topics, or explicitly refresh the demand plan to include the observed off-plan Agent Studio demand.
-2. Refresh Argus and prove that Audience Demand either becomes action-grade or remains explicitly blocked.
-3. Prove one useful cross-plane Argus recommendation and one learning effect.
+1. Review the generated Agent Studio recommendation for accuracy, novelty, and direct usefulness to a named team.
+2. If accepted, record the accepted recommendation and create the learning instruction required by Phase 5.
+3. If rejected or amended, record the reason and rerun Argus with the corrected learning or evidence requirement.
 4. Complete the remaining Product IA workflows beyond the live Market Field journey: Product Muscle Matrix, Conversation/Demand drilldowns, Pattern Board, Actions, Registry, Evidence Lab, and Command/Admin.
 5. Complete exhaustive frontend, backend, semantic, accessibility, security, and live-cron validation.
 6. Release a controlled Algolia pilot only after every gate passes.
 
 ## Next Gate
 
-Phase 4 is active. Audience Demand must provide planned-topic time-series evidence, either through a trended manual Looker export or a configured GA4 path.
+Phase 5 is active. Argus must prove one accepted cross-plane recommendation and one auditable learning effect.
 
-The latest served run is `blocked_on_evidence` with `0` promoted recommendations because demand movement is not action-grade. The Phase 4 evaluator found no matching current demand rows for the 12 active planned topics. It did find off-plan Agent Studio movement, and that amendment candidate is now visible in the live Argus operator handoff and dashboard. It still cannot pass the gate unless Argus explicitly plans against it. The next live action is to upload a trended planned demand export with previous-period or `change_pct` values, or refresh the Argus demand plan, then refresh Argus. Recurring GA4 automation remains deferred; the immediate blocker is the missing action-grade planned demand movement, not the connector itself.
+The latest served release is `cios-20260728T102723Z-manual-d6d4b6e`. Agent Studio was explicitly amended into the Argus demand plan, imported as a traceable demand signal, and refreshed into one recommendation. Phase 4 is treated as passed with limited confidence, not perfect coverage: the live readiness state is `processed_partial_plan_coverage`, with 1 of the planned topics covered by rising demand. Recurring GA4 automation remains deferred.
 
 ## Project Records
 

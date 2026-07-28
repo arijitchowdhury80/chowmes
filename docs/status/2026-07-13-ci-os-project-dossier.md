@@ -1,7 +1,7 @@
 # CI-OS Project Dossier
 
 Date: 2026-07-13; refreshed through 2026-07-28 UTC
-Status: Phase 3 passed; Phase 4 Audience Demand active; Market Field UX gate passed
+Status: Phase 4 Audience Demand passed with limited confidence; Phase 5 Argus Intelligence active
 Product owner: Arijit Chowdhury
 Operating agent: Argus
 Runtime: Hermes / MyOS-Core
@@ -9,9 +9,9 @@ First tenant: Algolia
 
 ## Executive Position
 
-CI-OS is approximately 45 percent complete against the original product goal. The engineering scaffold is approximately 75 percent complete, but the product does not yet deliver a reliable, evidence-backed competitive decision loop.
+CI-OS is approximately 55 percent complete against the original product goal. The engineering scaffold is approximately 80 percent complete, but the product does not yet deliver a fully accepted, evidence-backed competitive decision loop.
 
-The system must not be called launch-ready. Phase 1 passed after two consecutive real Hermes runs completed successfully as the dedicated `cios` application user. Phase 2 passed after fresh public artifacts were published through the Hermes wrapper with one run ID, live public JSON agreed with semantic dashboard data, and live dashboard click validation passed. Phase 3 Product Muscle has now passed: Athos, Bloomreach, Google Vertex AI Search, Lucidworks, and Meilisearch evidence work cleared the Product Muscle queue, and CI-OS now blocks cookie-consent boilerplate before it can enter the Product Muscle ledger. The Market Field-first UX / IA surface is implemented, deployed, served from release `cios-20260728T101358Z-manual-fa2f31f`, and live-validated on `https://ci.chowmes.com/`. The inward demand plane is connected through the approved manual Looker export path, but Audience Demand is not action-grade: a planned-demand evaluator inspected 12 active Argus topics and 11,057 Looker metric rows, found no matching current demand rows for the active plan, and therefore kept recommendations blocked at zero. The same evaluator now emits Agent Studio as a plan-amendment candidate with 1,619 current sessions versus 751 previous sessions, and that public-safe amendment is now visible in the live operator handoff; it remains off-plan until the Argus work order is refreshed or amended. The broader Product IA beyond the Market Field journey remains unfinished.
+The system must not be called launch-ready. Phase 1 passed after two consecutive real Hermes runs completed successfully as the dedicated `cios` application user. Phase 2 passed after fresh public artifacts were published through the Hermes wrapper with one run ID, live public JSON agreed with semantic dashboard data, and live dashboard click validation passed. Phase 3 Product Muscle has now passed: Athos, Bloomreach, Google Vertex AI Search, Lucidworks, and Meilisearch evidence work cleared the Product Muscle queue, and CI-OS now blocks cookie-consent boilerplate before it can enter the Product Muscle ledger. The Market Field-first UX / IA surface is implemented, deployed, served from release `cios-20260728T102723Z-manual-d6d4b6e`, and live-validated on `https://ci.chowmes.com/`. Phase 4 Audience Demand passed with limited confidence after Agent Studio was explicitly accepted into the Argus demand plan, imported into the demand ledger, and refreshed into one recommendation. The live run now reports 101 demand signals, 1 rising demand topic, 3 patterns, and 1 recommendation: turn the shipped Agent Studio capability into an evidence-backed market narrative before the demand window cools. Phase 5 is active and requires human acceptance, rejection, or amendment of that recommendation plus a proven learning effect. The broader Product IA beyond the Market Field journey remains unfinished.
 
 The retained implementation now has a clean, published branch, an immutable deployed package baseline, a verified run-bound publication path, and a live-validated Market Field UX entry point. Feature expansion is now gated on current product evidence, intelligence quality, and the remaining Product IA workflows. Recurring GA4 automation remains deferred and is not the current Phase 3 blocker.
 
@@ -56,10 +56,10 @@ Evidence was refreshed directly from Chowmes through 2026-07-28 UTC.
 | Execution mode | Hermes no-agent script |
 | Wrapper | `cios-daily.sh` |
 | Latest completed schedules | Phase 1 pair: 2026-07-14 03:49 ET and 04:05 ET; Phase 2 verification run: 2026-07-27 23:29 ET; latest Market Field staging run: 2026-07-28 04:42 ET |
-| Request IDs | Phase 1: `a70f4e219d294280a26703962c9be4e9`, `1b938c9de92f4568a059bdb84d3f9e6b`; Phase 2 public run: `cios-20260728T032901Z-3409872`; Phase 3 progress runs: `cios-20260728T034702Z-3433185`, `cios-20260728T041240Z-3510681`, `cios-20260728T043002Z-3533427`, `cios-20260728T044324Z-3552802`; Market Field release: `cios-20260728T084235Z-3769892`; current manual release: `cios-20260728T0934Z-manual-b55979e` |
+| Request IDs | Phase 1: `a70f4e219d294280a26703962c9be4e9`, `1b938c9de92f4568a059bdb84d3f9e6b`; Phase 2 public run: `cios-20260728T032901Z-3409872`; Phase 3 progress runs: `cios-20260728T034702Z-3433185`, `cios-20260728T041240Z-3510681`, `cios-20260728T043002Z-3533427`, `cios-20260728T044324Z-3552802`; Market Field release: `cios-20260728T084235Z-3769892`; current manual release: `cios-20260728T102723Z-manual-d6d4b6e` |
 | Results | Exit code 0 for the Phase 1 pair, the Phase 2 verification run, the latest Phase 3 progress run, and the Market Field staging run |
 | Runtime owner | `cios`, reached through the Hermes queue handoff |
-| Autonomous daily loop | Publication path, Market Field UX serving, and Phase 3 Product Muscle verified; Phase 4 Audience Demand active |
+| Autonomous daily loop | Publication path, Market Field UX serving, Phase 3 Product Muscle, and Phase 4 Audience Demand verified; Phase 5 review active |
 
 Both runs completed without root intervention, permission errors, timeout, orphan work, or ownership drift. The systemd service and delegated cgroup were empty after each run, and post-run hashes remained stable. Full evidence is recorded in `docs/status/2026-07-14-ci-os-phase1-hermes-execution-gate.md`.
 
@@ -71,8 +71,8 @@ Both runs completed without root intervention, permission errors, timeout, orpha
 | Publish status | `published` |
 | Generated at | `2026-07-28T09:33:47.175869Z` |
 | Public dashboard updated | true |
-| Public release | `cios-20260728T0934Z-manual-b55979e` |
-| Next Hermes action | `upload_trended_planned_demand_export` |
+| Public release | `cios-20260728T102723Z-manual-d6d4b6e` |
+| Next Hermes action | `review_agent_studio_recommendation` |
 
 ### Evidence planes
 
@@ -88,12 +88,12 @@ Both runs completed without root intervention, permission errors, timeout, orpha
 | Product-surface work queue | 0 items | Google Vertex AI Search, Lucidworks, and Meilisearch were extracted and ingested after the Bloomreach pass. |
 | Boilerplate extraction guard | Verified | CI-OS commit `b55979e` filters site cookie/privacy boilerplate; the Athos platform extraction that produced 8 bad cookie rows now returns empty. |
 | Conversation themes | 500 | Market-conversation evidence exists. |
-| Demand signals | 100 | Manual Looker Audience Demand feed is processed, but the latest served status is `processed_no_action_grade_demand`. The Phase 4 evaluator inspected 12 active planned topics and 11,057 Looker metric rows; no planned topic had matching current demand rows. |
-| Patterns | 2 | Deterministic pattern primitives produced output in the latest fresh run. |
-| Recommendations | 0 | No promoted action; latest served state remains blocked on action-grade Audience Demand. |
+| Demand signals | 101 | Manual Looker Audience Demand feed is processed. Agent Studio was amended into the plan and imported as a rising demand signal; readiness is `processed_partial_plan_coverage` because other planned topics remain uncovered. |
+| Patterns | 3 | Deterministic pattern primitives produced output in the latest refreshed run. |
+| Recommendations | 1 | Generated recommendation: turn the shipped Agent Studio capability into an evidence-backed market narrative before the demand window cools. Human acceptance is required for Phase 5. |
 | Consumed learnings | 0 | Learning effect on the current run is not proven. |
 
-Blocking the recommendation plane while Audience Demand is not action-grade is the correct behavior. The demand plane is connected for the pilot through the manual Looker export path, but the current export is not action-grade for the active Argus plan. The latest Phase 4 evaluator found off-plan Agent Studio movement and writes it as a plan-amendment candidate. CI-OS now surfaces that candidate in the live operator handoff and dashboard, but that does not satisfy the current gate unless the Argus demand plan is explicitly refreshed or amended. The next required demand action is a planned export with current and previous seven-day values for the active topics, or a deliberate plan refresh that makes the validated off-plan demand part of the work order. Recurring GA4 automation remains deferred.
+Phase 4 is no longer blocked by missing Audience Demand. The demand plane is connected for the pilot through the manual Looker export path, and Agent Studio is now explicitly planned, imported, and refreshed. Confidence remains limited because the accepted Agent Studio trend compares comparable but not identical Looker export families, and plan coverage is partial. The next required action is Phase 5 review of the generated recommendation and then a learning-effect proof. Recurring GA4 automation remains deferred.
 
 ## Repository State
 
@@ -179,7 +179,7 @@ The authoritative remote and branch ownership are reconciled. Commit `dea1816` a
 | E2E and launch validation | 45% | Broad tests exist; live click validation now passes, but full launch validation remains open. |
 | Version control and release hygiene | 70% | Clean branch, deployed baseline, Phase 2 status evidence, and renderer hotfix backup exist; production still needs full release-recorded deploy discipline. |
 
-Weighted product completion: approximately 45 percent.
+Weighted product completion: approximately 55 percent.
 
 ## Critical Code And Operational Findings
 

@@ -1,7 +1,7 @@
 ---
 title: CI-OS Completion Tracker
 type: project-tracker
-status: active
+status: phase-5-active
 updated: 2026-07-28
 ---
 
@@ -9,9 +9,9 @@ updated: 2026-07-28
 
 Last verified: 2026-07-28 UTC
 
-Overall product completion: **45 percent**
+Overall product completion: **55 percent**
 
-Engineering scaffold completion: **75 percent**
+Engineering scaffold completion: **80 percent**
 
 Launch status: **Not ready**
 
@@ -23,8 +23,8 @@ Launch status: **Not ready**
 | 1. Restore Hermes execution | Healthy scheduled operating loop | Passed |
 | 2. Trustworthy publication | Atomic, fresh, run-bound release evidence | Passed |
 | 3. Product Muscle | Current Scout-backed product comparison | Passed |
-| 4. Audience Demand | Valid GA4 / Looker evidence plane | Active; connected manual feed is not action-grade |
-| 5. Argus Intelligence | Accepted cross-plane pattern, action, and learning | Pending |
+| 4. Audience Demand | Valid GA4 / Looker evidence plane | Passed with limited confidence |
+| 5. Argus Intelligence | Accepted cross-plane pattern, action, and learning | Active; recommendation generated, awaiting human acceptance |
 | 6. Product IA | Coherent Argus business workflows | Market Field live gate passed; broader IA pending |
 | 7. End-to-end validation | Backend, frontend, semantic, UX, accessibility, and security proof | Pending |
 | 8. Algolia pilot | Versioned, monitored, controlled release | Pending |
@@ -51,20 +51,21 @@ Launch status: **Not ready**
 - Phase 3 then repaired the Athos Commerce `1:1 AI Personalization` item after an empty extraction, produced 11 product rows, published run `cios-20260728T043002Z-3533427`, and removed that item from the queue.
 - Phase 3 then extracted Athos Commerce `100s+ robust integrations & Open APIs`, published run `cios-20260728T044324Z-3552802`, observed current pattern count at 2, and removed that item from the queue.
 - Market Field-first UX / IA was implemented, deployed through the CI-OS package, published through the served release store as `cios-20260728T084235Z-3769892`, and passed live dashboard click validation on `https://ci.chowmes.com/`.
-- Demand readiness was tightened after live inspection: generic Looker report metadata no longer drives planned-topic matching, current-period-only demand is blocked explicitly, and the latest served status now reports `processed_no_action_grade_demand` with next action `upload_trended_planned_demand_export`.
+- Demand readiness was tightened after live inspection: generic Looker report metadata no longer drives planned-topic matching, and current-period-only demand is blocked explicitly. At that point the served status reported `processed_no_action_grade_demand` with next action `upload_trended_planned_demand_export`.
 - Product-surface extraction was hardened against cookie-consent and privacy-policy boilerplate in CI-OS commit `b55979e`; the Athos platform extraction that previously produced 8 bad cookie rows now correctly returns empty.
 - Bloomreach Discovery product evidence was extracted and ingested from `https://www.bloomreach.com/en/products/discovery`; the current served release `cios-20260728T0928Z-manual-b55979e` has 12 feature-comparison rows, 25 Market Field nodes, and a Product Muscle work queue reduced to 3 limiting items.
 - Google Vertex AI Search, Lucidworks, and Meilisearch product-surface extractions succeeded and were ingested; the current served release `cios-20260728T0934Z-manual-b55979e` has a Product Muscle work queue of `0`.
 - Phase 4 planned-demand evaluation ran against the active live Argus demand plan and local Looker exports. It inspected 12 active planned topics and 11,057 metric rows; no planned topic had matching current demand rows, so the Phase 4 gate remains open. Off-plan Agent Studio demand was detected, and the evaluator now emits it as a demand-plan amendment candidate with 1,619 current sessions versus 751 previous sessions. It is not current gate evidence until the Argus plan is explicitly refreshed or amended.
-- CI-OS commit `fa2f31f` is deployed on Chowmes as release `cios-20260728T101358Z-manual-fa2f31f`. The live dashboard and public handoff now expose the Agent Studio demand-plan amendment candidate while preserving `blocked_on_evidence`; live dashboard click validation passed after restoring the served competitor brief links.
+- CI-OS commit `fa2f31f` deployed the intermediate release `cios-20260728T101358Z-manual-fa2f31f`. The live dashboard and public handoff exposed the Agent Studio demand-plan amendment candidate while preserving `blocked_on_evidence`; live dashboard click validation passed after restoring the served competitor brief links.
+- CI-OS commit `d6d4b6e` added explicit demand-plan amendment support. Agent Studio was accepted into the Argus demand plan, imported into the demand ledger, refreshed through Argus, and served from release `cios-20260728T102723Z-manual-d6d4b6e`. The live run now has 101 demand signals, 1 rising demand topic, 3 patterns, and 1 generated recommendation; dashboard click validation passed after restoring served competitor brief links.
 
 ## Current Gate
 
-The project is currently in Phase 4 Audience Demand, with Phase 3 Product Muscle and the Market Field live gate passed but broader Product IA and recommendation gates still open:
+The project is currently in Phase 5 Argus Intelligence, with Phase 3 Product Muscle, Phase 4 Audience Demand, and the Market Field live gate passed but broader Product IA and recommendation acceptance still open:
 
-1. Upload a planned demand export with previous-period or `change_pct` values for the active Argus topics, or explicitly amend / refresh the Argus demand plan to include validated off-plan demand such as Agent Studio.
-2. Refresh Argus and verify whether demand movement qualifies for action.
-3. Keep unsupported recommendation output blocked until Product, Conversation, and Audience Demand evidence align.
+1. Review the Agent Studio recommendation: “Turn the shipped Agent Studio capability into an evidence-backed market narrative before the demand window cools.”
+2. Accept, reject, or amend the recommendation against the Phase 5 rubric: accuracy, specificity, novelty, direct team usefulness, confidence, and evidence sufficiency.
+3. Convert the accepted or corrected read into an auditable learning instruction and prove it changes the next successful run.
 4. Preserve explicit unknown states in the feature matrix; unknown must not become absent.
 
 Phase 1 evidence is recorded in
@@ -81,9 +82,9 @@ Market Field UX gate evidence is recorded in
 
 ## Next Gate
 
-CI-OS must complete action-grade Audience Demand, Argus intelligence, broader accepted IA, final E2E validation, and the controlled Algolia pilot before the full goal can pass.
+CI-OS must complete Argus intelligence acceptance and learning, broader accepted IA, final E2E validation, and the controlled Algolia pilot before the full goal can pass.
 
-Recurring GA4 automation remains deferred. The current demand blocker is not connector setup; it is that the processed manual Audience Demand feed has no action-grade rising-demand movement yet.
+Recurring GA4 automation remains deferred. The current blocker is no longer missing Audience Demand; it is human acceptance or correction of the generated Agent Studio recommendation and proof of a learning effect.
 
 Phase 4 planned-demand evidence is recorded in
 `docs/status/2026-07-28-ci-os-phase4-audience-demand-evaluation.md`.

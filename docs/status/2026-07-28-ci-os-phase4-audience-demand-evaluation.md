@@ -1,7 +1,7 @@
 # CI-OS Phase 4 Audience Demand Evaluation
 
 Date: 2026-07-28
-Status: Phase 4 remains active; gate did not pass
+Status: Phase 4 passed with limited confidence after explicit demand-plan amendment
 Scope: Algolia pilot Audience Demand gate
 
 ## What Was Evaluated
@@ -26,7 +26,7 @@ The evaluator uses the CI-OS demand quality rule from `src/cios/intelligence/dem
 
 ## Result
 
-Phase 4 did not pass.
+The first evaluation did not pass because Agent Studio was off-plan.
 
 The generated report status was:
 
@@ -78,15 +78,41 @@ CI-OS now carries this proposal into the Argus operator handoff when the evaluat
 
 This integration is deployed on Chowmes in CI-OS package commit `fa2f31f` and served from public release `cios-20260728T101358Z-manual-fa2f31f`. The live page at `https://ci.chowmes.com/` contains the Suggested demand-plan amendment panel for Agent Studio, and the public data endpoints expose both `argus-planned-demand-evaluation.json` and `argus-operator-handoff.json`.
 
+CI-OS commit `d6d4b6e` then added an explicit amendment tool and limited-confidence evaluator mode. The Agent Studio candidate was accepted into the Argus demand plan, evaluated as a planned topic, imported into the demand ledger, and refreshed through Argus.
+
+The amended evaluator result was:
+
+```json
+{
+  "status": "passed_limited",
+  "phase4_gate_passed": true,
+  "phase4_gate_confidence": "limited",
+  "phase4_gate_topics": ["Agent Studio"]
+}
+```
+
+The runtime import result was:
+
+```json
+{
+  "status": "refreshed",
+  "prepared_rows": 1,
+  "persisted_demand_signals": 1,
+  "recommendations": 1
+}
+```
+
+The current served release is `cios-20260728T102723Z-manual-d6d4b6e`. Public `argus-dashboard.json` reports 101 demand signals, 3 patterns, and 1 recommendation. Public `argus-demand-readiness.json` reports `processed_partial_plan_coverage`, 1 rising topic, and 1 top topic.
+
 ## Next Required Action
 
-One of these must happen before Phase 4 can pass:
+Phase 4 is now sufficient to enter Phase 5, with a confidence caveat:
 
-1. Export current and previous seven-day Looker rows for the active Argus topics above.
-2. Amend or refresh the Argus demand plan so the validated off-plan demand, especially Agent Studio, becomes an explicit planned topic.
-3. Configure a recurring GA4 path that produces the same planned-topic current and previous period fields.
+1. Human-review the generated Agent Studio recommendation for accuracy, novelty, and direct usefulness.
+2. If accepted, record the accepted read and create the Phase 5 learning instruction.
+3. If rejected or amended, record the critique and rerun Argus against the corrected read.
 
-The current blocker is not generic Looker access. The blocker is that the available export does not contain action-grade movement for the active Argus plan topics.
+The remaining demand caveat is coverage, not absence. Agent Studio is planned and rising, but the demand plan still has partial coverage and the accepted trend has limited confidence because it compares comparable but not identical Looker export families.
 
 ## Verification
 
@@ -114,3 +140,9 @@ Results:
 - VPS handoff rebuild: `blocked_on_evidence`, amendment candidate count `1`, first candidate `Agent Studio`
 - public JSON checks: `argus-planned-demand-evaluation.json` reports `phase4_gate_passed=False` and one `plan_amendment_candidates` row; `argus-operator-handoff.json` reports one public-safe `demand_plan_amendments` candidate
 - live dashboard validation: `python3 scripts/validate_dashboard_clicks.py --url https://ci.chowmes.com/` passed market field, structure, nav targets, timeline, semantic layer, priority selection, brief routing, appendices, and 390 / 768 / 1280 viewport checks
+- local amended evaluator proof: `passed_limited`, `phase4_gate_passed=True`, gate topic `Agent Studio`, prepared rows `1`
+- VPS package commit: `d6d4b6e`
+- VPS amended import: `status=refreshed`, prepared rows `1`, persisted demand signals `1`, refresh `0`, rerender `0`
+- current public release: `cios-20260728T102723Z-manual-d6d4b6e`
+- current public JSON checks: recommendation count `1`, demand signal count `101`, rising topic count `1`, primary action `Turn the shipped Agent Studio capability into an evidence-backed market narrative before the demand window cools.`
+- current live dashboard validation: `python3 scripts/validate_dashboard_clicks.py --url https://ci.chowmes.com/` passed after restoring the served competitor brief routes
