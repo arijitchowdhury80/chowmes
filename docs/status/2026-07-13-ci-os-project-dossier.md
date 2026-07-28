@@ -1,7 +1,7 @@
 # CI-OS Project Dossier
 
 Date: 2026-07-13; refreshed through 2026-07-28 UTC
-Status: Phase 2 passed; Phase 3 active
+Status: Phase 2 passed; Phase 3 active; Market Field UX gate passed
 Product owner: Arijit Chowdhury
 Operating agent: Argus
 Runtime: Hermes / MyOS-Core
@@ -11,9 +11,9 @@ First tenant: Algolia
 
 CI-OS is approximately 45 percent complete against the original product goal. The engineering scaffold is approximately 75 percent complete, but the product does not yet deliver a reliable, evidence-backed competitive decision loop.
 
-The system must not be called launch-ready. Phase 1 passed after two consecutive real Hermes runs completed successfully as the dedicated `cios` application user. Phase 2 now also passed after fresh public artifacts were published through the Hermes wrapper with one run ID, live public JSON agreed with semantic dashboard data, and live dashboard click validation passed. Phase 3 has verified first progress: the Athos Commerce `A/B Testing & Optimization` product-muscle gap was repaired with 12 product rows, a fresh Hermes-wrapper run published successfully, and that work item disappeared from the queue. The next Athos Commerce `100s+ Robust Integrations` item then extracted successfully, another Hermes-wrapper run published successfully, and that work item also disappeared from the queue. The Athos Commerce `1:1 AI Personalization` item then repaired successfully after an empty extraction, a third Phase 3 Hermes-wrapper run published, and that work item disappeared from the queue. The Athos Commerce `100s+ robust integrations & Open APIs` item then extracted successfully, a fourth Phase 3 Hermes-wrapper run published, and that work item disappeared from the queue. The inward demand plane is connected through the approved manual Looker export path, but Product Muscle remains incomplete, the live intelligence output contains zero recommendations, and the accepted Product Muscle IA remains unfinished.
+The system must not be called launch-ready. Phase 1 passed after two consecutive real Hermes runs completed successfully as the dedicated `cios` application user. Phase 2 now also passed after fresh public artifacts were published through the Hermes wrapper with one run ID, live public JSON agreed with semantic dashboard data, and live dashboard click validation passed. Phase 3 has verified first progress through multiple Athos Commerce product-muscle repairs and extractions. The Market Field-first UX / IA surface is now implemented, deployed, served from release `cios-20260728T084235Z-3769892`, and live-validated on `https://ci.chowmes.com/`. The inward demand plane is connected through the approved manual Looker export path, but Product Muscle remains incomplete, the live intelligence output contains zero recommendations, and the broader Product IA beyond the Market Field journey remains unfinished.
 
-The retained implementation now has a clean, published branch, an immutable deployed package baseline, and a verified run-bound publication path. Feature expansion is now gated on current product evidence, intelligence quality, and the accepted product IA. Recurring GA4 automation remains deferred and is not the current Phase 3 blocker.
+The retained implementation now has a clean, published branch, an immutable deployed package baseline, a verified run-bound publication path, and a live-validated Market Field UX entry point. Feature expansion is now gated on current product evidence, intelligence quality, and the remaining Product IA workflows. Recurring GA4 automation remains deferred and is not the current Phase 3 blocker.
 
 ## Product Goal
 
@@ -55,11 +55,11 @@ Evidence was refreshed directly from Chowmes through 2026-07-28 UTC.
 | Schedule | `0 9 * * *`, America/New_York |
 | Execution mode | Hermes no-agent script |
 | Wrapper | `cios-daily.sh` |
-| Latest completed schedules | Phase 1 pair: 2026-07-14 03:49 ET and 04:05 ET; Phase 2 verification run: 2026-07-27 23:29 ET; latest Phase 3 progress run: 2026-07-28 01:05 ET |
-| Request IDs | Phase 1: `a70f4e219d294280a26703962c9be4e9`, `1b938c9de92f4568a059bdb84d3f9e6b`; Phase 2 public run: `cios-20260728T032901Z-3409872`; Phase 3 progress runs: `cios-20260728T034702Z-3433185`, `cios-20260728T041240Z-3510681`, `cios-20260728T043002Z-3533427`, `cios-20260728T044324Z-3552802` |
-| Results | Exit code 0 for the Phase 1 pair, the Phase 2 verification run, and the latest Phase 3 progress run |
+| Latest completed schedules | Phase 1 pair: 2026-07-14 03:49 ET and 04:05 ET; Phase 2 verification run: 2026-07-27 23:29 ET; latest Market Field staging run: 2026-07-28 04:42 ET |
+| Request IDs | Phase 1: `a70f4e219d294280a26703962c9be4e9`, `1b938c9de92f4568a059bdb84d3f9e6b`; Phase 2 public run: `cios-20260728T032901Z-3409872`; Phase 3 progress runs: `cios-20260728T034702Z-3433185`, `cios-20260728T041240Z-3510681`, `cios-20260728T043002Z-3533427`, `cios-20260728T044324Z-3552802`; Market Field public release: `cios-20260728T084235Z-3769892` |
+| Results | Exit code 0 for the Phase 1 pair, the Phase 2 verification run, the latest Phase 3 progress run, and the Market Field staging run |
 | Runtime owner | `cios`, reached through the Hermes queue handoff |
-| Autonomous daily loop | Phase 2 publication path verified; Phase 3 Product Muscle active |
+| Autonomous daily loop | Publication path and Market Field UX serving verified; Phase 3 Product Muscle active |
 
 Both runs completed without root intervention, permission errors, timeout, orphan work, or ownership drift. The systemd service and delegated cgroup were empty after each run, and post-run hashes remained stable. Full evidence is recorded in `docs/status/2026-07-14-ci-os-phase1-hermes-execution-gate.md`.
 
@@ -67,22 +67,22 @@ Both runs completed without root intervention, permission errors, timeout, orpha
 
 | Item | Verified state |
 |---|---|
-| Status | `published` |
+| Status | `blocked_on_evidence` |
 | Publish status | `published` |
-| Generated at | `2026-07-28T05:05:13.246801Z` |
+| Generated at | `2026-07-28T08:42:35.309566Z` |
 | Public dashboard updated | true |
-| Run ID | `cios-20260728T044324Z-3552802` |
-| Next Hermes action | Run product-surface extraction for Athos Commerce and the `A/B Testing` matrix cell |
+| Public release | `cios-20260728T084235Z-3769892` |
+| Next Hermes action | `inspect_demand_mapping` |
 
 ### Evidence planes
 
 | Plane | Verified state | Meaning |
 |---|---:|---|
 | Monitored competitors | 27 | Registry exists and is represented publicly. |
-| Active sources | 43 | Reported active in current public state. |
-| Checked sources | 43 | Verified by the latest successful Hermes-triggered run. |
+| Active sources | 42 | Reported by the latest successful Hermes-wrapper run. |
+| Checked sources | 41 fetched | Latest wrapper run fetched 41 of 42 attempted active sources. |
 | Blocked sources | 5 | Present in the public source ledger. |
-| Failed active sources | 0 | Current artifact reports none. |
+| Failed active source fetches | 1 | Latest wrapper run reported one failed source fetch. |
 | Product events | 500 | Fresh semantic dashboard reports product events. The first and fourth Athos Commerce extractions produced 12 product rows from the pricing surface; the first repair produced 12 rows and the third repair produced 11 rows, but Product Muscle still has unresolved matrix gaps. |
 | Current product-surface targets | 38 | Targets are registered. |
 | Current product-surface planned | 0 | Current status does not prove execution. |
@@ -92,7 +92,7 @@ Both runs completed without root intervention, permission errors, timeout, orpha
 | Conversation themes | 500 | Market-conversation evidence exists. |
 | Demand signals | 100 | Manual Looker Audience Demand feed is processed in the fresh public run. |
 | Patterns | 2 | Deterministic pattern primitives produced output in the latest fresh run. |
-| Recommendations | 0 | No promoted action because Product Muscle evidence is still incomplete. |
+| Recommendations | 0 | No promoted action; latest served state remains blocked on evidence. |
 | Consumed learnings | 0 | Learning effect on the current run is not proven. |
 
 Blocking the recommendation plane while Product Muscle remains incomplete is the correct behavior. The demand plane is now connected for the pilot through the manual Looker export path; recurring GA4 automation remains deferred.
@@ -135,7 +135,7 @@ The authoritative remote and branch ownership are reconciled. Commit `dea1816` a
 - Learning event, challenge, proposal, and apply-plan artifacts.
 - Hermes package wrapper and cron registration.
 - Reliable Hermes-owned execution through the dedicated `cios` application user.
-- Public dashboard renderer and selected Playwright interaction checks.
+- Public dashboard renderer, Market Field-first live UX, and selected Playwright interaction checks.
 
 ### Partially implemented or unproven
 
@@ -152,7 +152,7 @@ The authoritative remote and branch ownership are reconciled. Commit `dea1816` a
 
 ### Not delivered to product standard
 
-- Production Argus Read.
+- Broader production Argus Read beyond the Market Field entry point.
 - Production Product Muscle Matrix.
 - Production Conversation Heatmap.
 - Production Demand Lens.
@@ -175,7 +175,7 @@ The authoritative remote and branch ownership are reconciled. Commit `dea1816` a
 | GA4 / Looker demand | 60% | Manual Looker export is processed with 100 demand signals; recurring GA4 automation is deferred. |
 | Pattern intelligence | 30% | Patterns exist; cross-plane validation is incomplete. |
 | Recommendations | 10% | Structures exist; current output is zero. |
-| Frontend IA and usability | 20% | Existing UI is not the accepted Product Muscle IA. |
+| Frontend IA and usability | 40% | Market Field-first entry point is live and validated; broader Product IA workflows remain unfinished. |
 | History, heatmap, semantic views | 30% | Surfaces exist; business validity is not acceptance-tested. |
 | Learning loop | 25% | Artifacts exist; downstream run impact is unproven. |
 | E2E and launch validation | 45% | Broad tests exist; live click validation now passes, but full launch validation remains open. |

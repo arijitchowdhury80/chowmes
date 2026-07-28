@@ -25,7 +25,7 @@ Launch status: **Not ready**
 | 3. Product Muscle | Current Scout-backed product comparison | Active |
 | 4. Audience Demand | Valid GA4 / Looker evidence plane | Connected manual feed; recurring GA4 deferred |
 | 5. Argus Intelligence | Accepted cross-plane pattern, action, and learning | Pending |
-| 6. Product IA | Coherent Argus business workflows | Pending |
+| 6. Product IA | Coherent Argus business workflows | Market Field live gate passed; broader IA pending |
 | 7. End-to-end validation | Backend, frontend, semantic, UX, accessibility, and security proof | Pending |
 | 8. Algolia pilot | Versioned, monitored, controlled release | Pending |
 
@@ -50,13 +50,14 @@ Launch status: **Not ready**
 - Phase 3 then extracted the next Athos Commerce product-surface item successfully, published run `cios-20260728T041240Z-3510681`, raised current pattern count to 3, and removed the `100s+ Robust Integrations` item from the queue.
 - Phase 3 then repaired the Athos Commerce `1:1 AI Personalization` item after an empty extraction, produced 11 product rows, published run `cios-20260728T043002Z-3533427`, and removed that item from the queue.
 - Phase 3 then extracted Athos Commerce `100s+ robust integrations & Open APIs`, published run `cios-20260728T044324Z-3552802`, observed current pattern count at 2, and removed that item from the queue.
+- Market Field-first UX / IA was implemented, deployed through the CI-OS package, published through the served release store as `cios-20260728T084235Z-3769892`, and passed live dashboard click validation on `https://ci.chowmes.com/`.
 
 ## Current Gate
 
-The project is currently in Phase 3 Product Muscle:
+The project is currently in Phase 3 Product Muscle, with the Market Field UX gate passed but the broader Product IA and recommendation gates still open:
 
-1. Run current product-surface extraction for the unresolved competitor/capability cells.
-2. Continue resolving the remaining 39 limiting matrix items, starting with the next Athos Commerce capability gaps.
+1. Inspect the latest served `blocked_on_evidence` state and why recommendation promotion remains `0`.
+2. Run current product-surface extraction for unresolved competitor/capability cells.
 3. Mark every active competitor/matrix cell as supported, unknown, not applicable, blocked, or needs operator review.
 4. Prevent blank or unsupported matrix claims.
 5. Refresh Argus from the evidence ledger after extraction.
@@ -70,9 +71,12 @@ Phase 2 evidence is recorded in
 Phase 3 progress evidence is recorded in
 `docs/status/2026-07-28-ci-os-phase3-product-muscle-progress.md`.
 
+Market Field UX gate evidence is recorded in
+`docs/status/2026-07-28-ci-os-market-field-ux-gate.md`.
+
 ## Next Gate
 
-CI-OS must complete Product Muscle before Argus intelligence, accepted IA, final E2E validation, and the controlled Algolia pilot can pass.
+CI-OS must complete Product Muscle before Argus intelligence, broader accepted IA, final E2E validation, and the controlled Algolia pilot can pass.
 
 Recurring GA4 automation remains deferred. It is not the current blocker because the pilot now has a processed manual Audience Demand feed.
 

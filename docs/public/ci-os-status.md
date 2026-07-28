@@ -30,10 +30,10 @@ Current product completion is approximately **45 percent**. The engineering scaf
 - Competitor-specific briefs and monitored-competitor views.
 - Product Muscle and demand work queues.
 - Local administration for competitors, sources, product surfaces, demand, and runs.
-- Dashboard renderer and selected browser-validation journeys.
+- Dashboard renderer, Market Field-first live UX, and selected browser-validation journeys.
 - 1,251 passing local tests in the latest verified suite.
 - Dedicated `cios` application user, secure Hermes queue handoff, and delegated cgroup containment.
-- Run-bound public publication through the Hermes wrapper.
+- Run-bound public publication through the Hermes wrapper and served release store.
 - Manual Audience Demand ingestion from the approved Looker export path.
 
 ## Current Verified State
@@ -43,23 +43,23 @@ Current product completion is approximately **45 percent**. The engineering scaf
 | Phase 0 baseline | Passed | Clean, published CI-OS recovery baseline. |
 | Phase 1 Hermes execution | Passed | Two consecutive real Hermes runs exited 0 as `cios`, with no permission error, timeout, orphan work, or ownership drift. |
 | Phase 2 publication | Passed | Fresh public run `cios-20260728T032901Z-3409872` published through the Hermes wrapper with matching public status and semantic dashboard run IDs. |
-| Deployed package | Verified | Commit `1fa7ac5` plus renderer hotfix from CI-OS commit `95caab9`; immutable archive and rollback-bundle drill passed for the Phase 1 baseline. |
+| Deployed package | Verified | CI-OS commit `54b5d2f` is deployed at `/opt/cios/app`; package contract passes as `cios`. |
 | Competitor registry | Partial | 27 competitors represented. |
-| Source coverage | Current | Latest Hermes run reports 43 active, 43 checked, and 0 failed sources. |
-| Product reality | Partial | Phase 3 resolved the first four Athos Commerce product-muscle gaps, removing `A/B Testing & Optimization`, `100s+ Robust Integrations`, `1:1 AI Personalization`, and `100s+ robust integrations & Open APIs` from the queue; 39 limiting matrix items remain after regeneration. |
+| Source coverage | Current with one fetch failure | Latest Hermes wrapper run reported 42 active sources, 41 fetched, and 1 failed source fetch. |
+| Product reality | Partial | Phase 3 has verified Product Muscle progress, but the latest served public state is still blocked on evidence and has `0` promoted recommendations. |
 | Market conversation | Present | 500 themes and 2 current candidate patterns. |
 | Audience demand | Connected manual feed | Fresh semantic data reports `demand_plane_status=processed` and `demand_signal_count=100`; recurring GA4 automation remains deferred. |
 | Recommendations | Blocked | 0 current recommendations because Product Muscle evidence is still incomplete. |
 | Learning | Unproven | No learning effect visible in the current run. |
-| Production UI | In redesign | Accepted Product Muscle IA is not yet the live application. |
-| Launch readiness | Not ready | Publication is now fresh and run-bound, but Product Muscle, Argus recommendation quality, accepted IA, and E2E gates remain open. |
+| Production UI | Market Field live gate passed | Market Field-first UX is live at `https://ci.chowmes.com/` and passed live click validation on release `cios-20260728T084235Z-3769892`; broader Product IA remains pending. |
+| Launch readiness | Not ready | Market Field UX and publication are live-verified, but Product Muscle, Argus recommendation quality, broader IA, and final E2E gates remain open. |
 
 ## What Comes Next
 
 1. Complete Scout-backed product and feature comparison.
 2. Keep the manual Audience Demand feed as the pilot input while recurring GA4 automation is deferred.
 3. Prove one useful cross-plane Argus recommendation and one learning effect.
-4. Build the accepted Argus Read, Product Muscle Matrix, Conversation Heatmap, Demand Lens, Pattern Board, Actions, Registry, Evidence Lab, and Command/Admin workflows.
+4. Complete the remaining Product IA workflows beyond the live Market Field journey: Product Muscle Matrix, Conversation/Demand drilldowns, Pattern Board, Actions, Registry, Evidence Lab, and Command/Admin.
 5. Complete exhaustive frontend, backend, semantic, accessibility, security, and live-cron validation.
 6. Release a controlled Algolia pilot only after every gate passes.
 
@@ -67,7 +67,7 @@ Current product completion is approximately **45 percent**. The engineering scaf
 
 Phase 3 is active. Product Muscle must produce current evidence or explicit unknown states for every active competitor and matrix cell.
 
-The next live actions are the remaining Product Muscle queue items, starting with Athos Commerce capability gaps for `A/B Testing`, `ABRA`, and `Account & Billing Management`. Recurring GA4 automation is deferred and does not block Phase 3.
+The next live actions are to inspect why the latest served run is `blocked_on_evidence` with `0` promoted recommendations, then continue the remaining Product Muscle evidence work. Recurring GA4 automation is deferred and does not block Phase 3.
 
 ## Project Records
 
