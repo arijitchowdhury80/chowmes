@@ -1,14 +1,14 @@
 # aRRIe Market Field Candidate UX / IA Spec
 
 Date: 2026-07-28
-Status: candidate for review, not approved, not implementation-ready
+Status: approved by Arijit for implementation planning, not implementation-ready
 Primary artifact: `docs/mockups/arrie/2026-07-28-market-field-option-1.html`
 
 ## Scope
 
-This spec defines the candidate UX / IA direction for the CI-OS / Argus first-read experience.
+This spec defines the approved UX / IA direction for the CI-OS / Argus first-read experience.
 
-It does not authorize production UI implementation, CI-OS runtime changes, Hermes changes, live data wiring, or pilot release work.
+It does not authorize production UI implementation, CI-OS runtime changes, Hermes changes, live data wiring, or pilot release work without the next implementation plan and phase gates.
 
 ## Product Decision Being Proposed
 
@@ -157,11 +157,8 @@ Current validation result:
 - mockup remains standalone
 - mobile route rail is tight at 390px and should be refined in high-fidelity design
 
-## Gate Recommendation
+## Approval Record
 
-Recommended next human decision:
+Arijit approved the Market Field-first UX / IA direction on 2026-07-28.
 
-> Approve the Market Field-first candidate UX / IA direction for implementation planning, or revise the candidate spec before implementation planning begins.
-
-If approved, the next artifact should be an implementation plan for the accepted UX / IA, not direct production coding.
-
+The next artifact is an implementation plan for the accepted UX / IA, not direct production coding.
