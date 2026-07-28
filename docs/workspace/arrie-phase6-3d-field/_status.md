@@ -1,7 +1,7 @@
 # aRRIe Phase 6 True 3D Market Field Status
 
 Date: 2026-07-28
-Status: true 3D Product IA direction accepted; reusable Agent Studio validation, public-safety, and deployment-mechanics artifacts verified locally
+Status: true 3D Product IA direction accepted; reusable Agent Studio validation, public-safety, redaction, and deployment-mechanics artifacts verified locally
 
 ## Scope
 
@@ -76,6 +76,19 @@ Build and validate a true 3D constellation-style Market Field prototype that use
 - Verified `python3 scripts/verify_hermes_package_contract.py --app-dir . --skip-python-imports` passed.
 - Verified `python3 -m py_compile scripts/scan_public_artifacts.py scripts/validate_market_field_visual_acceptance.py scripts/validate_market_field_story.py scripts/build_agent_studio_market_field_fixture.py scripts/verify_hermes_package_contract.py` passed.
 - Verified `git diff --check` passed.
+- CI-OS public artifact redaction gate implemented:
+  - `scripts/redact_public_artifacts.py` redacts internal filesystem paths and `file://` references from staged public HTML/JS/JSON/CSS/TXT/map artifacts.
+  - `deploy/cios-daily.sh` now redacts the staged public bundle before running the public artifact safety scan.
+  - Package preflight now requires the redaction script and wrapper redaction call.
+  - The redactor intentionally does not mask secret-like values, so real secrets still fail `scripts/scan_public_artifacts.py`.
+- Verified `python3 -m pytest tests/scripts/test_redact_public_artifacts.py tests/scripts/test_verify_hermes_package_contract.py::test_preflight_passes_complete_hermes_package_contract -q` passed with `4 passed`.
+- Verified `python3 -m pytest tests/deploy/test_cios_daily_wrapper.py -q` passed with `20 passed`.
+- Verified `python3 -m pytest tests/scripts/test_redact_public_artifacts.py tests/scripts/test_scan_public_artifacts.py tests/scripts/test_verify_hermes_package_contract.py -q` passed with `75 passed`.
+- Verified `python3 -m pytest tests/dashboard/test_market_field_view_model.py tests/dashboard/test_state_builder.py tests/dashboard/test_cockpit_renderer.py tests/scripts/test_validate_dashboard_clicks_market_field.py tests/scripts/test_validate_market_field_story.py tests/scripts/test_build_agent_studio_market_field_fixture.py tests/scripts/test_validate_market_field_visual_acceptance.py tests/scripts/test_redact_public_artifacts.py tests/scripts/test_scan_public_artifacts.py tests/scripts/test_verify_hermes_package_contract.py -q` passed with `174 passed`.
+- Verified `python3 scripts/verify_hermes_package_contract.py --app-dir . --skip-python-imports` passed.
+- Verified `python3 -m py_compile scripts/redact_public_artifacts.py scripts/scan_public_artifacts.py scripts/validate_market_field_visual_acceptance.py scripts/validate_market_field_story.py scripts/build_agent_studio_market_field_fixture.py scripts/verify_hermes_package_contract.py` passed.
+- Verified `git diff --check` passed.
+- Verified local staged-public redaction proof under `/tmp/cios-public-redaction-check`: redaction `status=redacted`, `redacted_file_count=2`, `redaction_count=4`; post-redaction scan `status=passed`, `findings=[]`.
 - CI-OS deployment-store and rollback-preparation slice implemented:
   - `deploy/cios-daily.sh` now runs `scripts/scan_public_artifacts.py` against the staged public bundle before copying anything to the public site.
   - `promote_public_store_if_present` now refreshes the public-store `served` root from the promoted release.
@@ -93,8 +106,8 @@ Build and validate a true 3D constellation-style Market Field prototype that use
 
 The human direction gate is cleared.
 
-Reusable local story, visual verifier, public-safety, and deployment-mechanics gates are cleared for the Agent Studio Market Field artifact.
+Reusable local story, visual verifier, public-safety, public-redaction, and deployment-mechanics gates are cleared for the Agent Studio Market Field artifact.
 
 Phase 6 final visual acceptance is not cleared yet because the UI/UX SOP/design-authority dependency remains missing or unwaived.
 
-Next production work: restore/provide the UI/UX SOP path or explicitly waive it as temporary pilot design authority, then deploy to the Chowmes CI-OS package path and execute the live staging gate with public-safety scan and dashboard click validation against the deployed artifact.
+Next production work: restore/provide the UI/UX SOP path or explicitly waive it as temporary pilot design authority, then deploy to the Chowmes CI-OS package path and execute the live staging gate with public redaction, public-safety scan, and dashboard click validation against the deployed artifact.
