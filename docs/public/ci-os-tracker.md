@@ -110,6 +110,9 @@ Phase 7 human usefulness acceptance is recorded in
 Phase 8 controlled pilot release evidence is recorded in
 `docs/workspace/arrie-phase6-3d-field/18-phase8-controlled-pilot-release.md`.
 
+Phase 8 observation 1 is recorded in
+`docs/workspace/arrie-phase6-3d-field/19-phase8-observation-1.md`.
+
 ## Related
 
 - [[status|Project status]]
