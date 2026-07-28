@@ -43,7 +43,7 @@ Current product completion is approximately **45 percent**. The engineering scaf
 | Phase 0 baseline | Passed | Clean, published CI-OS recovery baseline. |
 | Phase 1 Hermes execution | Passed | Two consecutive real Hermes runs exited 0 as `cios`, with no permission error, timeout, orphan work, or ownership drift. |
 | Phase 2 publication | Passed | Fresh public run `cios-20260728T032901Z-3409872` published through the Hermes wrapper with matching public status and semantic dashboard run IDs. |
-| Deployed package | Verified | CI-OS commit `b55979e` is deployed for the product-surface exporter; package source compile-check passed as `cios`. |
+| Deployed package | Verified | CI-OS commit `fa2f31f` is deployed for the demand-amendment handoff integration; package contract and source compile checks passed as `cios`. |
 | Competitor registry | Partial | 27 competitors represented. |
 | Source coverage | Current with one fetch failure | Latest Hermes wrapper run reported 42 active sources, 41 fetched, and 1 failed source fetch. |
 | Product reality | Passed for Phase 3 | Product Muscle queue is now `0` after verified Google Vertex AI Search, Lucidworks, Meilisearch, Bloomreach, and Athos evidence work. The latest served semantic dashboard has 12 feature-comparison rows and explicit unknown states where proof is absent. |
@@ -51,7 +51,7 @@ Current product completion is approximately **45 percent**. The engineering scaf
 | Audience demand | Connected but not action-grade | Fresh semantic data reports `demand_plane_status=processed` and `demand_signal_count=100`, but no topic crossed the rising-demand threshold. A planned-demand evaluation inspected 12 active Argus topics and 11,057 Looker metric rows; no active planned topic had matching current demand rows. The evaluator now emits one amendment candidate: Agent Studio, with 1,619 current sessions versus 751 previous sessions. The current next action is `upload_trended_planned_demand_export` or explicitly amend the demand plan. |
 | Recommendations | Blocked | 0 current recommendations because the current demand feed is not yet action-grade. |
 | Learning | Unproven | No learning effect visible in the current run. |
-| Production UI | Market Field live gate passed | Market Field-first UX is live at `https://ci.chowmes.com/` and passed live click validation on release `cios-20260728T0934Z-manual-b55979e`; broader Product IA remains pending. |
+| Production UI | Market Field live gate passed | Market Field-first UX is live at `https://ci.chowmes.com/` and passed live click validation on release `cios-20260728T101358Z-manual-fa2f31f`; broader Product IA remains pending. |
 | Launch readiness | Not ready | Product Muscle and Market Field publication are live-verified, but Audience Demand, Argus recommendation quality, broader IA, and final E2E gates remain open. |
 
 ## What Comes Next
@@ -67,7 +67,7 @@ Current product completion is approximately **45 percent**. The engineering scaf
 
 Phase 4 is active. Audience Demand must provide planned-topic time-series evidence, either through a trended manual Looker export or a configured GA4 path.
 
-The latest served run is `blocked_on_evidence` with `0` promoted recommendations because demand movement is not action-grade. The local Phase 4 evaluator found no matching current demand rows for the 12 active planned topics. It did find off-plan Agent Studio movement, but that cannot pass the gate unless Argus explicitly plans against it. The next live action is to upload a trended planned demand export with previous-period or `change_pct` values, or refresh the Argus demand plan, then refresh Argus. Recurring GA4 automation remains deferred; the immediate blocker is the missing action-grade planned demand movement, not the connector itself.
+The latest served run is `blocked_on_evidence` with `0` promoted recommendations because demand movement is not action-grade. The Phase 4 evaluator found no matching current demand rows for the 12 active planned topics. It did find off-plan Agent Studio movement, and that amendment candidate is now visible in the live Argus operator handoff and dashboard. It still cannot pass the gate unless Argus explicitly plans against it. The next live action is to upload a trended planned demand export with previous-period or `change_pct` values, or refresh the Argus demand plan, then refresh Argus. Recurring GA4 automation remains deferred; the immediate blocker is the missing action-grade planned demand movement, not the connector itself.
 
 ## Project Records
 

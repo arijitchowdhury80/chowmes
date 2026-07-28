@@ -76,6 +76,8 @@ This candidate should be treated as a work-order amendment proposal, not as a pa
 
 CI-OS now carries this proposal into the Argus operator handoff when the evaluator report is available. The daily wrapper can run the planned-demand evaluator from the configured Looker export data directory, publish the evaluation and amendment CSV artifacts, and pass the report into `build_argus_operator_handoff.py`. The dashboard renderer now has a public-safe “Suggested demand-plan amendment” panel, but the handoff still keeps `status=blocked_on_evidence` until an amended plan produces planned-topic gate evidence.
 
+This integration is deployed on Chowmes in CI-OS package commit `fa2f31f` and served from public release `cios-20260728T101358Z-manual-fa2f31f`. The live page at `https://ci.chowmes.com/` contains the Suggested demand-plan amendment panel for Agent Studio, and the public data endpoints expose both `argus-planned-demand-evaluation.json` and `argus-operator-handoff.json`.
+
 ## Next Required Action
 
 One of these must happen before Phase 4 can pass:
@@ -108,3 +110,7 @@ Results:
 - local handoff build with the real evaluator report kept `blocked_on_evidence`, titled the blocker `Demand movement not action-grade`, and carried `1` amendment candidate: Agent Studio
 - prepared demand CSV contained header only because no planned topic passed
 - amendment candidate CSV contained one proposed candidate, Agent Studio
+- VPS package contract check as `cios`: `PASS: CI-OS Hermes package contract satisfied`
+- VPS handoff rebuild: `blocked_on_evidence`, amendment candidate count `1`, first candidate `Agent Studio`
+- public JSON checks: `argus-planned-demand-evaluation.json` reports `phase4_gate_passed=False` and one `plan_amendment_candidates` row; `argus-operator-handoff.json` reports one public-safe `demand_plan_amendments` candidate
+- live dashboard validation: `python3 scripts/validate_dashboard_clicks.py --url https://ci.chowmes.com/` passed market field, structure, nav targets, timeline, semantic layer, priority selection, brief routing, appendices, and 390 / 768 / 1280 viewport checks

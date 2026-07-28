@@ -56,6 +56,7 @@ Launch status: **Not ready**
 - Bloomreach Discovery product evidence was extracted and ingested from `https://www.bloomreach.com/en/products/discovery`; the current served release `cios-20260728T0928Z-manual-b55979e` has 12 feature-comparison rows, 25 Market Field nodes, and a Product Muscle work queue reduced to 3 limiting items.
 - Google Vertex AI Search, Lucidworks, and Meilisearch product-surface extractions succeeded and were ingested; the current served release `cios-20260728T0934Z-manual-b55979e` has a Product Muscle work queue of `0`.
 - Phase 4 planned-demand evaluation ran against the active live Argus demand plan and local Looker exports. It inspected 12 active planned topics and 11,057 metric rows; no planned topic had matching current demand rows, so the Phase 4 gate remains open. Off-plan Agent Studio demand was detected, and the evaluator now emits it as a demand-plan amendment candidate with 1,619 current sessions versus 751 previous sessions. It is not current gate evidence until the Argus plan is explicitly refreshed or amended.
+- CI-OS commit `fa2f31f` is deployed on Chowmes as release `cios-20260728T101358Z-manual-fa2f31f`. The live dashboard and public handoff now expose the Agent Studio demand-plan amendment candidate while preserving `blocked_on_evidence`; live dashboard click validation passed after restoring the served competitor brief links.
 
 ## Current Gate
 
