@@ -43,15 +43,15 @@ Current product completion is approximately **45 percent**. The engineering scaf
 | Phase 0 baseline | Passed | Clean, published CI-OS recovery baseline. |
 | Phase 1 Hermes execution | Passed | Two consecutive real Hermes runs exited 0 as `cios`, with no permission error, timeout, orphan work, or ownership drift. |
 | Phase 2 publication | Passed | Fresh public run `cios-20260728T032901Z-3409872` published through the Hermes wrapper with matching public status and semantic dashboard run IDs. |
-| Deployed package | Verified | CI-OS commit `54b5d2f` is deployed at `/opt/cios/app`; package contract passes as `cios`. |
+| Deployed package | Verified | CI-OS commit `b55979e` is deployed for the product-surface exporter; package source compile-check passed as `cios`. |
 | Competitor registry | Partial | 27 competitors represented. |
 | Source coverage | Current with one fetch failure | Latest Hermes wrapper run reported 42 active sources, 41 fetched, and 1 failed source fetch. |
-| Product reality | Partial | Phase 3 has verified Product Muscle progress, but the latest served public state is still blocked on evidence and has `0` promoted recommendations. |
+| Product reality | Partial | Phase 3 has verified Product Muscle progress. The latest served semantic dashboard has 12 feature-comparison rows and the Product Muscle work queue is down to 3 limiting items, but the public state still has `0` promoted recommendations. |
 | Market conversation | Present | 500 themes and 2 current candidate patterns. |
 | Audience demand | Connected but not action-grade | Fresh semantic data reports `demand_plane_status=processed` and `demand_signal_count=100`, but no topic crossed the rising-demand threshold. The current next action is `upload_trended_planned_demand_export`. |
 | Recommendations | Blocked | 0 current recommendations because Product Muscle evidence remains incomplete and the current demand feed is not yet action-grade. |
 | Learning | Unproven | No learning effect visible in the current run. |
-| Production UI | Market Field live gate passed | Market Field-first UX is live at `https://ci.chowmes.com/` and passed live click validation on release `cios-20260728T084235Z-3769892`; broader Product IA remains pending. |
+| Production UI | Market Field live gate passed | Market Field-first UX is live at `https://ci.chowmes.com/` and passed live click validation on release `cios-20260728T0928Z-manual-b55979e`; broader Product IA remains pending. |
 | Launch readiness | Not ready | Market Field UX and publication are live-verified, but Product Muscle, Argus recommendation quality, broader IA, and final E2E gates remain open. |
 
 ## What Comes Next
@@ -67,7 +67,7 @@ Current product completion is approximately **45 percent**. The engineering scaf
 
 Phase 3 is active. Product Muscle must produce current evidence or explicit unknown states for every active competitor and matrix cell.
 
-The latest served run is `blocked_on_evidence` with `0` promoted recommendations because demand movement is not action-grade and Product Muscle remains incomplete. The next live actions are to upload a trended planned demand export, then continue the remaining Product Muscle evidence work. Recurring GA4 automation remains deferred; the immediate blocker is the missing action-grade demand movement, not the connector itself.
+The latest served run is `blocked_on_evidence` with `0` promoted recommendations because demand movement is not action-grade and the remaining Product Muscle queue still has 3 confidence-limiting items. The next live actions are to upload a trended planned demand export, then continue the remaining Product Muscle evidence work for Google Vertex AI Search, Lucidworks, and Meilisearch. Recurring GA4 automation remains deferred; the immediate blocker is the missing action-grade demand movement, not the connector itself.
 
 ## Project Records
 

@@ -11,7 +11,7 @@ First tenant: Algolia
 
 CI-OS is approximately 45 percent complete against the original product goal. The engineering scaffold is approximately 75 percent complete, but the product does not yet deliver a reliable, evidence-backed competitive decision loop.
 
-The system must not be called launch-ready. Phase 1 passed after two consecutive real Hermes runs completed successfully as the dedicated `cios` application user. Phase 2 now also passed after fresh public artifacts were published through the Hermes wrapper with one run ID, live public JSON agreed with semantic dashboard data, and live dashboard click validation passed. Phase 3 has verified first progress through multiple Athos Commerce product-muscle repairs and extractions. The Market Field-first UX / IA surface is now implemented, deployed, served from release `cios-20260728T084235Z-3769892`, and live-validated on `https://ci.chowmes.com/`. The inward demand plane is connected through the approved manual Looker export path, but Product Muscle remains incomplete, the live intelligence output contains zero recommendations, and the broader Product IA beyond the Market Field journey remains unfinished.
+The system must not be called launch-ready. Phase 1 passed after two consecutive real Hermes runs completed successfully as the dedicated `cios` application user. Phase 2 now also passed after fresh public artifacts were published through the Hermes wrapper with one run ID, live public JSON agreed with semantic dashboard data, and live dashboard click validation passed. Phase 3 has verified progress through Athos Commerce and Bloomreach product-muscle extraction work, including a semantic guard that prevents cookie-consent boilerplate from entering the Product Muscle ledger. The Market Field-first UX / IA surface is implemented, deployed, served from release `cios-20260728T0928Z-manual-b55979e`, and live-validated on `https://ci.chowmes.com/`. The inward demand plane is connected through the approved manual Looker export path, but Audience Demand is not action-grade, the live intelligence output contains zero recommendations, and the broader Product IA beyond the Market Field journey remains unfinished.
 
 The retained implementation now has a clean, published branch, an immutable deployed package baseline, a verified run-bound publication path, and a live-validated Market Field UX entry point. Feature expansion is now gated on current product evidence, intelligence quality, and the remaining Product IA workflows. Recurring GA4 automation remains deferred and is not the current Phase 3 blocker.
 
@@ -56,7 +56,7 @@ Evidence was refreshed directly from Chowmes through 2026-07-28 UTC.
 | Execution mode | Hermes no-agent script |
 | Wrapper | `cios-daily.sh` |
 | Latest completed schedules | Phase 1 pair: 2026-07-14 03:49 ET and 04:05 ET; Phase 2 verification run: 2026-07-27 23:29 ET; latest Market Field staging run: 2026-07-28 04:42 ET |
-| Request IDs | Phase 1: `a70f4e219d294280a26703962c9be4e9`, `1b938c9de92f4568a059bdb84d3f9e6b`; Phase 2 public run: `cios-20260728T032901Z-3409872`; Phase 3 progress runs: `cios-20260728T034702Z-3433185`, `cios-20260728T041240Z-3510681`, `cios-20260728T043002Z-3533427`, `cios-20260728T044324Z-3552802`; Market Field public release: `cios-20260728T084235Z-3769892` |
+| Request IDs | Phase 1: `a70f4e219d294280a26703962c9be4e9`, `1b938c9de92f4568a059bdb84d3f9e6b`; Phase 2 public run: `cios-20260728T032901Z-3409872`; Phase 3 progress runs: `cios-20260728T034702Z-3433185`, `cios-20260728T041240Z-3510681`, `cios-20260728T043002Z-3533427`, `cios-20260728T044324Z-3552802`; Market Field release: `cios-20260728T084235Z-3769892`; current manual release: `cios-20260728T0928Z-manual-b55979e` |
 | Results | Exit code 0 for the Phase 1 pair, the Phase 2 verification run, the latest Phase 3 progress run, and the Market Field staging run |
 | Runtime owner | `cios`, reached through the Hermes queue handoff |
 | Autonomous daily loop | Publication path and Market Field UX serving verified; Phase 3 Product Muscle active |
@@ -69,9 +69,9 @@ Both runs completed without root intervention, permission errors, timeout, orpha
 |---|---|
 | Status | `blocked_on_evidence` |
 | Publish status | `published` |
-| Generated at | `2026-07-28T09:09:44.242136Z` |
+| Generated at | `2026-07-28T09:27:04.746113Z` |
 | Public dashboard updated | true |
-| Public release | `cios-20260728T090947Z-manual-22e6467` |
+| Public release | `cios-20260728T0928Z-manual-b55979e` |
 | Next Hermes action | `upload_trended_planned_demand_export` |
 
 ### Evidence planes
@@ -83,12 +83,10 @@ Both runs completed without root intervention, permission errors, timeout, orpha
 | Checked sources | 41 fetched | Latest wrapper run fetched 41 of 42 attempted active sources. |
 | Blocked sources | 5 | Present in the public source ledger. |
 | Failed active source fetches | 1 | Latest wrapper run reported one failed source fetch. |
-| Product events | 500 | Fresh semantic dashboard reports product events. The first and fourth Athos Commerce extractions produced 12 product rows from the pricing surface; the first repair produced 12 rows and the third repair produced 11 rows, but Product Muscle still has unresolved matrix gaps. |
-| Current product-surface targets | 38 | Targets are registered. |
-| Current product-surface planned | 0 | Current status does not prove execution. |
-| Current product-surface succeeded | 0 | Current status does not prove execution. |
-| Current product rows extracted | 0 | Current status does not prove execution. |
-| Companies missing product muscle | 11 | Product comparison remains incomplete. |
+| Feature-comparison rows | 12 | Latest served semantic dashboard exposes 12 Product Muscle comparison rows. |
+| Market Field nodes | 25 | Latest served semantic dashboard exposes 25 Market Field nodes. |
+| Product-surface work queue | 3 limiting items | Queue now names Google Vertex AI Search, Lucidworks, and Meilisearch as remaining no-feature-evidence competitors. |
+| Boilerplate extraction guard | Verified | CI-OS commit `b55979e` filters site cookie/privacy boilerplate; the Athos platform extraction that produced 8 bad cookie rows now returns empty. |
 | Conversation themes | 500 | Market-conversation evidence exists. |
 | Demand signals | 100 | Manual Looker Audience Demand feed is processed, but the latest served status is `processed_no_action_grade_demand`: no topic crossed the rising-demand threshold. |
 | Patterns | 2 | Deterministic pattern primitives produced output in the latest fresh run. |
@@ -171,7 +169,7 @@ The authoritative remote and branch ownership are reconciled. Commit `dea1816` a
 | Hermes scheduled execution | Phase 1 passed | Two consecutive real runs exited 0 with clean containment and ownership. |
 | Competitor and source registry | 55% | Data/admin/public roster exist; onboarding proof incomplete. |
 | Daily outward collection | 55% | Coverage can be reported and the latest Hermes-wrapper publication run exited 0. |
-| Scout product muscle | 35% | Model and queues exist; the first four Athos Commerce items were verified and removed from the queue, but 39 limiting matrix items remain after regeneration. |
+| Scout product muscle | 70% | Model and queues exist; Athos and Bloomreach progress is verified, cookie-boilerplate pollution is blocked, and 3 limiting no-feature-evidence competitors remain. |
 | GA4 / Looker demand | 60% | Manual Looker export is processed with 100 demand signals, but no topic crossed the rising-demand threshold; recurring GA4 automation is deferred. |
 | Pattern intelligence | 30% | Patterns exist; cross-plane validation is incomplete. |
 | Recommendations | 10% | Structures exist; current output is zero. |
@@ -226,7 +224,7 @@ Without these answers, the application remains monitoring and plumbing rather th
 ## Remaining Deliverables
 
 1. Safe staging, atomic publication, current-run identity, and trustworthy launch evidence.
-2. Scout extraction across active product surfaces and a validated feature/capability matrix; four Athos Commerce gaps are resolved, 39 limiting queue items remain after regeneration.
+2. Scout extraction across active product surfaces and a validated feature/capability matrix; Athos and Bloomreach progress is verified, and 3 limiting no-feature-evidence competitors remain after regeneration.
 3. A real GA4 or Looker demand source with topic coverage and time-series signals.
 4. Cross-plane patterns with explicit support, contradiction, confidence, and unknowns.
 5. Specific recommendations with owner, urgency, evidence, and generated work products.

@@ -1,7 +1,7 @@
 # CI-OS Phase 3 Product Muscle Progress
 
 Date: 2026-07-28 UTC
-Status: Phase 3 active; four Product Muscle movements verified
+Status: Phase 3 active; five Product Muscle movements plus one extraction-quality guard verified
 Tenant: Algolia
 
 ## First Verified Movement
@@ -157,7 +157,7 @@ Live dashboard click validation passed again after this run.
 
 The `Athos Commerce` / `100s+ robust integrations & Open APIs` work item is no longer present in the Product Muscle queue.
 
-The queue still reports:
+At that point, before the fifth movement and boilerplate guard, the queue still reported:
 
 | Item | Verified value |
 |---|---:|
@@ -176,8 +176,67 @@ After the fourth movement, the current top queue items are now:
 7. Constructor / `A/B Testing`
 8. Constructor / `ABRA`
 
+## Fifth Verified Movement And Quality Guard
+
+Live Phase 3 inspection found that an Athos Commerce product-page extraction for `A/B Testing` returned 8 rows, but all rows were cookie-consent, cookie-category, preference, marketing-cookie, and privacy-policy boilerplate. Those rows were not ingested.
+
+CI-OS commit `b55979e` (`Filter product surface boilerplate noise`) adds a regression test and a source-export filter so site cookie/privacy boilerplate is removed before Product Muscle ingestion.
+
+Verification:
+
+| Item | Verified value |
+|---|---|
+| Local focused tests | `13 passed` |
+| Local adjacent Product Surface slice | `32 passed` |
+| Local broader Product Muscle / demand sidecar slice | `70 passed` |
+| Server compile check | `py_compile` passed for `scripts/export_product_surface_with_scout.py` |
+| Server backup | `/opt/cios/backups/boilerplate-filter-b55979e-20260728T092316Z` |
+| Re-run Athos platform extraction | `product_plane_status=empty`, `product_row_count=0` |
+| Re-run Athos products extraction | `product_plane_status=empty`, `product_row_count=0` |
+
+After the guard, Bloomreach Discovery product-page extraction produced clean product evidence from `https://www.bloomreach.com/en/products/discovery`.
+
+| Item | Verified value |
+|---|---|
+| Competitor | Bloomreach |
+| Focus capability | `A/B Testing` |
+| Extraction surface | `https://www.bloomreach.com/en/products/discovery` |
+| Extraction result | `product_plane_status=ready` |
+| Extracted rows | 6 |
+| Extracted capabilities | Ecommerce Search; Loomi AI; Personalized Search; Conversational Shopping Agent; User Behavior Tracking and Search Results Adjustment; Optimization for People and Behaviors (Loomi AI) |
+| Product Market ingest verdict | `quiet` |
+| Product events after ingest | 6 |
+| Feature positions after ingest | 6 |
+| Recommendations | 0 |
+
+The refreshed public release is:
+
+| Item | Verified value |
+|---|---|
+| Public release | `cios-20260728T0928Z-manual-b55979e` |
+| Public status | `blocked_on_evidence` |
+| Public blocker | `Demand movement not action-grade` |
+| Next Hermes action | `upload_trended_planned_demand_export` |
+| Semantic dashboard generated at | `2026-07-28T09:26:58.643468Z` |
+| Public run status generated at | `2026-07-28T09:27:04.746113Z` |
+| Feature-comparison rows | 12 |
+| Market Field nodes | 25 |
+| Product Muscle work items | 3 |
+| Limiting items | 3 |
+
+Live validation passed after the release swap:
+
+- `python3 scripts/validate_dashboard_clicks.py --url https://ci.chowmes.com/`
+- direct `curl` checks for `argus-latest-run-status.json` and `semantic-dashboard.json`
+
+The remaining Product Muscle queue now names:
+
+1. Google Vertex AI Search / no feature evidence
+2. Lucidworks / no feature evidence
+3. Meilisearch / no feature evidence
+
 ## Gate Judgment
 
 This is verified Product Muscle progress, not Phase 3 completion.
 
-Phase 3 remains active because the feature/capability matrix still contains 39 limiting work items. The next safe action is to continue resolving the remaining Product Muscle queue items through current product-surface extraction, repair when extraction is empty, ledger refresh, public run verification, and live click validation.
+Phase 3 remains active because three competitors still have no captured feature evidence, and Audience Demand is still not action-grade. The next safe action is to continue resolving Google Vertex AI Search, Lucidworks, and Meilisearch through current product-surface extraction, repair when extraction is empty, ledger refresh, public run verification, and live click validation.
