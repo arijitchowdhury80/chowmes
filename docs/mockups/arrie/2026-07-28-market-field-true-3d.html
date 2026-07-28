@@ -1,0 +1,1004 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>aRRIe True 3D Market Field</title>
+  <style>
+    :root {
+      --deep: #07080c;
+      --plane: #141820;
+      --ink: #f3efe4;
+      --muted: #a9a498;
+      --line: rgba(243, 239, 228, 0.16);
+      --blue: #0a4cff;
+      --cyan: #37d8e8;
+      --amber: #d8a642;
+      --red: #f06449;
+      --green: #77d489;
+      --panel: rgba(14, 16, 23, 0.84);
+      --panel-strong: rgba(18, 21, 30, 0.96);
+      --focus: #f3efe4;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--deep);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+      overflow-x: hidden;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      background:
+        linear-gradient(180deg, #07080c 0%, #0d1017 54%, #090a0d 100%);
+    }
+
+    .topbar {
+      min-height: 68px;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(7, 8, 12, 0.9);
+      backdrop-filter: blur(16px);
+      z-index: 5;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .mark {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3px;
+      padding: 7px;
+      border: 1px solid rgba(243, 239, 228, 0.28);
+      background: var(--plane);
+    }
+
+    .mark span {
+      border-radius: 50%;
+      background: var(--ink);
+      opacity: 0.78;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.1;
+      font-weight: 720;
+    }
+
+    .brand p {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .segmented,
+    .routes {
+      display: flex;
+      align-items: center;
+      border: 1px solid var(--line);
+      background: rgba(243, 239, 228, 0.05);
+      padding: 3px;
+    }
+
+    .segmented button,
+    .routes button {
+      min-height: 38px;
+      min-width: 44px;
+      border: 0;
+      color: var(--muted);
+      background: transparent;
+      padding: 0 12px;
+      cursor: pointer;
+    }
+
+    .segmented button[aria-pressed="true"] {
+      color: #05070b;
+      background: var(--ink);
+    }
+
+    .routes button {
+      color: var(--ink);
+    }
+
+    button:focus-visible,
+    .node-label:focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 3px;
+    }
+
+    .experience {
+      position: relative;
+      min-height: calc(100vh - 68px);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(360px, 430px);
+      overflow: hidden;
+    }
+
+    .field {
+      position: relative;
+      min-height: 780px;
+      border-right: 1px solid var(--line);
+      background:
+        linear-gradient(rgba(243, 239, 228, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(243, 239, 228, 0.035) 1px, transparent 1px);
+      background-size: 74px 74px;
+    }
+
+    #market-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .field-title {
+      position: absolute;
+      top: 28px;
+      left: 28px;
+      max-width: 330px;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--cyan);
+      font-size: 12px;
+      text-transform: uppercase;
+      font-weight: 760;
+    }
+
+    .field-title h2 {
+      margin: 0;
+      max-width: 320px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(32px, 3.8vw, 52px);
+      line-height: 0.96;
+      letter-spacing: 0;
+    }
+
+    .legend {
+      position: absolute;
+      left: 28px;
+      bottom: 24px;
+      z-index: 2;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      max-width: 680px;
+    }
+
+    .legend span,
+    .selection-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 32px;
+      border: 1px solid var(--line);
+      background: rgba(7, 8, 12, 0.72);
+      padding: 6px 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--ink);
+    }
+
+    .dot.theme { background: var(--blue); }
+    .dot.capability { background: var(--amber); }
+    .dot.demand { background: var(--cyan); }
+    .dot.limit { background: var(--red); }
+    .dot.action { background: var(--green); }
+
+    .node-labels {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .node-label {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      border: 1px solid rgba(243, 239, 228, 0.18);
+      background: rgba(7, 8, 12, 0.62);
+      color: var(--ink);
+      min-width: 112px;
+      max-width: 190px;
+      padding: 7px 9px;
+      text-align: center;
+      font-size: 12px;
+      line-height: 1.2;
+      pointer-events: auto;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+    }
+
+    .node-label[data-selected="true"] {
+      border-color: rgba(243, 239, 228, 0.72);
+      background: rgba(10, 76, 255, 0.28);
+      box-shadow: 0 0 0 1px rgba(55, 216, 232, 0.25);
+    }
+
+    .side {
+      min-height: 780px;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      background: var(--panel);
+      backdrop-filter: blur(18px);
+    }
+
+    .read {
+      padding: 28px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .read h3 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 34px;
+      line-height: 0.98;
+      letter-spacing: 0;
+    }
+
+    .read p {
+      margin: 16px 0 0;
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.56;
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      background: rgba(243, 239, 228, 0.045);
+      min-height: 74px;
+      padding: 11px;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 760;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 7px;
+      font-size: 15px;
+      line-height: 1.2;
+    }
+
+    .actions {
+      padding: 20px 28px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .action-row {
+      display: grid;
+      grid-template-columns: 64px minmax(0, 1fr) 46px;
+      gap: 12px;
+      align-items: start;
+      border-left: 3px solid var(--green);
+      background: rgba(119, 212, 137, 0.08);
+      padding: 13px 14px;
+    }
+
+    .action-row b {
+      font-size: 12px;
+      color: var(--green);
+    }
+
+    .action-row strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 15px;
+    }
+
+    .action-row p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .drawer {
+      min-height: 0;
+      padding: 22px 28px 28px;
+      overflow: auto;
+    }
+
+    .drawer button {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      background: var(--panel-strong);
+      color: var(--ink);
+      cursor: pointer;
+      text-align: left;
+      padding: 0 12px;
+    }
+
+    .proof {
+      display: none;
+      margin-top: 14px;
+      gap: 10px;
+    }
+
+    .proof[data-open="true"] {
+      display: grid;
+    }
+
+    .proof-item {
+      border: 1px solid var(--line);
+      background: rgba(243, 239, 228, 0.045);
+      padding: 12px;
+    }
+
+    .proof-item b {
+      color: var(--cyan);
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .proof-item p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .route-state {
+      display: none;
+      margin-top: 14px;
+      border: 1px solid rgba(216, 166, 66, 0.42);
+      color: var(--ink);
+      padding: 12px;
+      background: rgba(216, 166, 66, 0.08);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .route-state[data-open="true"] {
+      display: block;
+    }
+
+    @media (max-width: 980px) {
+      .experience {
+        grid-template-columns: 1fr;
+      }
+
+      .field {
+        min-height: 620px;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .side {
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 14px;
+      }
+
+      .controls {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .segmented,
+      .routes {
+        max-width: 100%;
+        overflow-x: auto;
+      }
+
+      .field {
+        min-height: 560px;
+      }
+
+      .field-title {
+        left: 16px;
+        top: 18px;
+        max-width: calc(100% - 32px);
+      }
+
+      .field-title h2 {
+        font-size: 34px;
+        max-width: 280px;
+      }
+
+      .legend {
+        left: 16px;
+        right: 16px;
+        bottom: 14px;
+      }
+
+      .node-label {
+        min-width: 84px;
+        max-width: 128px;
+        font-size: 10px;
+        padding: 6px 7px;
+      }
+
+      .read,
+      .actions,
+      .drawer {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      .status-grid,
+      .action-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="mark" aria-hidden="true">
+          <span></span><span></span><span></span>
+          <span></span><span></span><span></span>
+          <span></span><span></span><span></span>
+        </div>
+        <div>
+          <h1>Argus / CI-OS</h1>
+          <p>Tenant: Algolia</p>
+        </div>
+      </div>
+      <div class="controls">
+        <div class="segmented" aria-label="Time window">
+          <button type="button" data-window="Today" aria-pressed="false">Today</button>
+          <button type="button" data-window="7D" aria-pressed="true">7D</button>
+          <button type="button" data-window="30D" aria-pressed="false">30D</button>
+          <button type="button" data-window="Custom" aria-pressed="false">Custom</button>
+        </div>
+        <div class="routes" aria-label="Secondary routes">
+          <button type="button" data-route="evidence">Evidence</button>
+          <button type="button" data-route="admin">Admin</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="experience" aria-label="True 3D Market Field prototype">
+      <section class="field" aria-label="3D Market Field">
+        <canvas id="market-canvas" aria-label="3D constellation of competitive intelligence signals"></canvas>
+        <div class="field-title">
+          <p class="eyebrow">Market Field</p>
+          <h2>Agent Studio signal concentration</h2>
+        </div>
+        <div class="node-labels" id="node-labels" aria-hidden="false"></div>
+        <div class="legend" aria-label="Market Field legend">
+          <span><i class="dot theme"></i>Theme</span>
+          <span><i class="dot capability"></i>Product proof</span>
+          <span><i class="dot demand"></i>Audience Demand</span>
+          <span><i class="dot limit"></i>Confidence limit</span>
+          <span><i class="dot action"></i>Recommendation</span>
+        </div>
+      </section>
+
+      <aside class="side" aria-label="Selected Movement">
+        <section class="read">
+          <p class="eyebrow">Selected Movement</p>
+          <h3 id="selected-title">Agent Studio</h3>
+          <p id="selected-read">Algolia has product proof for Agent Studio and rising audience demand, but the visible market narrative is not yet carrying that proof.</p>
+          <div class="status-grid">
+            <div class="metric">
+              <span>Movement</span>
+              <strong id="movement">Rising over 7D</strong>
+            </div>
+            <div class="metric">
+              <span>Confidence</span>
+              <strong id="confidence">Limited, usable</strong>
+            </div>
+            <div class="metric">
+              <span>Demand</span>
+              <strong id="demand">1,619 sessions</strong>
+            </div>
+            <div class="metric">
+              <span>Limit</span>
+              <strong id="limit">Partial plan coverage</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="actions" aria-label="Recommended action">
+          <div class="action-row">
+            <b>PMM</b>
+            <div>
+              <strong id="action-title">Build the Agent Studio market narrative.</strong>
+              <p id="action-copy">Use product proof and rising audience demand before the demand window cools.</p>
+            </div>
+            <b>P1</b>
+          </div>
+        </section>
+
+        <section class="drawer" aria-label="Proof drawer">
+          <button type="button" id="proof-toggle" aria-expanded="false">Open proof</button>
+          <div class="proof" id="proof" data-open="false">
+            <div class="proof-item">
+              <b>Product proof</b>
+              <p>Algolia product and docs evidence support the Agent Studio capability story.</p>
+            </div>
+            <div class="proof-item">
+              <b>Audience Demand</b>
+              <p>Looker-derived demand shows Agent Studio at 1,619 current sessions versus 751 previous sessions.</p>
+            </div>
+            <div class="proof-item">
+              <b>Argus inference</b>
+              <p>The gap is narrative, not product absence: product proof exists, but market-facing story needs sharper expression.</p>
+            </div>
+            <div class="proof-item">
+              <b>Confidence limit</b>
+              <p>The accepted demand trend is limited because the compared Looker export families are comparable but not identical.</p>
+            </div>
+          </div>
+          <div class="route-state" id="route-state" data-open="false"></div>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <script type="module">
+    import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
+
+    const canvas = document.getElementById("market-canvas");
+    const labelRoot = document.getElementById("node-labels");
+    const title = document.getElementById("selected-title");
+    const read = document.getElementById("selected-read");
+    const movement = document.getElementById("movement");
+    const confidence = document.getElementById("confidence");
+    const demand = document.getElementById("demand");
+    const limit = document.getElementById("limit");
+    const actionTitle = document.getElementById("action-title");
+    const actionCopy = document.getElementById("action-copy");
+    const proof = document.getElementById("proof");
+    const proofToggle = document.getElementById("proof-toggle");
+    const routeState = document.getElementById("route-state");
+
+    const palette = {
+      theme: 0x0a4cff,
+      capability: 0xd8a642,
+      audience_demand: 0x37d8e8,
+      confidence_limit: 0xf06449,
+      recommendation: 0x77d489,
+      competitor: 0xf3efe4,
+      unknown_boundary: 0xf06449,
+    };
+
+    const nodes = [
+      {
+        id: "agent-studio",
+        label: "Agent Studio",
+        type: "theme",
+        position: [0, 0.7, 0],
+        radius: 0.34,
+        read: "Algolia has product proof for Agent Studio and rising audience demand, but the visible market narrative is not yet carrying that proof.",
+        action: "Build the Agent Studio market narrative.",
+        actionCopy: "Use product proof and rising audience demand before the demand window cools.",
+        confidence: "Limited, usable",
+        demand: "1,619 sessions",
+        limit: "Partial plan coverage",
+      },
+      {
+        id: "product-proof",
+        label: "Algolia product proof",
+        type: "capability",
+        position: [-1.55, -0.35, 0.75],
+        radius: 0.22,
+        read: "Product proof is present. Argus treats the gap as positioning and narrative, not as evidence that the capability is absent.",
+        action: "Convert proof into positioning.",
+        actionCopy: "Tie Agent Studio product evidence to the visible market story.",
+        confidence: "Product proof present",
+        demand: "3 linked proof URLs",
+        limit: "Comparison breadth still partial",
+      },
+      {
+        id: "audience-demand",
+        label: "Audience Demand",
+        type: "audience_demand",
+        position: [1.55, -0.28, 0.95],
+        radius: 0.24,
+        read: "Audience response is rising around Agent Studio. This strengthens priority, but it does not prove competitor movement by itself.",
+        action: "Use demand as urgency.",
+        actionCopy: "Make the narrative while attention is visible in the audience data.",
+        confidence: "Demand-linked",
+        demand: "+115.58%",
+        limit: "Comparable export families",
+      },
+      {
+        id: "narrative-gap",
+        label: "Narrative gap",
+        type: "confidence_limit",
+        position: [0.2, -1.3, -0.7],
+        radius: 0.2,
+        read: "The gap Argus sees is not missing product proof. It is missing narrative pressure around the product proof.",
+        action: "Name the gap directly.",
+        actionCopy: "Position Agent Studio as a market movement, not only a product page.",
+        confidence: "Action-grade gap",
+        demand: "1 narrative gap",
+        limit: "No matching narrative in evidence set",
+      },
+      {
+        id: "pmm-action",
+        label: "PMM action",
+        type: "recommendation",
+        position: [0, 1.65, -0.95],
+        radius: 0.2,
+        read: "Product Marketing owns the next useful action because the accepted read is about market narrative, not engineering repair.",
+        action: "Build the Agent Studio market narrative.",
+        actionCopy: "Create evidence-backed PMM material before the demand window cools.",
+        confidence: "Accepted by Arijit",
+        demand: "Recommendation 2",
+        limit: "Must be rechecked next run",
+      },
+      {
+        id: "vertex",
+        label: "Google Vertex AI Search",
+        type: "competitor",
+        position: [-2.6, 0.9, -1.35],
+        radius: 0.16,
+        read: "Google Vertex AI Search sits as competitor context around the Agent Studio movement.",
+        action: "Compare positioning pressure.",
+        actionCopy: "Keep Vertex in the proof drawer until the narrative claim is source-backed.",
+        confidence: "Contextual",
+        demand: "Monitored",
+        limit: "Not the accepted action center",
+      },
+      {
+        id: "bloomreach",
+        label: "Bloomreach",
+        type: "competitor",
+        position: [2.55, 0.62, -1.15],
+        radius: 0.16,
+        read: "Bloomreach provides competitive context in commerce and product proof patterns.",
+        action: "Watch commerce framing.",
+        actionCopy: "Use Bloomreach context only where evidence links support the claim.",
+        confidence: "Contextual",
+        demand: "Monitored",
+        limit: "Secondary actor",
+      },
+      {
+        id: "coveo",
+        label: "Coveo",
+        type: "competitor",
+        position: [2.25, -1.18, -1.25],
+        radius: 0.15,
+        read: "Coveo remains a monitored commerce/search actor, but it is not the accepted Agent Studio action center.",
+        action: "Hold as context.",
+        actionCopy: "Use Coveo as adjacent proof only when source links justify it.",
+        confidence: "Contextual",
+        demand: "Monitored",
+        limit: "Secondary actor",
+      },
+      {
+        id: "unknown",
+        label: "Unknown capability cells",
+        type: "unknown_boundary",
+        position: [-2.3, -1.15, -1.05],
+        radius: 0.15,
+        read: "Unknown capability cells limit confidence. They are not evidence that competitors lack the capability.",
+        action: "Keep unknowns visible.",
+        actionCopy: "Do not turn missing proof into absence claims.",
+        confidence: "Confidence limit",
+        demand: "Unresolved",
+        limit: "Unknown is not absent",
+      },
+    ];
+
+    const edges = [
+      ["agent-studio", "product-proof", "ships"],
+      ["agent-studio", "audience-demand", "overlaps_demand"],
+      ["agent-studio", "narrative-gap", "limits_confidence"],
+      ["agent-studio", "pmm-action", "influences_action"],
+      ["agent-studio", "vertex", "competitive_context"],
+      ["agent-studio", "bloomreach", "competitive_context"],
+      ["narrative-gap", "unknown", "limits_confidence"],
+      ["audience-demand", "coveo", "market_context"],
+    ];
+
+    const windowText = {
+      Today: "Fresh today",
+      "7D": "Rising over 7D",
+      "30D": "Durable over 30D",
+      Custom: "Custom investigation",
+    };
+    const pulseByWindow = { Today: 0.85, "7D": 1.15, "30D": 0.62, Custom: 0.4 };
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(46, 1, 0.1, 100);
+    camera.position.set(0, 0.3, 6.8);
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    const root = new THREE.Group();
+    scene.add(root);
+
+    const ambient = new THREE.AmbientLight(0xffffff, 1.2);
+    scene.add(ambient);
+    const key = new THREE.PointLight(0x37d8e8, 2.8, 10);
+    key.position.set(0, 3, 5);
+    scene.add(key);
+    const fill = new THREE.PointLight(0xd8a642, 1.4, 8);
+    fill.position.set(-4, -2, 3);
+    scene.add(fill);
+
+    const nodeById = new Map(nodes.map((node) => [node.id, node]));
+    const meshById = new Map();
+    const labelById = new Map();
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+    const pulses = [];
+    let selectedId = "agent-studio";
+    let currentWindow = "7D";
+    let targetRotationY = -0.28;
+    let targetRotationX = 0.18;
+    let dragging = false;
+    let lastPointer = null;
+
+    function materialFor(node) {
+      return new THREE.MeshStandardMaterial({
+        color: palette[node.type] || palette.competitor,
+        emissive: palette[node.type] || palette.competitor,
+        emissiveIntensity: node.id === selectedId ? 0.72 : 0.28,
+        roughness: 0.36,
+        metalness: 0.18,
+      });
+    }
+
+    function makeRing(radius, color) {
+      const curve = new THREE.EllipseCurve(0, 0, radius, radius, 0, Math.PI * 2);
+      const points = curve.getPoints(80).map((point) => new THREE.Vector3(point.x, point.y, 0));
+      const geometry = new THREE.BufferGeometry().setFromPoints(points);
+      const material = new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.45 });
+      return new THREE.LineLoop(geometry, material);
+    }
+
+    nodes.forEach((node) => {
+      const geometry = new THREE.SphereGeometry(node.radius, 36, 22);
+      const mesh = new THREE.Mesh(geometry, materialFor(node));
+      mesh.position.set(...node.position);
+      mesh.userData.nodeId = node.id;
+      root.add(mesh);
+      meshById.set(node.id, mesh);
+
+      if (node.type === "confidence_limit" || node.type === "unknown_boundary") {
+        const ring = makeRing(node.radius * 1.9, palette[node.type]);
+        ring.position.copy(mesh.position);
+        ring.lookAt(camera.position);
+        root.add(ring);
+      }
+
+      const label = document.createElement("button");
+      label.type = "button";
+      label.className = "node-label";
+      label.textContent = node.label;
+      label.dataset.nodeId = node.id;
+      label.dataset.selected = String(node.id === selectedId);
+      label.addEventListener("click", () => selectNode(node.id));
+      labelRoot.appendChild(label);
+      labelById.set(node.id, label);
+    });
+
+    edges.forEach(([sourceId, targetId, edgeType]) => {
+      const source = meshById.get(sourceId).position;
+      const target = meshById.get(targetId).position;
+      const color = edgeType === "overlaps_demand" ? palette.audience_demand
+        : edgeType === "ships" ? palette.capability
+        : edgeType === "limits_confidence" ? palette.confidence_limit
+        : edgeType === "influences_action" ? palette.recommendation
+        : 0x6f7480;
+      const geometry = new THREE.BufferGeometry().setFromPoints([source, target]);
+      const material = new THREE.LineBasicMaterial({ color, transparent: true, opacity: edgeType === "competitive_context" ? 0.28 : 0.58 });
+      root.add(new THREE.Line(geometry, material));
+
+      const pulse = new THREE.Mesh(
+        new THREE.SphereGeometry(0.045, 16, 10),
+        new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.92 })
+      );
+      pulse.userData = { sourceId, targetId, edgeType, phase: Math.random() };
+      root.add(pulse);
+      pulses.push(pulse);
+    });
+
+    function selectNode(nodeId) {
+      selectedId = nodeId;
+      const node = nodeById.get(nodeId);
+      title.textContent = node.label;
+      read.textContent = node.read;
+      movement.textContent = windowText[currentWindow];
+      confidence.textContent = node.confidence;
+      demand.textContent = node.demand;
+      limit.textContent = node.limit;
+      actionTitle.textContent = node.action;
+      actionCopy.textContent = node.actionCopy;
+      labelById.forEach((label, id) => label.dataset.selected = String(id === nodeId));
+      meshById.forEach((mesh, id) => {
+        mesh.material.emissiveIntensity = id === nodeId ? 0.78 : 0.28;
+        mesh.scale.setScalar(id === nodeId ? 1.22 : 1);
+      });
+    }
+
+    function updateSize() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      renderer.setSize(rect.width, rect.height, false);
+      camera.aspect = rect.width / rect.height;
+      camera.position.z = rect.width < 560 ? 9.1 : 6.8;
+      camera.updateProjectionMatrix();
+    }
+
+    function updateLabels() {
+      const rect = canvas.getBoundingClientRect();
+      nodes.forEach((node) => {
+        const mesh = meshById.get(node.id);
+        const point = mesh.position.clone();
+        root.localToWorld(point);
+        point.project(camera);
+        const x = (point.x * 0.5 + 0.5) * rect.width;
+        const y = (-point.y * 0.5 + 0.5) * rect.height;
+        const label = labelById.get(node.id);
+        label.style.left = `${x}px`;
+        label.style.top = `${y}px`;
+        const halfWidth = Math.max(52, label.offsetWidth / 2);
+        const halfHeight = Math.max(18, label.offsetHeight / 2);
+        const onScreen = x > halfWidth + 6 && x < rect.width - halfWidth - 6 && y > halfHeight + 6 && y < rect.height - halfHeight - 6;
+        label.style.opacity = point.z < 1 && onScreen ? "1" : "0";
+      });
+    }
+
+    function animate(now) {
+      const time = now * 0.001;
+      root.rotation.y += (targetRotationY - root.rotation.y) * 0.045;
+      root.rotation.x += (targetRotationX - root.rotation.x) * 0.045;
+
+      meshById.forEach((mesh, id) => {
+        const selectedBoost = id === selectedId ? 0.07 : 0.025;
+        mesh.position.y = nodeById.get(id).position[1] + Math.sin(time * 1.6 + mesh.position.x) * selectedBoost;
+      });
+
+      pulses.forEach((pulse) => {
+        const source = meshById.get(pulse.userData.sourceId).position;
+        const target = meshById.get(pulse.userData.targetId).position;
+        const speed = pulseByWindow[currentWindow];
+        const t = (time * speed + pulse.userData.phase) % 1;
+        pulse.position.lerpVectors(source, target, t);
+        pulse.visible = pulse.userData.edgeType !== "competitive_context" || currentWindow !== "Today";
+      });
+
+      updateLabels();
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    }
+
+    function setPointer(event) {
+      const rect = canvas.getBoundingClientRect();
+      pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    }
+
+    canvas.addEventListener("click", (event) => {
+      setPointer(event);
+      raycaster.setFromCamera(pointer, camera);
+      const hits = raycaster.intersectObjects([...meshById.values()]);
+      if (hits.length) {
+        selectNode(hits[0].object.userData.nodeId);
+      }
+    });
+
+    canvas.addEventListener("pointerdown", (event) => {
+      dragging = true;
+      lastPointer = { x: event.clientX, y: event.clientY };
+      canvas.setPointerCapture(event.pointerId);
+    });
+
+    canvas.addEventListener("pointermove", (event) => {
+      if (!dragging || !lastPointer) return;
+      targetRotationY += (event.clientX - lastPointer.x) * 0.006;
+      targetRotationX += (event.clientY - lastPointer.y) * 0.003;
+      targetRotationX = Math.max(-0.55, Math.min(0.55, targetRotationX));
+      lastPointer = { x: event.clientX, y: event.clientY };
+    });
+
+    canvas.addEventListener("pointerup", (event) => {
+      dragging = false;
+      lastPointer = null;
+      canvas.releasePointerCapture(event.pointerId);
+    });
+
+    document.querySelectorAll("[data-window]").forEach((button) => {
+      button.addEventListener("click", () => {
+        currentWindow = button.dataset.window;
+        document.querySelectorAll("[data-window]").forEach((item) => item.setAttribute("aria-pressed", "false"));
+        button.setAttribute("aria-pressed", "true");
+        movement.textContent = windowText[currentWindow];
+        targetRotationY = currentWindow === "30D" ? 0.4 : currentWindow === "Today" ? -0.52 : -0.28;
+      });
+    });
+
+    proofToggle.addEventListener("click", () => {
+      const next = proof.dataset.open !== "true";
+      proof.dataset.open = String(next);
+      proofToggle.setAttribute("aria-expanded", String(next));
+      proofToggle.textContent = next ? "Close proof" : "Open proof";
+    });
+
+    document.querySelectorAll("[data-route]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const route = button.dataset.route;
+        routeState.dataset.open = "true";
+        routeState.textContent = route === "evidence"
+          ? "Evidence Lab owns raw rows, citations, source health, contradictions, and failed checks."
+          : "Admin owns runs, registry, source controls, publication health, and operator diagnostics.";
+      });
+    });
+
+    window.addEventListener("resize", updateSize);
+    updateSize();
+    selectNode(selectedId);
+    requestAnimationFrame(animate);
+  </script>
+</body>
+</html>
