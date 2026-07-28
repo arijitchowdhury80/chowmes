@@ -130,4 +130,4 @@ Reusable local story, visual verifier, public-safety, public-redaction, deployme
 
 Phase 6 is passed for the controlled pilot.
 
-Next production work: run the Phase 8 observation window from deployed package `47ef4d565f00e8907c42280f62cf9943678805c4`, record recommendation usage or rejection by a named team, and review learning effects before any completion claim.
+Next production work: run the Phase 8 observation window from deployed package `b4d7423cff92b719dd48bc4b34af0ff21faefc16`, record usage, rejection, or amendment of current PMM recommendation `2` by a named team, and review learning effects before any completion claim.

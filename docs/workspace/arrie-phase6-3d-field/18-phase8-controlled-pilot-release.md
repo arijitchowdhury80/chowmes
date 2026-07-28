@@ -5,8 +5,8 @@ Status: released to controlled monitored pilot; observation window active
 
 ## Release
 
-- Pilot release ID: `cios-pilot-algolia-20260728-47ef4d5`
-- CI-OS package commit: `47ef4d565f00e8907c42280f62cf9943678805c4`
+- Pilot release ID: `cios-pilot-algolia-20260728-b4d7423`
+- CI-OS package commit: `b4d7423cff92b719dd48bc4b34af0ff21faefc16`
 - CI-OS branch: `codex/ci-os-phase0-baseline`
 - Package path: `/opt/cios/app`
 - Runtime owner: `cios`
@@ -14,9 +14,9 @@ Status: released to controlled monitored pilot; observation window active
 
 ## Versioned Bundle
 
-- Release bundle: `/opt/cios/releases/47ef4d5.tar.gz`
-- SHA-256: `fcd7d6aee86a4a2fd9cdc26afbefda73651032ea6926fc5d877b36d1890009f7`
-- Extracted release directory: `/opt/cios/releases/47ef4d5`
+- Release bundle: `/opt/cios/releases/b4d7423.tar.gz`
+- SHA-256: `4ef05bc3466ffc36d4729eb2a375973a2128ba9f9ae0f71e32a25417b441cc31`
+- Previous release bundle: `/opt/cios/releases/47ef4d5.tar.gz`
 - Source release verification: package contract passed with Python imports skipped.
 - Deployed package verification: package contract passed with app virtualenv.
 
@@ -51,7 +51,9 @@ The deployed package passed:
 - Product-surface failed captures: `3`
 - Pattern count: `4`
 - Next monitoring actions: `2`
-- Current recommendation count in public run status: `0`
+- Current recommendation count in public run status: `1`
+- Current recommendation owner: `PMM`
+- Current recommendation action: turn the shipped Agent Studio capability into an evidence-backed market narrative before the demand window cools.
 
 Monitoring debt preserved:
 
@@ -59,7 +61,7 @@ Monitoring debt preserved:
 - Demand plan is missing `11` of `12` planned topics.
 - `4` active sources failed this run.
 - `3` product-surface captures failed.
-- No current recommendation appears in public run status.
+The earlier public-status `recommendation_count=0` was corrected in CI-OS commit `b4d7423cff92b719dd48bc4b34af0ff21faefc16`. The live public URL now exposes one sanitized current recommendation.
 
 Next Hermes action:
 

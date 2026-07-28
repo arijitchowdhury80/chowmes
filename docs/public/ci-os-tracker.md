@@ -63,6 +63,7 @@ Launch status: **Controlled monitored pilot released; observation window active*
 - Phase 7 technical E2E validation passed for the controlled pilot after CI-OS commit `2f7385f4afdcdd2af771e34d8e92bdc629a990fa` deployed to `/opt/cios/app`, package contract passed, live operational safety passed, public redaction and public safety scans passed, live dashboard click validation passed, and the aggregate launch-readiness gate passed. Source coverage was `42` active and checked sources with `4` failed active source fetches; this passed by the explicit controlled-pilot ratio policy, `0.0952 <= 0.10`, while remaining visible as a limitation.
 - Arijit accepted the Phase 7 human usefulness gate on 2026-07-28. Phase 8 may start.
 - Phase 8 controlled pilot release `cios-pilot-algolia-20260728-47ef4d5` deployed CI-OS commit `47ef4d565f00e8907c42280f62cf9943678805c4` to `/opt/cios/app`, preserved rollback bundle `/opt/cios/releases/rollback-before-phase8-20260728T141016Z-pre-2b88539.tar.gz`, created release bundle `/opt/cios/releases/47ef4d5.tar.gz` with SHA-256 `fcd7d6aee86a4a2fd9cdc26afbefda73651032ea6926fc5d877b36d1890009f7`, and passed package, operational safety, dashboard click, launch readiness, and controlled-pilot monitoring gates.
+- Phase 8 observation 2 corrected the public recommendation surfacing gap. CI-OS commit `b4d7423cff92b719dd48bc4b34af0ff21faefc16` is deployed to `/opt/cios/app`, release bundle `/opt/cios/releases/b4d7423.tar.gz` has SHA-256 `4ef05bc3466ffc36d4729eb2a375973a2128ba9f9ae0f71e32a25417b441cc31`, `https://ci.chowmes.com/data/argus-latest-run-status.json` now reports `recommendation_count=1`, and E2E launch readiness plus controlled-pilot monitoring pass against the served public status.
 
 ## Current Gate
 
@@ -71,7 +72,7 @@ The project has released the controlled monitored Algolia pilot, with Phases 0 t
 1. Preserve the accepted Agent Studio recommendation and learning policy as Phase 5 evidence.
 2. Preserve the Phase 6 Market Field click-to-reveal Product IA as the controlled-pilot spine.
 3. Preserve the Phase 7 production validation artifact at `docs/workspace/arrie-phase6-3d-field/16-phase7-technical-e2e-gate.md`.
-4. Run the observation window and record real recommendation usage or rejection.
+4. Run the observation window and record real recommendation usage, rejection, or amendment for current PMM recommendation `2`.
 
 Phase 1 evidence is recorded in
 `docs/status/2026-07-14-ci-os-phase1-hermes-execution-gate.md`.
@@ -112,6 +113,9 @@ Phase 8 controlled pilot release evidence is recorded in
 
 Phase 8 observation 1 is recorded in
 `docs/workspace/arrie-phase6-3d-field/19-phase8-observation-1.md`.
+
+Phase 8 observation 2 is recorded in
+`docs/workspace/arrie-phase6-3d-field/20-phase8-observation-2.md`.
 
 ## Related
 
