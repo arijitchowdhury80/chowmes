@@ -1,7 +1,7 @@
 # aRRIe Phase 6 Acceptance Checklist
 
 Date: 2026-07-28
-Status: human direction accepted; production implementation pending verification
+Status: passed for controlled pilot with temporary design-authority waiver
 
 ## Human Direction Gate
 
@@ -25,6 +25,8 @@ Five representative users must be able to answer without a builder explanation:
 - [ ] What is unknown, stale, blocked, or confidence-limiting?
 - [ ] Where do they inspect raw proof?
 - [ ] Where do they manage sources, runs, and diagnostics?
+
+Pilot waiver: this formal five-user comprehension study is deferred to post-pilot UX hardening. It is not required to start Phase 7 for the controlled Algolia pilot.
 
 ## Navigation Gate
 
@@ -68,6 +70,8 @@ Five representative users must be able to answer without a builder explanation:
 - [x] 768px tablet layout preserves the read and proof path in the reusable Agent Studio verifier artifact.
 - [x] 1280px+ desktop layout preserves the market field as the primary visual in the reusable Agent Studio verifier artifact.
 
+Pilot waiver: the remaining manual accessibility checks are deferred to post-pilot UX hardening. Responsive automated validation passed.
+
 ## Operational Gate
 
 - [ ] CI-OS remains a separately versioned Hermes extension.
@@ -82,4 +86,6 @@ Five representative users must be able to answer without a builder explanation:
 
 ## Gate Judgment
 
-Phase 6 status remains `active` until every required item above is verified and recorded, or the remaining design-authority/comprehension gaps are explicitly narrowed or waived for the controlled pilot.
+Phase 6 status is `passed_for_controlled_pilot`.
+
+Arijit's 2026-07-28 approval is recorded as the temporary pilot design-authority waiver. Formal user-comprehension, full accessibility, and restored UI/UX SOP validation remain required post-pilot hardening items, not Phase 6 blockers.

@@ -1,7 +1,7 @@
 # aRRIe Phase 6 True 3D Market Field Status
 
 Date: 2026-07-28
-Status: true 3D Product IA direction accepted; live CI-OS deployment, public-safety redaction, and dashboard click validation verified
+Status: Phase 6 passed for controlled pilot; live CI-OS deployment, public-safety redaction, and dashboard click validation verified
 
 ## Scope
 
@@ -105,6 +105,10 @@ Build and validate a true 3D constellation-style Market Field prototype that use
   - Market Field hotspot/time/proof interactions.
   - Structure, navigation, timeline, semantic heat map, priority state, competitor briefs, and appendices.
   - Responsive checks at `390x844`, `768x1024`, and `1280x900`.
+- Arijit's 2026-07-28 approval is recorded as a temporary pilot design-authority waiver for Phase 6:
+  - The missing UI/UX SOP/design-authority path is no longer a Phase 6 blocker for the controlled pilot.
+  - Formal five-user comprehension, full accessibility, and restored design-authority validation move to post-pilot UX hardening.
+  - The waiver does not authorize skipping Phase 7 or Phase 8 gates.
 - CI-OS deployment-store and rollback-preparation slice implemented:
   - `deploy/cios-daily.sh` now runs `scripts/scan_public_artifacts.py` against the staged public bundle before copying anything to the public site.
   - `promote_public_store_if_present` now refreshes the public-store `served` root from the promoted release.
@@ -124,6 +128,6 @@ The human direction gate is cleared.
 
 Reusable local story, visual verifier, public-safety, public-redaction, deployment-mechanics, live deployment, and live dashboard click-validation gates are cleared for the Agent Studio Market Field artifact.
 
-Phase 6 final visual acceptance is not cleared yet because the UI/UX SOP/design-authority dependency remains missing unless Arijit's latest approval is recorded as a temporary pilot design-authority waiver.
+Phase 6 is passed for the controlled pilot.
 
-Next production work: decide whether Arijit's current approval is a temporary pilot design-authority waiver. If yes, record the waiver and close Phase 6. If no, restore/provide the UI/UX SOP path and run final visual acceptance against that authority.
+Next production work: start Phase 7 only from the controlled-pilot basis, preserving the evidence, redaction, public-safety, rollback, and live-validation gates.
