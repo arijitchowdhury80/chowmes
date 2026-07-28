@@ -48,8 +48,8 @@ Current product completion is approximately **45 percent**. The engineering scaf
 | Source coverage | Current with one fetch failure | Latest Hermes wrapper run reported 42 active sources, 41 fetched, and 1 failed source fetch. |
 | Product reality | Partial | Phase 3 has verified Product Muscle progress, but the latest served public state is still blocked on evidence and has `0` promoted recommendations. |
 | Market conversation | Present | 500 themes and 2 current candidate patterns. |
-| Audience demand | Connected manual feed | Fresh semantic data reports `demand_plane_status=processed` and `demand_signal_count=100`; recurring GA4 automation remains deferred. |
-| Recommendations | Blocked | 0 current recommendations because Product Muscle evidence is still incomplete. |
+| Audience demand | Connected but not action-grade | Fresh semantic data reports `demand_plane_status=processed` and `demand_signal_count=100`, but no topic crossed the rising-demand threshold. The current next action is `upload_trended_planned_demand_export`. |
+| Recommendations | Blocked | 0 current recommendations because Product Muscle evidence remains incomplete and the current demand feed is not yet action-grade. |
 | Learning | Unproven | No learning effect visible in the current run. |
 | Production UI | Market Field live gate passed | Market Field-first UX is live at `https://ci.chowmes.com/` and passed live click validation on release `cios-20260728T084235Z-3769892`; broader Product IA remains pending. |
 | Launch readiness | Not ready | Market Field UX and publication are live-verified, but Product Muscle, Argus recommendation quality, broader IA, and final E2E gates remain open. |
@@ -57,7 +57,7 @@ Current product completion is approximately **45 percent**. The engineering scaf
 ## What Comes Next
 
 1. Complete Scout-backed product and feature comparison.
-2. Keep the manual Audience Demand feed as the pilot input while recurring GA4 automation is deferred.
+2. Replace or enrich the manual Audience Demand feed with planned topic mapping plus previous-period or `change_pct` values.
 3. Prove one useful cross-plane Argus recommendation and one learning effect.
 4. Complete the remaining Product IA workflows beyond the live Market Field journey: Product Muscle Matrix, Conversation/Demand drilldowns, Pattern Board, Actions, Registry, Evidence Lab, and Command/Admin.
 5. Complete exhaustive frontend, backend, semantic, accessibility, security, and live-cron validation.
@@ -67,7 +67,7 @@ Current product completion is approximately **45 percent**. The engineering scaf
 
 Phase 3 is active. Product Muscle must produce current evidence or explicit unknown states for every active competitor and matrix cell.
 
-The next live actions are to inspect why the latest served run is `blocked_on_evidence` with `0` promoted recommendations, then continue the remaining Product Muscle evidence work. Recurring GA4 automation is deferred and does not block Phase 3.
+The latest served run is `blocked_on_evidence` with `0` promoted recommendations because demand movement is not action-grade and Product Muscle remains incomplete. The next live actions are to upload a trended planned demand export, then continue the remaining Product Muscle evidence work. Recurring GA4 automation remains deferred; the immediate blocker is the missing action-grade demand movement, not the connector itself.
 
 ## Project Records
 

@@ -69,10 +69,10 @@ Both runs completed without root intervention, permission errors, timeout, orpha
 |---|---|
 | Status | `blocked_on_evidence` |
 | Publish status | `published` |
-| Generated at | `2026-07-28T08:42:35.309566Z` |
+| Generated at | `2026-07-28T09:09:44.242136Z` |
 | Public dashboard updated | true |
-| Public release | `cios-20260728T084235Z-3769892` |
-| Next Hermes action | `inspect_demand_mapping` |
+| Public release | `cios-20260728T090947Z-manual-22e6467` |
+| Next Hermes action | `upload_trended_planned_demand_export` |
 
 ### Evidence planes
 
@@ -90,12 +90,12 @@ Both runs completed without root intervention, permission errors, timeout, orpha
 | Current product rows extracted | 0 | Current status does not prove execution. |
 | Companies missing product muscle | 11 | Product comparison remains incomplete. |
 | Conversation themes | 500 | Market-conversation evidence exists. |
-| Demand signals | 100 | Manual Looker Audience Demand feed is processed in the fresh public run. |
+| Demand signals | 100 | Manual Looker Audience Demand feed is processed, but the latest served status is `processed_no_action_grade_demand`: no topic crossed the rising-demand threshold. |
 | Patterns | 2 | Deterministic pattern primitives produced output in the latest fresh run. |
 | Recommendations | 0 | No promoted action; latest served state remains blocked on evidence. |
 | Consumed learnings | 0 | Learning effect on the current run is not proven. |
 
-Blocking the recommendation plane while Product Muscle remains incomplete is the correct behavior. The demand plane is now connected for the pilot through the manual Looker export path; recurring GA4 automation remains deferred.
+Blocking the recommendation plane while Product Muscle remains incomplete is the correct behavior. The demand plane is connected for the pilot through the manual Looker export path, but the current export is not action-grade. The next required demand action is a planned export with previous-period or `change_pct` values. Recurring GA4 automation remains deferred.
 
 ## Repository State
 
@@ -172,7 +172,7 @@ The authoritative remote and branch ownership are reconciled. Commit `dea1816` a
 | Competitor and source registry | 55% | Data/admin/public roster exist; onboarding proof incomplete. |
 | Daily outward collection | 55% | Coverage can be reported and the latest Hermes-wrapper publication run exited 0. |
 | Scout product muscle | 35% | Model and queues exist; the first four Athos Commerce items were verified and removed from the queue, but 39 limiting matrix items remain after regeneration. |
-| GA4 / Looker demand | 60% | Manual Looker export is processed with 100 demand signals; recurring GA4 automation is deferred. |
+| GA4 / Looker demand | 60% | Manual Looker export is processed with 100 demand signals, but no topic crossed the rising-demand threshold; recurring GA4 automation is deferred. |
 | Pattern intelligence | 30% | Patterns exist; cross-plane validation is incomplete. |
 | Recommendations | 10% | Structures exist; current output is zero. |
 | Frontend IA and usability | 40% | Market Field-first entry point is live and validated; broader Product IA workflows remain unfinished. |

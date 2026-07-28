@@ -51,12 +51,13 @@ Launch status: **Not ready**
 - Phase 3 then repaired the Athos Commerce `1:1 AI Personalization` item after an empty extraction, produced 11 product rows, published run `cios-20260728T043002Z-3533427`, and removed that item from the queue.
 - Phase 3 then extracted Athos Commerce `100s+ robust integrations & Open APIs`, published run `cios-20260728T044324Z-3552802`, observed current pattern count at 2, and removed that item from the queue.
 - Market Field-first UX / IA was implemented, deployed through the CI-OS package, published through the served release store as `cios-20260728T084235Z-3769892`, and passed live dashboard click validation on `https://ci.chowmes.com/`.
+- Demand readiness was tightened after live inspection: generic Looker report metadata no longer drives planned-topic matching, current-period-only demand is blocked explicitly, and the latest served status now reports `processed_no_action_grade_demand` with next action `upload_trended_planned_demand_export`.
 
 ## Current Gate
 
 The project is currently in Phase 3 Product Muscle, with the Market Field UX gate passed but the broader Product IA and recommendation gates still open:
 
-1. Inspect the latest served `blocked_on_evidence` state and why recommendation promotion remains `0`.
+1. Upload a planned demand export with previous-period or `change_pct` values so Audience Demand can become action-grade.
 2. Run current product-surface extraction for unresolved competitor/capability cells.
 3. Mark every active competitor/matrix cell as supported, unknown, not applicable, blocked, or needs operator review.
 4. Prevent blank or unsupported matrix claims.
@@ -78,7 +79,7 @@ Market Field UX gate evidence is recorded in
 
 CI-OS must complete Product Muscle before Argus intelligence, broader accepted IA, final E2E validation, and the controlled Algolia pilot can pass.
 
-Recurring GA4 automation remains deferred. It is not the current blocker because the pilot now has a processed manual Audience Demand feed.
+Recurring GA4 automation remains deferred. The current demand blocker is not connector setup; it is that the processed manual Audience Demand feed has no action-grade rising-demand movement yet.
 
 ## Related
 
