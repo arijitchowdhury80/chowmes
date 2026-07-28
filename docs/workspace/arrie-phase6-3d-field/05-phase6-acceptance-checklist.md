@@ -1,15 +1,15 @@
 # aRRIe Phase 6 Acceptance Checklist
 
 Date: 2026-07-28
-Status: pending acceptance and production implementation
+Status: human direction accepted; production implementation pending verification
 
 ## Human Direction Gate
 
-- [ ] Arijit accepts the true 3D constellation Market Field as the Product IA spine.
+- [x] Arijit accepts the true 3D constellation Market Field as the Product IA spine.
 - [ ] Arijit rejects it and requests a revised direction.
 - [ ] Arijit accepts it with amendments recorded in this workspace.
 
-Only one of the above can be true.
+Only one of the above can be true. Acceptance recorded from Arijit's 2026-07-28 approval.
 
 ## Business-User Comprehension Gate
 
@@ -82,4 +82,3 @@ Five representative users must be able to answer without a builder explanation:
 ## Gate Judgment
 
 Phase 6 status remains `active` until every required item above is verified and recorded.
-

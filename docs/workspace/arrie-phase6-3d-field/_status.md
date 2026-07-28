@@ -1,7 +1,7 @@
 # aRRIe Phase 6 True 3D Market Field Status
 
 Date: 2026-07-28
-Status: true 3D review prototype locally validated
+Status: true 3D Product IA direction accepted; production guardrail slice active
 
 ## Scope
 
@@ -30,9 +30,11 @@ Build and validate a true 3D constellation-style Market Field prototype that use
 - Local Playwright validation passed with WebGL canvas-pixel check and interaction checks.
 - Production implementation plan written.
 - Phase 6 acceptance checklist written.
+- 3D runtime dependency review written, including Three.js `0.160.0` license, integrity, tarball checksum, candidate vendoring path, CDN rejection rule, and production validation requirements.
+- Human direction gate accepted by Arijit on 2026-07-28: true 3D constellation Market Field is the Product IA spine for production implementation.
 
 ## Gate
 
-This artifact can only advance Phase 6 if it helps Arijit judge whether the true 3D constellation mental model is the accepted Product IA direction for the broader implementation.
+The human direction gate is cleared.
 
-Next human decision: accept, reject, or amend the true 3D constellation direction before CI-OS production UI implementation begins.
+Next production work: implement the vendored runtime guardrails with TDD, then implement the first production 3D Market Field slice in CI-OS.

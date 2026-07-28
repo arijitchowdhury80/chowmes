@@ -1,16 +1,16 @@
 # aRRIe Phase 6 Production Implementation Plan
 
 Date: 2026-07-28
-Status: ready for review; not approved for production implementation
+Status: human direction accepted; production implementation may begin with TDD guardrails
 Scope: CI-OS Product IA only. Hermes core remains untouched.
 
 ## Gate Position
 
 Phase 6 is active, but not passed.
 
-The true 3D prototype proves a viable direction for review. It does not approve production implementation by itself.
+The true 3D prototype proved a viable direction for review. Arijit accepted the true 3D constellation direction on 2026-07-28.
 
-Production work should begin only after Arijit accepts the true 3D constellation direction as the Product IA spine.
+Production work must begin with the dependency/package guardrail slice before renderer changes.
 
 ## Implementation Thesis
 
@@ -243,4 +243,3 @@ Phase 6 can pass only when:
 Arijit needs to decide whether the validated true 3D Market Field prototype is the accepted Product IA direction.
 
 If accepted, the next implementation slice is Slice 1: state contract and tests in the CI-OS package.
-
