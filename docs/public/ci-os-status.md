@@ -44,7 +44,7 @@ Current product completion is approximately **80 percent**. The engineering scaf
 | Phase 0 baseline | Passed | Clean, published CI-OS recovery baseline. |
 | Phase 1 Hermes execution | Passed | Two consecutive real Hermes runs exited 0 as `cios`, with no permission error, timeout, orphan work, or ownership drift. |
 | Phase 2 publication | Passed | Fresh public run `cios-20260728T032901Z-3409872` published through the Hermes wrapper with matching public status and semantic dashboard run IDs. |
-| Deployed package | Verified | CI-OS commit `63f819b649fedf2625fad126dcd776fb5fe66788` is deployed at `/opt/cios/app`; package contract passed as `cios`. |
+| Deployed package | Verified | CI-OS commit `44f78fee009f3773698e89083cd3249e41c6582b` is deployed at `/opt/cios/app`; package contract passed as `cios`. |
 | Competitor registry | Partial | 27 competitors represented. |
 | Source coverage | Current with controlled-pilot limitation | Latest Hermes wrapper run reported 42 active sources, 42 checked, 38 fetched, and 4 failed source fetches. This passes the controlled-pilot ratio policy, `0.0952 <= 0.10`, but remains a visible limitation. |
 | Product reality | Passed for Phase 3 | Product Muscle queue is now `0` after verified Google Vertex AI Search, Lucidworks, Meilisearch, Bloomreach, and Athos evidence work. The latest served semantic dashboard has 12 feature-comparison rows and explicit unknown states where proof is absent. |
@@ -65,7 +65,7 @@ Current product completion is approximately **80 percent**. The engineering scaf
 
 Phase 7 technical validation and human usefulness acceptance have passed. CI-OS is released to the Phase 8 controlled Algolia pilot observation window.
 
-The latest served package is `63f819b649fedf2625fad126dcd776fb5fe66788`. Agent Studio was explicitly amended into the Argus demand plan, imported as a traceable demand signal, refreshed into one recommendation, accepted by Arijit, and recorded into an approved learning policy. The current live public status exposes one open PMM recommendation for pilot-window disposition, and the package now includes `/opt/cios/app/out/phase8/argus-recommendation-disposition-pending.json` as the handoff artifact for recording use, rejection, or amendment. Phase 4 and Phase 5 are treated as passed with limited confidence, not perfect coverage. Phase 6 is passed for the controlled pilot with a temporary design-authority waiver. Phase 7 is passed. Phase 8 release is live, with observation still required before the full goal can close. Recurring GA4 automation remains deferred.
+The latest served package is `44f78fee009f3773698e89083cd3249e41c6582b`. Agent Studio was explicitly amended into the Argus demand plan, imported as a traceable demand signal, refreshed into one recommendation, accepted by Arijit, and recorded into an approved learning policy. The current live public status exposes one open PMM recommendation for pilot-window disposition, and the package now includes `/opt/cios/app/out/phase8/cios-phase8-exit.json` as the formal exit gate. That gate currently fails only because disposition is still pending. Phase 4 and Phase 5 are treated as passed with limited confidence, not perfect coverage. Phase 6 is passed for the controlled pilot with a temporary design-authority waiver. Phase 7 is passed. Phase 8 release is live, with observation still required before the full goal can close. Recurring GA4 automation remains deferred.
 
 ## Project Records
 

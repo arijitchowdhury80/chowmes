@@ -130,4 +130,4 @@ Reusable local story, visual verifier, public-safety, public-redaction, deployme
 
 Phase 6 is passed for the controlled pilot.
 
-Next production work: run the Phase 8 observation window from deployed package `63f819b649fedf2625fad126dcd776fb5fe66788`, record usage, rejection, or amendment of current PMM recommendation `2` by a named team using `/opt/cios/app/out/phase8/argus-recommendation-disposition-pending.json` as the handoff, and review learning effects before any completion claim.
+Next production work: record usage, rejection, or amendment of current PMM recommendation `2` by a named team, rerun `/opt/cios/app/scripts/check_phase8_exit.py`, and only claim completion when `/opt/cios/app/out/phase8/cios-phase8-exit.json` reports `status=pass`.
