@@ -1,7 +1,7 @@
 # CI-OS Phase 3 Product Muscle Progress
 
 Date: 2026-07-28 UTC
-Status: Phase 3 active; first Product Muscle repair and second Product Muscle extraction verified
+Status: Phase 3 active; first Product Muscle repair, second Product Muscle extraction, and third Product Muscle repair verified
 Tenant: Algolia
 
 ## First Verified Movement
@@ -88,6 +88,40 @@ Live dashboard click validation passed again after this run.
 
 The `Athos Commerce` / `100s+ Robust Integrations` work item is no longer present in the Product Muscle queue.
 
+## Third Verified Movement
+
+The next queue item after the second movement was `Athos Commerce` / `1:1 AI Personalization`. Direct product-surface extraction returned empty, so the repair path was run for the same competitor and focus capability.
+
+| Item | Verified value |
+|---|---|
+| Competitor | Athos Commerce |
+| Target capability | `1:1 AI Personalization` |
+| Initial extraction result | `status=empty` |
+| Repair result | `status=succeeded` |
+| Repair output | `/tmp/cios-product-market/algolia/product-surface-repairs/20260728T042928Z/000222-athos-commerce-pricing.repair.json` |
+| Extracted rows | 11 |
+| Product events after repair refresh | 11 |
+| Feature positions after repair refresh | 10 |
+
+The Hermes wrapper was run again after this repair. It completed with exit code 0 and published another fresh public run.
+
+| Item | Verified value |
+|---|---|
+| Latest public run ID | `cios-20260728T043002Z-3533427` |
+| Status | `published` |
+| Publish status | `published` |
+| Generated at | `2026-07-28T04:40:38.229789Z` |
+| Public dashboard updated | true |
+| Semantic dashboard run ID match | true |
+| Demand plane status | `processed` |
+| Demand signal count | 100 |
+| Pattern count | 3 |
+| Recommendation count | 0 |
+
+Live dashboard click validation passed again after this run.
+
+The `Athos Commerce` / `1:1 AI Personalization` work item is no longer present in the Product Muscle queue.
+
 The queue still reports:
 
 | Item | Verified value |
@@ -96,16 +130,16 @@ The queue still reports:
 | Blocking items | 0 |
 | Limiting items | 39 |
 
-After the second movement, the current top queue items are now:
+After the third movement, the current top queue items are now:
 
-1. Athos Commerce / `1:1 AI Personalization`
-2. Athos Commerce / `1:1 Personalized Search Results`
-3. Athos Commerce / `30-day Free Trial`
-4. Bloomreach / `1:1 AI Personalization`
-5. Bloomreach / `1:1 Personalized Search Results`
-6. Bloomreach / `30-day Free Trial`
-7. Constructor / `1:1 AI Personalization`
-8. Constructor / `1:1 Personalized Search Results`
+1. Athos Commerce / `100s+ robust integrations & Open APIs`
+2. Athos Commerce / `A/B Testing`
+3. Athos Commerce / `ABRA`
+4. Bloomreach / `100s+ robust integrations & Open APIs`
+5. Bloomreach / `A/B Testing`
+6. Bloomreach / `ABRA`
+7. Constructor / `100s+ robust integrations & Open APIs`
+8. Constructor / `A/B Testing`
 
 ## Gate Judgment
 
