@@ -1,7 +1,7 @@
 ---
 title: CI-OS Project Status
 type: project-status
-status: phase-3-product-muscle
+status: phase-4-audience-demand
 updated: 2026-07-28
 ---
 
@@ -46,18 +46,18 @@ Current product completion is approximately **45 percent**. The engineering scaf
 | Deployed package | Verified | CI-OS commit `b55979e` is deployed for the product-surface exporter; package source compile-check passed as `cios`. |
 | Competitor registry | Partial | 27 competitors represented. |
 | Source coverage | Current with one fetch failure | Latest Hermes wrapper run reported 42 active sources, 41 fetched, and 1 failed source fetch. |
-| Product reality | Partial | Phase 3 has verified Product Muscle progress. The latest served semantic dashboard has 12 feature-comparison rows and the Product Muscle work queue is down to 3 limiting items, but the public state still has `0` promoted recommendations. |
+| Product reality | Passed for Phase 3 | Product Muscle queue is now `0` after verified Google Vertex AI Search, Lucidworks, Meilisearch, Bloomreach, and Athos evidence work. The latest served semantic dashboard has 12 feature-comparison rows and explicit unknown states where proof is absent. |
 | Market conversation | Present | 500 themes and 2 current candidate patterns. |
 | Audience demand | Connected but not action-grade | Fresh semantic data reports `demand_plane_status=processed` and `demand_signal_count=100`, but no topic crossed the rising-demand threshold. The current next action is `upload_trended_planned_demand_export`. |
-| Recommendations | Blocked | 0 current recommendations because Product Muscle evidence remains incomplete and the current demand feed is not yet action-grade. |
+| Recommendations | Blocked | 0 current recommendations because the current demand feed is not yet action-grade. |
 | Learning | Unproven | No learning effect visible in the current run. |
-| Production UI | Market Field live gate passed | Market Field-first UX is live at `https://ci.chowmes.com/` and passed live click validation on release `cios-20260728T0928Z-manual-b55979e`; broader Product IA remains pending. |
-| Launch readiness | Not ready | Market Field UX and publication are live-verified, but Product Muscle, Argus recommendation quality, broader IA, and final E2E gates remain open. |
+| Production UI | Market Field live gate passed | Market Field-first UX is live at `https://ci.chowmes.com/` and passed live click validation on release `cios-20260728T0934Z-manual-b55979e`; broader Product IA remains pending. |
+| Launch readiness | Not ready | Product Muscle and Market Field publication are live-verified, but Audience Demand, Argus recommendation quality, broader IA, and final E2E gates remain open. |
 
 ## What Comes Next
 
-1. Complete Scout-backed product and feature comparison.
-2. Replace or enrich the manual Audience Demand feed with planned topic mapping plus previous-period or `change_pct` values.
+1. Replace or enrich the manual Audience Demand feed with planned topic mapping plus previous-period or `change_pct` values.
+2. Refresh Argus and prove that Audience Demand either becomes action-grade or remains explicitly blocked.
 3. Prove one useful cross-plane Argus recommendation and one learning effect.
 4. Complete the remaining Product IA workflows beyond the live Market Field journey: Product Muscle Matrix, Conversation/Demand drilldowns, Pattern Board, Actions, Registry, Evidence Lab, and Command/Admin.
 5. Complete exhaustive frontend, backend, semantic, accessibility, security, and live-cron validation.
@@ -65,9 +65,9 @@ Current product completion is approximately **45 percent**. The engineering scaf
 
 ## Next Gate
 
-Phase 3 is active. Product Muscle must produce current evidence or explicit unknown states for every active competitor and matrix cell.
+Phase 4 is active. Audience Demand must provide planned-topic time-series evidence, either through a trended manual Looker export or a configured GA4 path.
 
-The latest served run is `blocked_on_evidence` with `0` promoted recommendations because demand movement is not action-grade and the remaining Product Muscle queue still has 3 confidence-limiting items. The next live actions are to upload a trended planned demand export, then continue the remaining Product Muscle evidence work for Google Vertex AI Search, Lucidworks, and Meilisearch. Recurring GA4 automation remains deferred; the immediate blocker is the missing action-grade demand movement, not the connector itself.
+The latest served run is `blocked_on_evidence` with `0` promoted recommendations because demand movement is not action-grade. The next live action is to upload a trended planned demand export with previous-period or `change_pct` values, then refresh Argus. Recurring GA4 automation remains deferred; the immediate blocker is the missing action-grade demand movement, not the connector itself.
 
 ## Project Records
 

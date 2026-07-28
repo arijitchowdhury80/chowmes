@@ -22,8 +22,8 @@ Launch status: **Not ready**
 | 0. Contain and baseline | Clean, reviewable, versioned implementation | Passed |
 | 1. Restore Hermes execution | Healthy scheduled operating loop | Passed |
 | 2. Trustworthy publication | Atomic, fresh, run-bound release evidence | Passed |
-| 3. Product Muscle | Current Scout-backed product comparison | Active |
-| 4. Audience Demand | Valid GA4 / Looker evidence plane | Connected manual feed; recurring GA4 deferred |
+| 3. Product Muscle | Current Scout-backed product comparison | Passed |
+| 4. Audience Demand | Valid GA4 / Looker evidence plane | Active; connected manual feed is not action-grade |
 | 5. Argus Intelligence | Accepted cross-plane pattern, action, and learning | Pending |
 | 6. Product IA | Coherent Argus business workflows | Market Field live gate passed; broader IA pending |
 | 7. End-to-end validation | Backend, frontend, semantic, UX, accessibility, and security proof | Pending |
@@ -54,16 +54,16 @@ Launch status: **Not ready**
 - Demand readiness was tightened after live inspection: generic Looker report metadata no longer drives planned-topic matching, current-period-only demand is blocked explicitly, and the latest served status now reports `processed_no_action_grade_demand` with next action `upload_trended_planned_demand_export`.
 - Product-surface extraction was hardened against cookie-consent and privacy-policy boilerplate in CI-OS commit `b55979e`; the Athos platform extraction that previously produced 8 bad cookie rows now correctly returns empty.
 - Bloomreach Discovery product evidence was extracted and ingested from `https://www.bloomreach.com/en/products/discovery`; the current served release `cios-20260728T0928Z-manual-b55979e` has 12 feature-comparison rows, 25 Market Field nodes, and a Product Muscle work queue reduced to 3 limiting items.
+- Google Vertex AI Search, Lucidworks, and Meilisearch product-surface extractions succeeded and were ingested; the current served release `cios-20260728T0934Z-manual-b55979e` has a Product Muscle work queue of `0`.
 
 ## Current Gate
 
-The project is currently in Phase 3 Product Muscle, with the Market Field UX gate passed but the broader Product IA and recommendation gates still open:
+The project is currently in Phase 4 Audience Demand, with Phase 3 Product Muscle and the Market Field live gate passed but broader Product IA and recommendation gates still open:
 
 1. Upload a planned demand export with previous-period or `change_pct` values so Audience Demand can become action-grade.
-2. Run current product-surface extraction for the remaining unresolved competitors: Google Vertex AI Search, Lucidworks, and Meilisearch.
-3. Mark every active competitor/matrix cell as supported, unknown, not applicable, blocked, or needs operator review.
-4. Prevent blank or unsupported matrix claims.
-5. Refresh Argus from the evidence ledger after extraction.
+2. Refresh Argus and verify whether demand movement qualifies for action.
+3. Keep unsupported recommendation output blocked until Product, Conversation, and Audience Demand evidence align.
+4. Preserve explicit unknown states in the feature matrix; unknown must not become absent.
 
 Phase 1 evidence is recorded in
 `docs/status/2026-07-14-ci-os-phase1-hermes-execution-gate.md`.
@@ -79,7 +79,7 @@ Market Field UX gate evidence is recorded in
 
 ## Next Gate
 
-CI-OS must complete Product Muscle, action-grade Audience Demand, broader accepted IA, final E2E validation, and the controlled Algolia pilot before the full goal can pass.
+CI-OS must complete action-grade Audience Demand, Argus intelligence, broader accepted IA, final E2E validation, and the controlled Algolia pilot before the full goal can pass.
 
 Recurring GA4 automation remains deferred. The current demand blocker is not connector setup; it is that the processed manual Audience Demand feed has no action-grade rising-demand movement yet.
 

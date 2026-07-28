@@ -1,7 +1,7 @@
 # CI-OS Phase 3 Product Muscle Progress
 
 Date: 2026-07-28 UTC
-Status: Phase 3 active; five Product Muscle movements plus one extraction-quality guard verified
+Status: Phase 3 passed; Product Muscle queue cleared
 Tenant: Algolia
 
 ## First Verified Movement
@@ -209,7 +209,7 @@ After the guard, Bloomreach Discovery product-page extraction produced clean pro
 | Feature positions after ingest | 6 |
 | Recommendations | 0 |
 
-The refreshed public release is:
+The refreshed public release after Bloomreach was:
 
 | Item | Verified value |
 |---|---|
@@ -237,6 +237,43 @@ The remaining Product Muscle queue now names:
 
 ## Gate Judgment
 
-This is verified Product Muscle progress, not Phase 3 completion.
+This is now verified Phase 3 Product Muscle completion.
 
-Phase 3 remains active because three competitors still have no captured feature evidence, and Audience Demand is still not action-grade. The next safe action is to continue resolving Google Vertex AI Search, Lucidworks, and Meilisearch through current product-surface extraction, repair when extraction is empty, ledger refresh, public run verification, and live click validation.
+After the Bloomreach pass, the remaining Product Muscle queue named Google Vertex AI Search, Lucidworks, and Meilisearch. Each was then extracted and ingested:
+
+| Competitor | Surface | Result | Rows |
+|---|---|---|---:|
+| Google Vertex AI Search | `https://cloud.google.com/generative-ai-app-builder/docs` | `product_plane_status=ready` | 12 |
+| Lucidworks | `https://doc.lucidworks.com/docs/lw-platform/latest-changes` | `product_plane_status=ready` | 12 |
+| Meilisearch | `https://github.com/meilisearch/meilisearch/releases` | `product_plane_status=ready` | 12 |
+
+The final Product Market ingest for those three Scout artifacts produced:
+
+| Item | Verified value |
+|---|---:|
+| Product events | 36 |
+| Feature positions | 19 |
+| Patterns | 0 |
+| Recommendations | 0 |
+
+The final served release is:
+
+| Item | Verified value |
+|---|---|
+| Public release | `cios-20260728T0934Z-manual-b55979e` |
+| Public status | `blocked_on_evidence` |
+| Public blocker | `Demand movement not action-grade` |
+| Next Hermes action | `upload_trended_planned_demand_export` |
+| Semantic dashboard generated at | `2026-07-28T09:33:41.875368Z` |
+| Public run status generated at | `2026-07-28T09:33:47.175869Z` |
+| Feature-comparison rows | 12 |
+| Market Field nodes | 25 |
+| Product Muscle work items | 0 |
+| Limiting items | 0 |
+
+Live validation passed after the final release swap:
+
+- `python3 scripts/validate_dashboard_clicks.py --url https://ci.chowmes.com/`
+- direct `curl` checks for `argus-latest-run-status.json` and `semantic-dashboard.json`
+
+Phase 3 passes because Product Muscle now has current evidence or explicit unknown states and the Product Muscle work queue is empty. Phase 4 Audience Demand is now the active blocker because the public run still has `0` recommendations and `Demand movement not action-grade`.
