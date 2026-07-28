@@ -1,7 +1,7 @@
 # CI-OS Project Dossier
 
 Date: 2026-07-13; refreshed through 2026-07-28 UTC
-Status: Phase 4 Audience Demand passed with limited confidence; Phase 5 Argus Intelligence active
+Status: Phase 5 Argus Intelligence passed with limited confidence; Phase 6 Product IA active
 Product owner: Arijit Chowdhury
 Operating agent: Argus
 Runtime: Hermes / MyOS-Core
@@ -9,9 +9,9 @@ First tenant: Algolia
 
 ## Executive Position
 
-CI-OS is approximately 55 percent complete against the original product goal. The engineering scaffold is approximately 80 percent complete, but the product does not yet deliver a fully accepted, evidence-backed competitive decision loop.
+CI-OS is approximately 60 percent complete against the original product goal. The engineering scaffold is approximately 82 percent complete, but the product does not yet deliver a complete, accepted Product IA and pilot-ready operating loop.
 
-The system must not be called launch-ready. Phase 1 passed after two consecutive real Hermes runs completed successfully as the dedicated `cios` application user. Phase 2 passed after fresh public artifacts were published through the Hermes wrapper with one run ID, live public JSON agreed with semantic dashboard data, and live dashboard click validation passed. Phase 3 Product Muscle has now passed: Athos, Bloomreach, Google Vertex AI Search, Lucidworks, and Meilisearch evidence work cleared the Product Muscle queue, and CI-OS now blocks cookie-consent boilerplate before it can enter the Product Muscle ledger. The Market Field-first UX / IA surface is implemented, deployed, served from release `cios-20260728T102723Z-manual-d6d4b6e`, and live-validated on `https://ci.chowmes.com/`. Phase 4 Audience Demand passed with limited confidence after Agent Studio was explicitly accepted into the Argus demand plan, imported into the demand ledger, and refreshed into one recommendation. The live run now reports 101 demand signals, 1 rising demand topic, 3 patterns, and 1 recommendation: turn the shipped Agent Studio capability into an evidence-backed market narrative before the demand window cools. Phase 5 is active and requires human acceptance, rejection, or amendment of that recommendation plus a proven learning effect. The broader Product IA beyond the Market Field journey remains unfinished.
+The system must not be called launch-ready. Phase 1 passed after two consecutive real Hermes runs completed successfully as the dedicated `cios` application user. Phase 2 passed after fresh public artifacts were published through the Hermes wrapper with one run ID, live public JSON agreed with semantic dashboard data, and live dashboard click validation passed. Phase 3 Product Muscle has now passed: Athos, Bloomreach, Google Vertex AI Search, Lucidworks, and Meilisearch evidence work cleared the Product Muscle queue, and CI-OS now blocks cookie-consent boilerplate before it can enter the Product Muscle ledger. The Market Field-first UX / IA surface is implemented, deployed, served from release `cios-20260728T102723Z-manual-d6d4b6e`, and live-validated on `https://ci.chowmes.com/`. Phase 4 Audience Demand passed with limited confidence after Agent Studio was explicitly accepted into the Argus demand plan, imported into the demand ledger, and refreshed into one recommendation. Phase 5 Argus Intelligence passed with a confidence caveat after Arijit accepted that recommendation for Product Marketing and CI-OS recorded an auditable learning effect. The broader Product IA beyond the Market Field journey remains unfinished.
 
 The retained implementation now has a clean, published branch, an immutable deployed package baseline, a verified run-bound publication path, and a live-validated Market Field UX entry point. Feature expansion is now gated on current product evidence, intelligence quality, and the remaining Product IA workflows. Recurring GA4 automation remains deferred and is not the current Phase 3 blocker.
 
@@ -59,7 +59,7 @@ Evidence was refreshed directly from Chowmes through 2026-07-28 UTC.
 | Request IDs | Phase 1: `a70f4e219d294280a26703962c9be4e9`, `1b938c9de92f4568a059bdb84d3f9e6b`; Phase 2 public run: `cios-20260728T032901Z-3409872`; Phase 3 progress runs: `cios-20260728T034702Z-3433185`, `cios-20260728T041240Z-3510681`, `cios-20260728T043002Z-3533427`, `cios-20260728T044324Z-3552802`; Market Field release: `cios-20260728T084235Z-3769892`; current manual release: `cios-20260728T102723Z-manual-d6d4b6e` |
 | Results | Exit code 0 for the Phase 1 pair, the Phase 2 verification run, the latest Phase 3 progress run, and the Market Field staging run |
 | Runtime owner | `cios`, reached through the Hermes queue handoff |
-| Autonomous daily loop | Publication path, Market Field UX serving, Phase 3 Product Muscle, and Phase 4 Audience Demand verified; Phase 5 review active |
+| Autonomous daily loop | Publication path, Market Field UX serving, Phase 3 Product Muscle, Phase 4 Audience Demand, and Phase 5 accepted learning verified; Phase 6 Product IA active |
 
 Both runs completed without root intervention, permission errors, timeout, orphan work, or ownership drift. The systemd service and delegated cgroup were empty after each run, and post-run hashes remained stable. Full evidence is recorded in `docs/status/2026-07-14-ci-os-phase1-hermes-execution-gate.md`.
 
@@ -72,7 +72,7 @@ Both runs completed without root intervention, permission errors, timeout, orpha
 | Generated at | `2026-07-28T09:33:47.175869Z` |
 | Public dashboard updated | true |
 | Public release | `cios-20260728T102723Z-manual-d6d4b6e` |
-| Next Hermes action | `review_agent_studio_recommendation` |
+| Next Hermes action | `complete_product_ia_workflows` |
 
 ### Evidence planes
 
@@ -90,10 +90,10 @@ Both runs completed without root intervention, permission errors, timeout, orpha
 | Conversation themes | 500 | Market-conversation evidence exists. |
 | Demand signals | 101 | Manual Looker Audience Demand feed is processed. Agent Studio was amended into the plan and imported as a rising demand signal; readiness is `processed_partial_plan_coverage` because other planned topics remain uncovered. |
 | Patterns | 3 | Deterministic pattern primitives produced output in the latest refreshed run. |
-| Recommendations | 1 | Generated recommendation: turn the shipped Agent Studio capability into an evidence-backed market narrative before the demand window cools. Human acceptance is required for Phase 5. |
-| Consumed learnings | 0 | Learning effect on the current run is not proven. |
+| Recommendations | 1 | Arijit accepted the Agent Studio recommendation for Product Marketing: turn the shipped Agent Studio capability into an evidence-backed market narrative before the demand window cools. |
+| Consumed learnings | 1 approved policy | Acceptance was recorded as learning event `2` and approved improvement `3`; the next-sweep plan, apply plan, approved policy, and policy audit prove the learning path for the next run. |
 
-Phase 4 is no longer blocked by missing Audience Demand. The demand plane is connected for the pilot through the manual Looker export path, and Agent Studio is now explicitly planned, imported, and refreshed. Confidence remains limited because the accepted Agent Studio trend compares comparable but not identical Looker export families, and plan coverage is partial. The next required action is Phase 5 review of the generated recommendation and then a learning-effect proof. Recurring GA4 automation remains deferred.
+Phase 4 is no longer blocked by missing Audience Demand. Phase 5 is no longer blocked by recommendation acceptance or learning proof. The demand plane is connected for the pilot through the manual Looker export path, and Agent Studio is now explicitly planned, imported, refreshed, accepted, and converted into an approved package learning policy. Confidence remains limited because the accepted Agent Studio trend compares comparable but not identical Looker export families, and plan coverage is partial. The next required action is Phase 6 Product IA. Recurring GA4 automation remains deferred.
 
 ## Repository State
 
@@ -170,12 +170,12 @@ The authoritative remote and branch ownership are reconciled. Commit `dea1816` a
 | Competitor and source registry | 55% | Data/admin/public roster exist; onboarding proof incomplete. |
 | Daily outward collection | 55% | Coverage can be reported and the latest Hermes-wrapper publication run exited 0. |
 | Scout product muscle | Phase 3 passed | Product Muscle queue is zero after Athos, Bloomreach, Google Vertex AI Search, Lucidworks, and Meilisearch evidence work; cookie-boilerplate pollution is blocked. |
-| GA4 / Looker demand | 60% | Manual Looker export is processed with 100 demand signals, but no active planned topic has action-grade movement; recurring GA4 automation is deferred. |
-| Pattern intelligence | 30% | Patterns exist; cross-plane validation is incomplete. |
-| Recommendations | 10% | Structures exist; current output is zero. |
+| GA4 / Looker demand | 65% | Manual Looker export is processed with 101 demand signals and one accepted rising Agent Studio topic; recurring GA4 automation is deferred. |
+| Pattern intelligence | 40% | Patterns exist and one cross-plane recommendation was accepted; broader pattern journeys are still incomplete. |
+| Recommendations | 35% | One recommendation was accepted and recorded as learning; broader recommendation workflows remain unfinished. |
 | Frontend IA and usability | 40% | Market Field-first entry point is live and validated; broader Product IA workflows remain unfinished. |
 | History, heatmap, semantic views | 30% | Surfaces exist; business validity is not acceptance-tested. |
-| Learning loop | 25% | Artifacts exist; downstream run impact is unproven. |
+| Learning loop | 45% | Accepted recommendation was recorded into an approved package policy and audit passed; downstream full run impact still needs Phase 7 proof. |
 | E2E and launch validation | 45% | Broad tests exist; live click validation now passes, but full launch validation remains open. |
 | Version control and release hygiene | 70% | Clean branch, deployed baseline, Phase 2 status evidence, and renderer hotfix backup exist; production still needs full release-recorded deploy discipline. |
 

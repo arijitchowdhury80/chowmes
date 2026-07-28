@@ -1,7 +1,7 @@
 ---
 title: CI-OS Completion Tracker
 type: project-tracker
-status: phase-5-active
+status: phase-6-active
 updated: 2026-07-28
 ---
 
@@ -9,9 +9,9 @@ updated: 2026-07-28
 
 Last verified: 2026-07-28 UTC
 
-Overall product completion: **55 percent**
+Overall product completion: **60 percent**
 
-Engineering scaffold completion: **80 percent**
+Engineering scaffold completion: **82 percent**
 
 Launch status: **Not ready**
 
@@ -24,8 +24,8 @@ Launch status: **Not ready**
 | 2. Trustworthy publication | Atomic, fresh, run-bound release evidence | Passed |
 | 3. Product Muscle | Current Scout-backed product comparison | Passed |
 | 4. Audience Demand | Valid GA4 / Looker evidence plane | Passed with limited confidence |
-| 5. Argus Intelligence | Accepted cross-plane pattern, action, and learning | Active; recommendation generated, awaiting human acceptance |
-| 6. Product IA | Coherent Argus business workflows | Market Field live gate passed; broader IA pending |
+| 5. Argus Intelligence | Accepted cross-plane pattern, action, and learning | Passed with limited-confidence caveat |
+| 6. Product IA | Coherent Argus business workflows | Active; Market Field live gate passed, broader IA pending |
 | 7. End-to-end validation | Backend, frontend, semantic, UX, accessibility, and security proof | Pending |
 | 8. Algolia pilot | Versioned, monitored, controlled release | Pending |
 
@@ -58,15 +58,16 @@ Launch status: **Not ready**
 - Phase 4 planned-demand evaluation ran against the active live Argus demand plan and local Looker exports. It inspected 12 active planned topics and 11,057 metric rows; no planned topic had matching current demand rows, so the Phase 4 gate remains open. Off-plan Agent Studio demand was detected, and the evaluator now emits it as a demand-plan amendment candidate with 1,619 current sessions versus 751 previous sessions. It is not current gate evidence until the Argus plan is explicitly refreshed or amended.
 - CI-OS commit `fa2f31f` deployed the intermediate release `cios-20260728T101358Z-manual-fa2f31f`. The live dashboard and public handoff exposed the Agent Studio demand-plan amendment candidate while preserving `blocked_on_evidence`; live dashboard click validation passed after restoring the served competitor brief links.
 - CI-OS commit `d6d4b6e` added explicit demand-plan amendment support. Agent Studio was accepted into the Argus demand plan, imported into the demand ledger, refreshed through Argus, and served from release `cios-20260728T102723Z-manual-d6d4b6e`. The live run now has 101 demand signals, 1 rising demand topic, 3 patterns, and 1 generated recommendation; dashboard click validation passed after restoring served competitor brief links.
+- CI-OS commit `b7c787d` added the Phase 5 recommendation review packet exporter and recommendation acceptance recorder. Arijit accepted the Agent Studio recommendation for Product Marketing. The live DB recorded learning event `2` and approved improvement `3`; the generated next-sweep plan, apply plan, approved policy, and learning-policy audit are public at `https://ci.chowmes.com/data/`.
 
 ## Current Gate
 
-The project is currently in Phase 5 Argus Intelligence, with Phase 3 Product Muscle, Phase 4 Audience Demand, and the Market Field live gate passed but broader Product IA and recommendation acceptance still open:
+The project is currently entering Phase 6 Product IA, with Phase 3 Product Muscle, Phase 4 Audience Demand, Phase 5 Argus Intelligence, and the Market Field live gate passed but broader Product IA still open:
 
-1. Review the Agent Studio recommendation: “Turn the shipped Agent Studio capability into an evidence-backed market narrative before the demand window cools.”
-2. Accept, reject, or amend the recommendation against the Phase 5 rubric: accuracy, specificity, novelty, direct team usefulness, confidence, and evidence sufficiency.
-3. Convert the accepted or corrected read into an auditable learning instruction and prove it changes the next successful run.
-4. Preserve explicit unknown states in the feature matrix; unknown must not become absent.
+1. Preserve the accepted Agent Studio recommendation and learning policy as Phase 5 evidence.
+2. Complete the remaining Product IA workflows: Product Muscle Matrix, Conversation/Demand drilldowns, Pattern Board, Actions, Registry, Evidence Lab, and Command/Admin.
+3. Preserve explicit unknown states in the feature matrix; unknown must not become absent.
+4. Keep the Market Field click-to-reveal model as the primary product spine.
 
 Phase 1 evidence is recorded in
 `docs/status/2026-07-14-ci-os-phase1-hermes-execution-gate.md`.
@@ -82,12 +83,15 @@ Market Field UX gate evidence is recorded in
 
 ## Next Gate
 
-CI-OS must complete Argus intelligence acceptance and learning, broader accepted IA, final E2E validation, and the controlled Algolia pilot before the full goal can pass.
+CI-OS must complete broader accepted IA, final E2E validation, and the controlled Algolia pilot before the full goal can pass.
 
-Recurring GA4 automation remains deferred. The current blocker is no longer missing Audience Demand; it is human acceptance or correction of the generated Agent Studio recommendation and proof of a learning effect.
+Recurring GA4 automation remains deferred. The current blocker is no longer missing Audience Demand or recommendation acceptance; it is the broader Product IA gate.
 
 Phase 4 planned-demand evidence is recorded in
 `docs/status/2026-07-28-ci-os-phase4-audience-demand-evaluation.md`.
+
+Phase 5 recommendation and learning evidence is recorded in
+`docs/status/2026-07-28-ci-os-phase5-argus-recommendation-acceptance.md`.
 
 ## Related
 
