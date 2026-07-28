@@ -66,6 +66,7 @@ Launch status: **Controlled monitored pilot released; observation window active*
 - Phase 8 observation 2 corrected the public recommendation surfacing gap. CI-OS commit `b4d7423cff92b719dd48bc4b34af0ff21faefc16` is deployed to `/opt/cios/app`, release bundle `/opt/cios/releases/b4d7423.tar.gz` has SHA-256 `4ef05bc3466ffc36d4729eb2a375973a2128ba9f9ae0f71e32a25417b441cc31`, `https://ci.chowmes.com/data/argus-latest-run-status.json` now reports `recommendation_count=1`, and E2E launch readiness plus controlled-pilot monitoring pass against the served public status.
 - CI-OS commit `63f819b649fedf2625fad126dcd776fb5fe66788` added the Phase 8 pilot disposition artifact writer and deployed it to `/opt/cios/app`. Release bundle `/opt/cios/releases/63f819b.tar.gz` has SHA-256 `e121955765c9cbbb55406b6489522260c5828de6a111b21c7f2eb2bf8b20a323`; live package contract, operational safety, E2E launch readiness, and controlled-pilot monitoring pass. Pending disposition artifact: `/opt/cios/app/out/phase8/argus-recommendation-disposition-pending.json`.
 - CI-OS commit `44f78fee009f3773698e89083cd3249e41c6582b` added the formal Phase 8 exit checker and deployed it to `/opt/cios/app`. Release bundle `/opt/cios/releases/44f78fe.tar.gz` has SHA-256 `2467154f7072fed446f6e029bcbef80d7a28e4d4936f25fd5a327331c88bf9ae`; live package contract, operational safety, E2E launch readiness, and controlled-pilot monitoring pass. The Phase 8 exit artifact `/opt/cios/app/out/phase8/cios-phase8-exit.json` currently fails on `named_team_disposition_final`, as expected.
+- CI-OS commit `f8f8a3cfd5f39577ff224aabdc3c195e59ddc7a4` added the Phase 8 Product Marketing work-artifact exporter and deployed it to `/opt/cios/app`. Release bundle `/opt/cios/releases/f8f8a3c.tar.gz` has SHA-256 `6a0f4acd72105d206822ec2aff7faaeadc13f317dce9b2df54b5f92bda5257ea`; the live artifact `/opt/cios/app/out/phase8/argus-pmm-narrative-brief.json` is a `draft_for_named_team_review`, not Phase 8 exit evidence. Live operational safety, E2E launch readiness, and controlled-pilot monitoring pass; the exit checker still correctly fails on `named_team_disposition_final`.
 
 ## Current Gate
 
@@ -124,6 +125,9 @@ Phase 8 recommendation disposition handoff is recorded in
 
 Phase 8 exit gate evidence is recorded in
 `docs/workspace/arrie-phase6-3d-field/22-phase8-exit-gate.md`.
+
+Phase 8 PMM work artifact evidence is recorded in
+`docs/workspace/arrie-phase6-3d-field/23-phase8-pmm-work-artifact.md`.
 
 ## Related
 
