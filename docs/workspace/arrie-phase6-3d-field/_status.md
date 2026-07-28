@@ -28,7 +28,11 @@ Build and validate a true 3D constellation-style Market Field prototype that use
 - True 3D Three.js Market Field mockup created at `docs/mockups/arrie/2026-07-28-market-field-true-3d.html`.
 - Desktop and mobile screenshots captured.
 - Local Playwright validation passed with WebGL canvas-pixel check and interaction checks.
+- Production implementation plan written.
+- Phase 6 acceptance checklist written.
 
 ## Gate
 
 This artifact can only advance Phase 6 if it helps Arijit judge whether the true 3D constellation mental model is the accepted Product IA direction for the broader implementation.
+
+Next human decision: accept, reject, or amend the true 3D constellation direction before CI-OS production UI implementation begins.
