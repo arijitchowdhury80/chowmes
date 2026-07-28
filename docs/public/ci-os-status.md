@@ -1,7 +1,7 @@
 ---
 title: CI-OS Project Status
 type: project-status
-status: phase-7-e2e-validation
+status: phase-8-controlled-pilot-released
 updated: 2026-07-28
 ---
 
@@ -19,7 +19,7 @@ CI-OS is an Algolia-first Competitive Intelligence Operating System operated by 
 
 The target output is an evidence-backed recommendation for Product, Product Marketing, Sales, Content, or executive teams.
 
-Current product completion is approximately **70 percent**. The engineering scaffold is approximately **86 percent** complete. CI-OS is **not launch-ready**.
+Current product completion is approximately **80 percent**. The engineering scaffold is approximately **90 percent** complete. CI-OS is released to a controlled monitored pilot, with observation still active.
 
 ## What Has Been Built
 
@@ -44,7 +44,7 @@ Current product completion is approximately **70 percent**. The engineering scaf
 | Phase 0 baseline | Passed | Clean, published CI-OS recovery baseline. |
 | Phase 1 Hermes execution | Passed | Two consecutive real Hermes runs exited 0 as `cios`, with no permission error, timeout, orphan work, or ownership drift. |
 | Phase 2 publication | Passed | Fresh public run `cios-20260728T032901Z-3409872` published through the Hermes wrapper with matching public status and semantic dashboard run IDs. |
-| Deployed package | Verified | CI-OS commit `2f7385f4afdcdd2af771e34d8e92bdc629a990fa` is deployed at `/opt/cios/app`; package contract passed as `cios`. |
+| Deployed package | Verified | CI-OS commit `47ef4d565f00e8907c42280f62cf9943678805c4` is deployed at `/opt/cios/app`; package contract passed as `cios`. |
 | Competitor registry | Partial | 27 competitors represented. |
 | Source coverage | Current with controlled-pilot limitation | Latest Hermes wrapper run reported 42 active sources, 42 checked, 38 fetched, and 4 failed source fetches. This passes the controlled-pilot ratio policy, `0.0952 <= 0.10`, but remains a visible limitation. |
 | Product reality | Passed for Phase 3 | Product Muscle queue is now `0` after verified Google Vertex AI Search, Lucidworks, Meilisearch, Bloomreach, and Athos evidence work. The latest served semantic dashboard has 12 feature-comparison rows and explicit unknown states where proof is absent. |
@@ -53,19 +53,19 @@ Current product completion is approximately **70 percent**. The engineering scaf
 | Recommendations | Phase 5 passed with confidence caveat | Arijit accepted the Agent Studio recommendation for Product Marketing: turn the shipped Agent Studio capability into an evidence-backed market narrative before the demand window cools. |
 | Learning | Phase 5 proof passed | Acceptance was recorded as learning event `2` and approved improvement `3`; next-sweep plan, apply plan, approved policy, and policy audit are publicly available. |
 | Production UI | Phase 6 passed for controlled pilot | Market Field-first Product IA is live at `https://ci.chowmes.com/`, public artifact redaction and safety scan passed, and live click validation passed across desktop, tablet, and mobile. |
-| Launch readiness | Technical gate passed | Package contract, operational safety, public redaction, public safety scan, live dashboard click validation, and aggregate E2E launch readiness passed against production. Human usefulness acceptance is still required before Phase 8 pilot release starts. |
+| Launch readiness | Controlled pilot released | Package contract, operational safety, public redaction, public safety scan, live dashboard click validation, aggregate E2E launch readiness, human usefulness acceptance, rollback preservation, and pilot monitoring passed. Observation window is active. |
 
 ## What Comes Next
 
-1. Review the live decision surface and give or withhold human usefulness acceptance.
-2. If accepted, start Phase 8 controlled Algolia pilot release.
-3. Preserve monitoring debt: partial demand-plan coverage and 4 failed source fetches.
+1. Run the controlled pilot observation window.
+2. Record whether a named team uses, rejects, or amends an Argus recommendation.
+3. Preserve monitoring debt: partial demand-plan coverage, 4 failed source fetches, 3 product-surface failed captures, and no current recommendation in public run status.
 
 ## Next Gate
 
-Phase 7 technical validation has passed. CI-OS must now receive human usefulness acceptance before the controlled Algolia pilot can be released.
+Phase 7 technical validation and human usefulness acceptance have passed. CI-OS is released to the Phase 8 controlled Algolia pilot observation window.
 
-The latest served package is `2f7385f4afdcdd2af771e34d8e92bdc629a990fa`. Agent Studio was explicitly amended into the Argus demand plan, imported as a traceable demand signal, refreshed into one recommendation, accepted by Arijit, and recorded into an approved learning policy. Phase 4 and Phase 5 are treated as passed with limited confidence, not perfect coverage. Phase 6 is passed for the controlled pilot with a temporary design-authority waiver. Phase 7 technical validation is passed. Recurring GA4 automation remains deferred.
+The latest served package is `47ef4d565f00e8907c42280f62cf9943678805c4`. Agent Studio was explicitly amended into the Argus demand plan, imported as a traceable demand signal, refreshed into one recommendation, accepted by Arijit, and recorded into an approved learning policy. Phase 4 and Phase 5 are treated as passed with limited confidence, not perfect coverage. Phase 6 is passed for the controlled pilot with a temporary design-authority waiver. Phase 7 is passed. Phase 8 release is live, with observation still required before the full goal can close. Recurring GA4 automation remains deferred.
 
 ## Project Records
 

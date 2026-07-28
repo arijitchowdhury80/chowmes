@@ -1,7 +1,7 @@
 ---
 title: CI-OS Completion Tracker
 type: project-tracker
-status: phase-7-technical-pass-awaiting-human-acceptance
+status: phase-8-controlled-pilot-released
 updated: 2026-07-28
 ---
 
@@ -9,11 +9,11 @@ updated: 2026-07-28
 
 Last verified: 2026-07-28 UTC
 
-Overall product completion: **70 percent**
+Overall product completion: **80 percent**
 
-Engineering scaffold completion: **86 percent**
+Engineering scaffold completion: **90 percent**
 
-Launch status: **Technical launch gate passed for controlled pilot; awaiting human usefulness acceptance**
+Launch status: **Controlled monitored pilot released; observation window active**
 
 ## Phase Status
 
@@ -26,8 +26,8 @@ Launch status: **Technical launch gate passed for controlled pilot; awaiting hum
 | 4. Audience Demand | Valid GA4 / Looker evidence plane | Passed with limited confidence |
 | 5. Argus Intelligence | Accepted cross-plane pattern, action, and learning | Passed with limited-confidence caveat |
 | 6. Product IA | Coherent Argus business workflows | Passed for controlled pilot with temporary design-authority waiver |
-| 7. End-to-end validation | Backend, frontend, semantic, UX, accessibility, and security proof | Technical gate passed; human usefulness acceptance pending |
-| 8. Algolia pilot | Versioned, monitored, controlled release | Pending |
+| 7. End-to-end validation | Backend, frontend, semantic, UX, accessibility, and security proof | Passed |
+| 8. Algolia pilot | Versioned, monitored, controlled release | Released; observation window active |
 
 ## Completed Foundations
 
@@ -61,15 +61,17 @@ Launch status: **Technical launch gate passed for controlled pilot; awaiting hum
 - CI-OS commit `b7c787d` added the Phase 5 recommendation review packet exporter and recommendation acceptance recorder. Arijit accepted the Agent Studio recommendation for Product Marketing. The live DB recorded learning event `2` and approved improvement `3`; the generated next-sweep plan, apply plan, approved policy, and learning-policy audit are public at `https://ci.chowmes.com/data/`.
 - Phase 6 Product IA passed for the controlled pilot after CI-OS commit `760f03c` deployed to `/opt/cios/app`, public-store release `cios-20260728T122836Z-3951326` became current, public artifact redaction removed 216 internal references, the public safety scan passed with zero findings across 68 staged artifacts, hidden staging directories were removed from served release roots, and live dashboard click validation passed on `https://ci.chowmes.com/` across desktop, tablet, and mobile. Arijit's 2026-07-28 approval is recorded as the temporary pilot design-authority waiver; formal five-user comprehension and full accessibility studies move to post-pilot UX hardening.
 - Phase 7 technical E2E validation passed for the controlled pilot after CI-OS commit `2f7385f4afdcdd2af771e34d8e92bdc629a990fa` deployed to `/opt/cios/app`, package contract passed, live operational safety passed, public redaction and public safety scans passed, live dashboard click validation passed, and the aggregate launch-readiness gate passed. Source coverage was `42` active and checked sources with `4` failed active source fetches; this passed by the explicit controlled-pilot ratio policy, `0.0952 <= 0.10`, while remaining visible as a limitation.
+- Arijit accepted the Phase 7 human usefulness gate on 2026-07-28. Phase 8 may start.
+- Phase 8 controlled pilot release `cios-pilot-algolia-20260728-47ef4d5` deployed CI-OS commit `47ef4d565f00e8907c42280f62cf9943678805c4` to `/opt/cios/app`, preserved rollback bundle `/opt/cios/releases/rollback-before-phase8-20260728T141016Z-pre-2b88539.tar.gz`, created release bundle `/opt/cios/releases/47ef4d5.tar.gz` with SHA-256 `fcd7d6aee86a4a2fd9cdc26afbefda73651032ea6926fc5d877b36d1890009f7`, and passed package, operational safety, dashboard click, launch readiness, and controlled-pilot monitoring gates.
 
 ## Current Gate
 
-The project has passed Phase 7 technical E2E validation for the controlled pilot, with Phases 0 through 6 already passed:
+The project has released the controlled monitored Algolia pilot, with Phases 0 through 7 passed:
 
 1. Preserve the accepted Agent Studio recommendation and learning policy as Phase 5 evidence.
 2. Preserve the Phase 6 Market Field click-to-reveal Product IA as the controlled-pilot spine.
 3. Preserve the Phase 7 production validation artifact at `docs/workspace/arrie-phase6-3d-field/16-phase7-technical-e2e-gate.md`.
-4. Do not start Phase 8 release until Arijit gives the human usefulness acceptance pass.
+4. Run the observation window and record real recommendation usage or rejection.
 
 Phase 1 evidence is recorded in
 `docs/status/2026-07-14-ci-os-phase1-hermes-execution-gate.md`.
@@ -85,9 +87,9 @@ Market Field UX gate evidence is recorded in
 
 ## Next Gate
 
-CI-OS must receive human usefulness acceptance, then complete the controlled Algolia pilot before the full goal can pass.
+CI-OS must complete the controlled Algolia pilot observation window before the full goal can pass.
 
-Recurring GA4 automation remains deferred. The current blocker is no longer missing Audience Demand, recommendation acceptance, Product IA, or technical launch validation; it is human acceptance to advance from Phase 7 into Phase 8.
+Recurring GA4 automation remains deferred. The current work is Phase 8 observation, recommendation usage proof, and learning review.
 
 Phase 4 planned-demand evidence is recorded in
 `docs/status/2026-07-28-ci-os-phase4-audience-demand-evaluation.md`.
@@ -101,6 +103,12 @@ Phase 6 Product IA live deployment evidence is recorded in
 
 Phase 7 technical E2E evidence is recorded in
 `docs/workspace/arrie-phase6-3d-field/16-phase7-technical-e2e-gate.md`.
+
+Phase 7 human usefulness acceptance is recorded in
+`docs/workspace/arrie-phase6-3d-field/17-phase7-human-usefulness-acceptance.md`.
+
+Phase 8 controlled pilot release evidence is recorded in
+`docs/workspace/arrie-phase6-3d-field/18-phase8-controlled-pilot-release.md`.
 
 ## Related
 

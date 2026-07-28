@@ -1,7 +1,7 @@
 # Phase 7 Technical E2E Gate
 
 Date: 2026-07-28
-Status: technical gate passed for controlled pilot; human usefulness acceptance still required before Phase 8
+Status: technical gate passed for controlled pilot; human usefulness acceptance recorded in `17-phase7-human-usefulness-acceptance.md`
 
 ## Scope
 
@@ -101,4 +101,4 @@ Broader `tests/scripts` status:
 
 Phase 7 technical validation is passed for the controlled pilot basis.
 
-Phase 7 is not fully closed until Arijit accepts the live decision surface as useful enough to advance to Phase 8.
+Phase 7 is closed after Arijit's human usefulness acceptance recorded in `17-phase7-human-usefulness-acceptance.md`.

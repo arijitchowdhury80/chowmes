@@ -1,7 +1,7 @@
 # aRRIe Phase 6 True 3D Market Field Status
 
 Date: 2026-07-28
-Status: Phase 7 technical E2E gate passed for controlled pilot; human usefulness acceptance pending
+Status: Phase 8 controlled monitored pilot released; observation window active
 
 ## Scope
 
@@ -130,4 +130,4 @@ Reusable local story, visual verifier, public-safety, public-redaction, deployme
 
 Phase 6 is passed for the controlled pilot.
 
-Next production work: obtain human usefulness acceptance for the live decision surface. If accepted, start Phase 8 controlled pilot release from the deployed package `2f7385f4afdcdd2af771e34d8e92bdc629a990fa`, preserving evidence limits, rollback, monitoring, and live-validation gates.
+Next production work: run the Phase 8 observation window from deployed package `47ef4d565f00e8907c42280f62cf9943678805c4`, record recommendation usage or rejection by a named team, and review learning effects before any completion claim.
