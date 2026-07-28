@@ -1,7 +1,7 @@
 # aRRIe Phase 6 True 3D Market Field Status
 
 Date: 2026-07-28
-Status: true 3D Product IA direction accepted; reusable Agent Studio validation, public-safety, redaction, and deployment-mechanics artifacts verified locally
+Status: true 3D Product IA direction accepted; live CI-OS deployment, public-safety redaction, and dashboard click validation verified
 
 ## Scope
 
@@ -89,6 +89,22 @@ Build and validate a true 3D constellation-style Market Field prototype that use
 - Verified `python3 -m py_compile scripts/redact_public_artifacts.py scripts/scan_public_artifacts.py scripts/validate_market_field_visual_acceptance.py scripts/validate_market_field_story.py scripts/build_agent_studio_market_field_fixture.py scripts/verify_hermes_package_contract.py` passed.
 - Verified `git diff --check` passed.
 - Verified local staged-public redaction proof under `/tmp/cios-public-redaction-check`: redaction `status=redacted`, `redacted_file_count=2`, `redaction_count=4`; post-redaction scan `status=passed`, `findings=[]`.
+- CI-OS live deployment completed on Chowmes:
+  - Deployed commit `760f03cbdf110c467a5b09b591017774d1db520e` to `/opt/cios/app`.
+  - Backup before deploy: `/root/.hermes/backups/cios-phase6-redaction-before-20260728T120805Z.tgz`.
+  - Live wrapper completed in `1045.9s` and published `https://ci.chowmes.com/`.
+  - Public-store current release: `/opt/cios/public-store/releases/cios-20260728T122836Z-3951326`.
+  - Remote package contract passed.
+  - Public redaction evidence: `status=redacted`, `scanned_file_count=68`, `redacted_file_count=6`, `redaction_count=216`.
+  - Public safety scan evidence: `status=passed`, `public_safe=true`, `scanned_file_count=68`, `findings=0`.
+  - Hidden `.argus-publish.*` staging directories were removed from public roots after verification.
+  - Follow-up CI-OS commit `760f03cbdf110c467a5b09b591017774d1db520e` prevents future staged bundle directories from being promoted into public-store releases.
+- Verified `https://ci.chowmes.com/` returned HTTP 200 with content length `454630` and `last-modified: Tue, 28 Jul 2026 12:28:36 GMT`.
+- Verified live semantic dashboard JSON: `schema_version=26`, `product_market_run=true`, `bytes=5336421`.
+- Verified `python3 scripts/validate_dashboard_clicks.py --url https://ci.chowmes.com/` passed:
+  - Market Field hotspot/time/proof interactions.
+  - Structure, navigation, timeline, semantic heat map, priority state, competitor briefs, and appendices.
+  - Responsive checks at `390x844`, `768x1024`, and `1280x900`.
 - CI-OS deployment-store and rollback-preparation slice implemented:
   - `deploy/cios-daily.sh` now runs `scripts/scan_public_artifacts.py` against the staged public bundle before copying anything to the public site.
   - `promote_public_store_if_present` now refreshes the public-store `served` root from the promoted release.
@@ -106,8 +122,8 @@ Build and validate a true 3D constellation-style Market Field prototype that use
 
 The human direction gate is cleared.
 
-Reusable local story, visual verifier, public-safety, public-redaction, and deployment-mechanics gates are cleared for the Agent Studio Market Field artifact.
+Reusable local story, visual verifier, public-safety, public-redaction, deployment-mechanics, live deployment, and live dashboard click-validation gates are cleared for the Agent Studio Market Field artifact.
 
-Phase 6 final visual acceptance is not cleared yet because the UI/UX SOP/design-authority dependency remains missing or unwaived.
+Phase 6 final visual acceptance is not cleared yet because the UI/UX SOP/design-authority dependency remains missing unless Arijit's latest approval is recorded as a temporary pilot design-authority waiver.
 
-Next production work: restore/provide the UI/UX SOP path or explicitly waive it as temporary pilot design authority, then deploy to the Chowmes CI-OS package path and execute the live staging gate with public redaction, public-safety scan, and dashboard click validation against the deployed artifact.
+Next production work: decide whether Arijit's current approval is a temporary pilot design-authority waiver. If yes, record the waiver and close Phase 6. If no, restore/provide the UI/UX SOP path and run final visual acceptance against that authority.

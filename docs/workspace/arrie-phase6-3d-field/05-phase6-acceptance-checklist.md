@@ -78,8 +78,8 @@ Five representative users must be able to answer without a builder explanation:
 - [x] Public safety scan rejects secret, local path, private artifact leakage, and forbidden external runtime hosts for the reusable Agent Studio artifact.
 - [x] Deployment mechanics use the CI-OS package path, stage before publish, redact internal filesystem references before scan, scan before publish, refresh public-store `served`, and preserve rollback pointers locally.
 - [x] Public redaction gate removes private paths and `file://` references from staged public artifacts while still allowing the safety scanner to block secret-like values.
-- [ ] Live dashboard click validation passes.
+- [x] Live dashboard click validation passes.
 
 ## Gate Judgment
 
-Phase 6 status remains `active` until every required item above is verified and recorded.
+Phase 6 status remains `active` until every required item above is verified and recorded, or the remaining design-authority/comprehension gaps are explicitly narrowed or waived for the controlled pilot.
