@@ -1,7 +1,7 @@
 # CI-OS Project Dossier
 
 Date: 2026-07-13; refreshed through 2026-07-28 UTC
-Status: Phase 6 Product IA passed for controlled pilot; Phase 7 E2E validation active
+Status: Phase 7 technical E2E gate passed for controlled pilot; awaiting human usefulness acceptance before Phase 8
 Product owner: Arijit Chowdhury
 Operating agent: Argus
 Runtime: Hermes / MyOS-Core
@@ -11,7 +11,7 @@ First tenant: Algolia
 
 CI-OS is approximately 70 percent complete against the original product goal. The engineering scaffold is approximately 86 percent complete, but the product has not yet passed final E2E validation or pilot release.
 
-The system must not be called launch-ready. Phase 1 passed after two consecutive real Hermes runs completed successfully as the dedicated `cios` application user. Phase 2 passed after fresh public artifacts were published through the Hermes wrapper with one run ID, live public JSON agreed with semantic dashboard data, and live dashboard click validation passed. Phase 3 Product Muscle passed after Athos, Bloomreach, Google Vertex AI Search, Lucidworks, and Meilisearch evidence work cleared the Product Muscle queue, and CI-OS now blocks cookie-consent boilerplate before it can enter the Product Muscle ledger. Phase 4 Audience Demand passed with limited confidence after Agent Studio was explicitly accepted into the Argus demand plan, imported into the demand ledger, and refreshed into one recommendation. Phase 5 Argus Intelligence passed with a confidence caveat after Arijit accepted that recommendation for Product Marketing and CI-OS recorded an auditable learning effect. Phase 6 Product IA passed for the controlled pilot after the true 3D Market Field Product IA was deployed live, public artifact redaction and safety scans passed, live dashboard click validation passed, and Arijit's approval was recorded as the temporary pilot design-authority waiver. Phase 7 E2E validation is now active.
+The system must not yet be called pilot-released. Phase 1 passed after two consecutive real Hermes runs completed successfully as the dedicated `cios` application user. Phase 2 passed after fresh public artifacts were published through the Hermes wrapper with one run ID, live public JSON agreed with semantic dashboard data, and live dashboard click validation passed. Phase 3 Product Muscle passed after Athos, Bloomreach, Google Vertex AI Search, Lucidworks, and Meilisearch evidence work cleared the Product Muscle queue, and CI-OS now blocks cookie-consent boilerplate before it can enter the Product Muscle ledger. Phase 4 Audience Demand passed with limited confidence after Agent Studio was explicitly accepted into the Argus demand plan, imported into the demand ledger, and refreshed into one recommendation. Phase 5 Argus Intelligence passed with a confidence caveat after Arijit accepted that recommendation for Product Marketing and CI-OS recorded an auditable learning effect. Phase 6 Product IA passed for the controlled pilot after the true 3D Market Field Product IA was deployed live, public artifact redaction and safety scans passed, live dashboard click validation passed, and Arijit's approval was recorded as the temporary pilot design-authority waiver. Phase 7 technical E2E validation passed on 2026-07-28 after the deployed package contract, operational safety, public redaction, public safety scan, live dashboard click validation, and aggregate launch-readiness gate all passed against production. Phase 7 still awaits Arijit's human usefulness acceptance before Phase 8 pilot release starts.
 
 The retained implementation now has a clean, published branch, an immutable deployed package baseline, a verified run-bound publication path, and a live-validated Market Field UX entry point. Feature expansion is now gated on current product evidence, intelligence quality, and the remaining Product IA workflows. Recurring GA4 automation remains deferred and is not the current Phase 3 blocker.
 
@@ -55,11 +55,11 @@ Evidence was refreshed directly from Chowmes through 2026-07-28 UTC.
 | Schedule | `0 9 * * *`, America/New_York |
 | Execution mode | Hermes no-agent script |
 | Wrapper | `cios-daily.sh` |
-| Latest completed schedules | Phase 1 pair: 2026-07-14 03:49 ET and 04:05 ET; Phase 2 verification run: 2026-07-27 23:29 ET; latest Phase 6 live deployment run: 2026-07-28 08:28 ET |
+| Latest completed schedules | Phase 1 pair: 2026-07-14 03:49 ET and 04:05 ET; Phase 2 verification run: 2026-07-27 23:29 ET; Phase 6 live deployment run: 2026-07-28 08:28 ET; Phase 7 technical validation run: 2026-07-28 09:28 ET |
 | Request IDs | Phase 1: `a70f4e219d294280a26703962c9be4e9`, `1b938c9de92f4568a059bdb84d3f9e6b`; Phase 2 public run: `cios-20260728T032901Z-3409872`; Phase 3 progress runs: `cios-20260728T034702Z-3433185`, `cios-20260728T041240Z-3510681`, `cios-20260728T043002Z-3533427`, `cios-20260728T044324Z-3552802`; Market Field release: `cios-20260728T084235Z-3769892`; Phase 6 current release: `cios-20260728T122836Z-3951326` |
 | Results | Exit code 0 for the Phase 1 pair, the Phase 2 verification run, the latest Phase 3 progress run, and the Market Field staging run |
 | Runtime owner | `cios`, reached through the Hermes queue handoff |
-| Autonomous daily loop | Publication path, Phase 3 Product Muscle, Phase 4 Audience Demand, Phase 5 accepted learning, and Phase 6 Product IA verified; Phase 7 E2E validation active |
+| Autonomous daily loop | Publication path, Phase 3 Product Muscle, Phase 4 Audience Demand, Phase 5 accepted learning, Phase 6 Product IA, and Phase 7 technical E2E validation verified; human usefulness acceptance remains before Phase 8 |
 
 Both runs completed without root intervention, permission errors, timeout, orphan work, or ownership drift. The systemd service and delegated cgroup were empty after each run, and post-run hashes remained stable. Full evidence is recorded in `docs/status/2026-07-14-ci-os-phase1-hermes-execution-gate.md`.
 
@@ -67,12 +67,12 @@ Both runs completed without root intervention, permission errors, timeout, orpha
 
 | Item | Verified state |
 |---|---|
-| Status | `blocked_on_evidence` |
+| Status | `limited_by_evidence` |
 | Publish status | `published` |
-| Generated at | `2026-07-28T09:33:47.175869Z` |
+| Generated at | `2026-07-28T13:45:09.425489Z` |
 | Public dashboard updated | true |
-| Public release | `cios-20260728T102723Z-manual-d6d4b6e` |
-| Next Hermes action | `complete_product_ia_workflows` |
+| Public release | Current published dashboard from the 2026-07-28 09:28 ET wrapper run |
+| Next Hermes action | `Run product-surface extraction for Athos Commerce, then refresh Argus from the evidence ledger to resolve the A/B Testing matrix cell.` |
 
 ### Evidence planes
 
@@ -80,17 +80,17 @@ Both runs completed without root intervention, permission errors, timeout, orpha
 |---|---:|---|
 | Monitored competitors | 27 | Registry exists and is represented publicly. |
 | Active sources | 42 | Reported by the latest successful Hermes-wrapper run. |
-| Checked sources | 41 fetched | Latest wrapper run fetched 41 of 42 attempted active sources. |
+| Checked sources | 42 checked, 38 fetched | Latest wrapper run checked all 42 active sources and fetched 38. |
 | Blocked sources | 5 | Present in the public source ledger. |
-| Failed active source fetches | 1 | Latest wrapper run reported one failed source fetch. |
+| Failed active source fetches | 4 | Phase 7 passed by explicit controlled-pilot ratio policy: `4 / 42 = 0.0952`, below the `0.10` ceiling, with failures still visible as monitored limitations. |
 | Feature-comparison rows | 12 | Latest served semantic dashboard exposes 12 Product Muscle comparison rows. |
 | Market Field nodes | 25 | Latest served semantic dashboard exposes 25 Market Field nodes. |
-| Product-surface work queue | 0 items | Google Vertex AI Search, Lucidworks, and Meilisearch were extracted and ingested after the Bloomreach pass. |
+| Product-surface work queue | 39 limiting items | Current run produced 524 product rows, but the Product Muscle queue now records 39 confidence-limiting evidence gaps for monitoring. |
 | Boilerplate extraction guard | Verified | CI-OS commit `b55979e` filters site cookie/privacy boilerplate; the Athos platform extraction that produced 8 bad cookie rows now returns empty. |
 | Conversation themes | 500 | Market-conversation evidence exists. |
 | Demand signals | 101 | Manual Looker Audience Demand feed is processed. Agent Studio was amended into the plan and imported as a rising demand signal; readiness is `processed_partial_plan_coverage` because other planned topics remain uncovered. |
 | Patterns | 3 | Deterministic pattern primitives produced output in the latest refreshed run. |
-| Recommendations | 1 | Arijit accepted the Agent Studio recommendation for Product Marketing: turn the shipped Agent Studio capability into an evidence-backed market narrative before the demand window cools. |
+| Recommendations | 3 current signals; 1 accepted learning artifact | The latest run produced 3 Argus signals. The prior accepted learning artifact remains the Agent Studio recommendation for Product Marketing. |
 | Consumed learnings | 1 approved policy | Acceptance was recorded as learning event `2` and approved improvement `3`; the next-sweep plan, apply plan, approved policy, and policy audit prove the learning path for the next run. |
 
 Phase 4 is no longer blocked by missing Audience Demand. Phase 5 is no longer blocked by recommendation acceptance or learning proof. The demand plane is connected for the pilot through the manual Looker export path, and Agent Studio is now explicitly planned, imported, refreshed, accepted, and converted into an approved package learning policy. Confidence remains limited because the accepted Agent Studio trend compares comparable but not identical Looker export families, and plan coverage is partial. The next required action is Phase 6 Product IA. Recurring GA4 automation remains deferred.
