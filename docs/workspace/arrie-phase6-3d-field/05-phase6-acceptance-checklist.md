@@ -76,7 +76,7 @@ Five representative users must be able to answer without a builder explanation:
 - [x] Any vendored 3D runtime has license and checksum recorded.
 - [x] Package verifier checks required 3D/runtime assets and reusable Market Field validation scripts.
 - [x] Public safety scan rejects secret, local path, private artifact leakage, and forbidden external runtime hosts for the reusable Agent Studio artifact.
-- [ ] Deployment uses the CI-OS package path and preserves rollback.
+- [x] Deployment mechanics use the CI-OS package path, stage before publish, scan before publish, refresh public-store `served`, and preserve rollback pointers locally.
 - [ ] Live dashboard click validation passes.
 
 ## Gate Judgment
