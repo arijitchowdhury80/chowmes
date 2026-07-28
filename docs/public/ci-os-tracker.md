@@ -55,12 +55,13 @@ Launch status: **Not ready**
 - Product-surface extraction was hardened against cookie-consent and privacy-policy boilerplate in CI-OS commit `b55979e`; the Athos platform extraction that previously produced 8 bad cookie rows now correctly returns empty.
 - Bloomreach Discovery product evidence was extracted and ingested from `https://www.bloomreach.com/en/products/discovery`; the current served release `cios-20260728T0928Z-manual-b55979e` has 12 feature-comparison rows, 25 Market Field nodes, and a Product Muscle work queue reduced to 3 limiting items.
 - Google Vertex AI Search, Lucidworks, and Meilisearch product-surface extractions succeeded and were ingested; the current served release `cios-20260728T0934Z-manual-b55979e` has a Product Muscle work queue of `0`.
+- Phase 4 planned-demand evaluation ran against the active live Argus demand plan and local Looker exports. It inspected 12 active planned topics and 11,057 metric rows; no planned topic had matching current demand rows, so the Phase 4 gate remains open. Off-plan Agent Studio demand was detected, but it is not current gate evidence until the Argus plan is explicitly refreshed or amended.
 
 ## Current Gate
 
 The project is currently in Phase 4 Audience Demand, with Phase 3 Product Muscle and the Market Field live gate passed but broader Product IA and recommendation gates still open:
 
-1. Upload a planned demand export with previous-period or `change_pct` values so Audience Demand can become action-grade.
+1. Upload a planned demand export with previous-period or `change_pct` values for the active Argus topics, or explicitly amend / refresh the Argus demand plan to include validated off-plan demand such as Agent Studio.
 2. Refresh Argus and verify whether demand movement qualifies for action.
 3. Keep unsupported recommendation output blocked until Product, Conversation, and Audience Demand evidence align.
 4. Preserve explicit unknown states in the feature matrix; unknown must not become absent.
@@ -82,6 +83,9 @@ Market Field UX gate evidence is recorded in
 CI-OS must complete action-grade Audience Demand, Argus intelligence, broader accepted IA, final E2E validation, and the controlled Algolia pilot before the full goal can pass.
 
 Recurring GA4 automation remains deferred. The current demand blocker is not connector setup; it is that the processed manual Audience Demand feed has no action-grade rising-demand movement yet.
+
+Phase 4 planned-demand evidence is recorded in
+`docs/status/2026-07-28-ci-os-phase4-audience-demand-evaluation.md`.
 
 ## Related
 

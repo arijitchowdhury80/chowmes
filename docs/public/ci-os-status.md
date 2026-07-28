@@ -48,7 +48,7 @@ Current product completion is approximately **45 percent**. The engineering scaf
 | Source coverage | Current with one fetch failure | Latest Hermes wrapper run reported 42 active sources, 41 fetched, and 1 failed source fetch. |
 | Product reality | Passed for Phase 3 | Product Muscle queue is now `0` after verified Google Vertex AI Search, Lucidworks, Meilisearch, Bloomreach, and Athos evidence work. The latest served semantic dashboard has 12 feature-comparison rows and explicit unknown states where proof is absent. |
 | Market conversation | Present | 500 themes and 2 current candidate patterns. |
-| Audience demand | Connected but not action-grade | Fresh semantic data reports `demand_plane_status=processed` and `demand_signal_count=100`, but no topic crossed the rising-demand threshold. The current next action is `upload_trended_planned_demand_export`. |
+| Audience demand | Connected but not action-grade | Fresh semantic data reports `demand_plane_status=processed` and `demand_signal_count=100`, but no topic crossed the rising-demand threshold. A planned-demand evaluation inspected 12 active Argus topics and 11,057 Looker metric rows; no active planned topic had matching current demand rows. The current next action is `upload_trended_planned_demand_export` or explicitly amend the demand plan. |
 | Recommendations | Blocked | 0 current recommendations because the current demand feed is not yet action-grade. |
 | Learning | Unproven | No learning effect visible in the current run. |
 | Production UI | Market Field live gate passed | Market Field-first UX is live at `https://ci.chowmes.com/` and passed live click validation on release `cios-20260728T0934Z-manual-b55979e`; broader Product IA remains pending. |
@@ -56,7 +56,7 @@ Current product completion is approximately **45 percent**. The engineering scaf
 
 ## What Comes Next
 
-1. Replace or enrich the manual Audience Demand feed with planned topic mapping plus previous-period or `change_pct` values.
+1. Replace or enrich the manual Audience Demand feed with planned topic mapping plus previous-period or `change_pct` values for the active Argus topics, or explicitly refresh the demand plan to include the observed off-plan Agent Studio demand.
 2. Refresh Argus and prove that Audience Demand either becomes action-grade or remains explicitly blocked.
 3. Prove one useful cross-plane Argus recommendation and one learning effect.
 4. Complete the remaining Product IA workflows beyond the live Market Field journey: Product Muscle Matrix, Conversation/Demand drilldowns, Pattern Board, Actions, Registry, Evidence Lab, and Command/Admin.
@@ -67,7 +67,7 @@ Current product completion is approximately **45 percent**. The engineering scaf
 
 Phase 4 is active. Audience Demand must provide planned-topic time-series evidence, either through a trended manual Looker export or a configured GA4 path.
 
-The latest served run is `blocked_on_evidence` with `0` promoted recommendations because demand movement is not action-grade. The next live action is to upload a trended planned demand export with previous-period or `change_pct` values, then refresh Argus. Recurring GA4 automation remains deferred; the immediate blocker is the missing action-grade demand movement, not the connector itself.
+The latest served run is `blocked_on_evidence` with `0` promoted recommendations because demand movement is not action-grade. The local Phase 4 evaluator found no matching current demand rows for the 12 active planned topics. It did find off-plan Agent Studio movement, but that cannot pass the gate unless Argus explicitly plans against it. The next live action is to upload a trended planned demand export with previous-period or `change_pct` values, or refresh the Argus demand plan, then refresh Argus. Recurring GA4 automation remains deferred; the immediate blocker is the missing action-grade planned demand movement, not the connector itself.
 
 ## Project Records
 
