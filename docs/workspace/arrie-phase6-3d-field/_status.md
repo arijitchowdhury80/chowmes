@@ -1,7 +1,7 @@
 # aRRIe Phase 6 True 3D Market Field Status
 
 Date: 2026-07-28
-Status: true 3D Product IA direction accepted; reusable Agent Studio validation artifact verified locally
+Status: true 3D Product IA direction accepted; reusable Agent Studio validation and visual verifier artifacts verified locally
 
 ## Scope
 
@@ -54,9 +54,24 @@ Build and validate a true 3D constellation-style Market Field prototype that use
 - Built reusable local artifact under `/tmp/cios-agent-studio-validation/`.
 - Verified `/tmp/cios-agent-studio-validation/agent-studio-market-field-fixture-manifest.json`: selected hotspot `Agent Studio`, node types include product reality / market conversation / Audience Demand / Argus action / unknown boundary, proof planes include product reality / market conversation / Audience Demand / Argus recommendation.
 - Verified `/tmp/cios-agent-studio-validation/market-field-story-validation.json`: `status=passed`, `canvas_nonblank=true`, `console_errors=[]`, `action_owners=["Product Marketing"]`, `node_count=9`, `edge_count=8`, `proof_count=4`.
+- CI-OS reusable visual acceptance verifier implemented:
+  - `scripts/validate_market_field_visual_acceptance.py` validates the rendered Market Field across mobile, tablet, and desktop viewports.
+  - It checks the 3D canvas, Agent Studio click-to-reveal selection, 30D time-window state, proof drawer behavior, visible story terms, critical selector clipping, Market Field before raw evidence, and console health.
+  - Package contract now requires the verifier script.
+- Built reusable local artifact under `/tmp/cios-agent-studio-visual-acceptance/`.
+- Verified `/tmp/cios-agent-studio-visual-acceptance/market-field-visual-acceptance.json`: `status=passed_with_design_authority_gap`, `design_authority_status=missing_or_unwaived`, `final_visual_acceptance=false`, `viewport_count=3`, `console_errors=[]`, and no clipped critical selectors on mobile/tablet/desktop.
+- Verified `python3 -m pytest tests/scripts/test_validate_market_field_visual_acceptance.py tests/scripts/test_verify_hermes_package_contract.py -q` passed with `69 passed`.
+- Verified `python3 -m pytest tests/dashboard/test_market_field_view_model.py tests/dashboard/test_state_builder.py tests/dashboard/test_cockpit_renderer.py tests/scripts/test_validate_dashboard_clicks_market_field.py tests/scripts/test_validate_market_field_story.py tests/scripts/test_build_agent_studio_market_field_fixture.py tests/scripts/test_validate_market_field_visual_acceptance.py tests/scripts/test_verify_hermes_package_contract.py -q` passed with `165 passed`.
+- Verified `python3 scripts/verify_hermes_package_contract.py --app-dir . --skip-python-imports` passed.
+- Verified `python3 -m py_compile scripts/validate_market_field_visual_acceptance.py scripts/validate_market_field_story.py scripts/build_agent_studio_market_field_fixture.py scripts/verify_hermes_package_contract.py` passed.
+- Verified `git diff --check` passed.
 
 ## Gate
 
 The human direction gate is cleared.
 
-Next production work: resolve or explicitly waive the missing UI/UX SOP path, run visual acceptance against the reusable local artifact, then prepare the live deployment/staging gate.
+Reusable local story and visual verifier gates are cleared for the Agent Studio Market Field artifact.
+
+Phase 6 final visual acceptance is not cleared yet because the UI/UX SOP/design-authority dependency remains missing or unwaived.
+
+Next production work: restore/provide the UI/UX SOP path or explicitly waive it as temporary pilot design authority, then prepare the live deployment/staging gate.

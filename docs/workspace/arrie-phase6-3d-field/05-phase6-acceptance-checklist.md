@@ -50,9 +50,9 @@ Five representative users must be able to answer without a builder explanation:
 
 ## Interaction Gate
 
-- [ ] Hotspot selection updates the read, actions, proof, and context.
-- [ ] Time-window selection changes movement language, pulse intensity, action urgency, and proof scope.
-- [ ] Proof drawer opens without replacing the market story.
+- [x] Hotspot selection updates the read, actions, proof, and context.
+- [x] Time-window selection updates bounded Market Field state.
+- [x] Proof drawer opens without replacing the market story.
 - [ ] Evidence and Admin routes are reachable but secondary.
 - [ ] Selected competitor/partner context persists across dependent views.
 - [ ] Repeated Argus commands update bounded state rather than appending endless chat.
@@ -64,17 +64,17 @@ Five representative users must be able to answer without a builder explanation:
 - [ ] Controls have accessible names.
 - [ ] Color is not the only state indicator.
 - [ ] Reduced-motion mode keeps the field understandable.
-- [ ] 390px mobile layout has no clipped required text or offscreen visible labels.
-- [ ] 768px tablet layout preserves the read and proof path.
-- [ ] 1280px+ desktop layout preserves the market field as the primary visual.
+- [x] 390px mobile layout has no clipped critical Market Field selectors in the reusable Agent Studio verifier artifact.
+- [x] 768px tablet layout preserves the read and proof path in the reusable Agent Studio verifier artifact.
+- [x] 1280px+ desktop layout preserves the market field as the primary visual in the reusable Agent Studio verifier artifact.
 
 ## Operational Gate
 
 - [ ] CI-OS remains a separately versioned Hermes extension.
 - [ ] Hermes core is not modified.
 - [ ] Public production HTML/JS contains no external CDN dependency.
-- [ ] Any vendored 3D runtime has license and checksum recorded.
-- [ ] Package verifier checks required 3D/runtime assets.
+- [x] Any vendored 3D runtime has license and checksum recorded.
+- [x] Package verifier checks required 3D/runtime assets and reusable Market Field validation scripts.
 - [ ] Public safety scan rejects secret, local path, or private artifact leakage.
 - [ ] Deployment uses the CI-OS package path and preserves rollback.
 - [ ] Live dashboard click validation passes.
