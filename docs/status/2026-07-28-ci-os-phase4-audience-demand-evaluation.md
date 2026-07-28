@@ -74,6 +74,8 @@ The evaluator now emits a plan-amendment candidate CSV when off-plan movement qu
 
 This candidate should be treated as a work-order amendment proposal, not as a passed gate by itself.
 
+CI-OS now carries this proposal into the Argus operator handoff when the evaluator report is available. The daily wrapper can run the planned-demand evaluator from the configured Looker export data directory, publish the evaluation and amendment CSV artifacts, and pass the report into `build_argus_operator_handoff.py`. The dashboard renderer now has a public-safe “Suggested demand-plan amendment” panel, but the handoff still keeps `status=blocked_on_evidence` until an amended plan produces planned-topic gate evidence.
+
 ## Next Required Action
 
 One of these must happen before Phase 4 can pass:
@@ -93,12 +95,16 @@ python3 -m pytest tests/scripts/test_evaluate_argus_planned_demand_exports.py -q
 python3 -m py_compile scripts/evaluate_argus_planned_demand_exports.py
 python3 scripts/evaluate_argus_planned_demand_exports.py --plan /tmp/argus-demand-plan-template.csv --data-dir data --output /tmp/argus-planned-demand-evaluation.json --prepared-output /tmp/argus-planned-demand-prepared.csv
 python3 scripts/evaluate_argus_planned_demand_exports.py --plan /tmp/argus-demand-plan-template.csv --data-dir data --output /tmp/argus-planned-demand-evaluation.json --prepared-output /tmp/argus-planned-demand-prepared.csv --amendment-output /tmp/argus-demand-plan-amendment-candidates.csv
+python3 scripts/build_argus_operator_handoff.py --tenant algolia --work-queue <empty queue fixture> --demand-readiness <processed_no_action_grade_demand fixture> --demand-plan-amendments /tmp/argus-planned-demand-evaluation.json --output /tmp/argus-operator-handoff-with-amendments.json
 ```
 
 Results:
 
-- evaluator tests: `4 passed`
+- wrapper and package-contract tests: `81 passed`
+- renderer, handoff, attach, and evaluator tests: `55 passed`
 - compile check: passed
+- shell syntax check for `deploy/cios-daily.sh`: passed
 - real evaluation exit code: `2`, expected for a failed phase gate
+- local handoff build with the real evaluator report kept `blocked_on_evidence`, titled the blocker `Demand movement not action-grade`, and carried `1` amendment candidate: Agent Studio
 - prepared demand CSV contained header only because no planned topic passed
 - amendment candidate CSV contained one proposed candidate, Agent Studio
