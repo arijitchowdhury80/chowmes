@@ -130,4 +130,16 @@ Reusable local story, visual verifier, public-safety, public-redaction, deployme
 
 Phase 6 is passed for the controlled pilot.
 
+## Phase 8 Current State
+
+As of 2026-07-28, CI-OS commit `8c39f15` is deployed at `/opt/cios/app`.
+
+- Public PMM brief: `https://ci.chowmes.com/data/phase8/argus-pmm-narrative-brief.md`
+- Public PMM disposition request: `https://ci.chowmes.com/data/phase8/argus-pmm-disposition-request.md`
+- Release bundle: `/opt/cios/releases/8c39f15.tar.gz`
+- Release SHA-256: `84a1c27db3ee1386737964b954be6bae99816dcdf055c66100703c14473e3493`
+- Live dashboard click validation passed against `https://ci.chowmes.com/`.
+- Package contract, public redaction, public safety scan, live operational safety, E2E launch readiness, and controlled-pilot monitoring passed.
+- `/opt/cios/app/out/phase8/cios-phase8-exit.json` still reports `status=fail` because `named_team_disposition_final` is pending.
+
 Next production work: record usage, rejection, or amendment of current PMM recommendation `2` by a named team, rerun `/opt/cios/app/scripts/check_phase8_exit.py`, and only claim completion when `/opt/cios/app/out/phase8/cios-phase8-exit.json` reports `status=pass`.

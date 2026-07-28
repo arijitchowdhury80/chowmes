@@ -69,6 +69,7 @@ Launch status: **Controlled monitored pilot released; observation window active*
 - CI-OS commit `f8f8a3cfd5f39577ff224aabdc3c195e59ddc7a4` added the Phase 8 Product Marketing work-artifact exporter and deployed it to `/opt/cios/app`. Release bundle `/opt/cios/releases/f8f8a3c.tar.gz` has SHA-256 `6a0f4acd72105d206822ec2aff7faaeadc13f317dce9b2df54b5f92bda5257ea`; the live artifact `/opt/cios/app/out/phase8/argus-pmm-narrative-brief.json` is a `draft_for_named_team_review`, not Phase 8 exit evidence. Live operational safety, E2E launch readiness, and controlled-pilot monitoring pass; the exit checker still correctly fails on `named_team_disposition_final`.
 - CI-OS commit `8aff99a26a6f4825e682f4be31b4fd4c223507e6` added a public-safe publisher for the Phase 8 Product Marketing artifact and deployed it to `/opt/cios/app`. Release bundle `/opt/cios/releases/8aff99a.tar.gz` has SHA-256 `54125d5bf8dd85ee2cba654d688a96509fdfe4b6c3ea60ade79df83adaf70715`. The public manifest is now reachable at `https://ci.chowmes.com/data/phase8/argus-phase8-work-artifacts.json`, with the Markdown brief at `https://ci.chowmes.com/data/phase8/argus-pmm-narrative-brief.md`. The served public safety scan passes with zero findings; live operational safety, E2E launch readiness, and controlled-pilot monitoring pass; the exit checker still correctly fails on `named_team_disposition_final`.
 - CI-OS commit `2a4923973857ac035ba53b58168792ffb85c3fa2` hardened the daily wrapper so Phase 8 PMM work artifacts are generated and published through the staged public release path whenever a current reviewable recommendation exists. Release bundle `/opt/cios/releases/2a49239.tar.gz` has SHA-256 `0a7224a914aab459f7409f3e870d51865b22305e06fdc066dfe1f704fdc5fb28`. Package contract, served public safety scan, live operational safety, E2E launch readiness, and controlled-pilot monitoring pass; the exit checker still correctly fails on `named_team_disposition_final`.
+- CI-OS commit `8c39f15` added and deployed a public-safe Phase 8 PMM disposition request beside the PMM work artifact. Release bundle `/opt/cios/releases/8c39f15.tar.gz` has SHA-256 `84a1c27db3ee1386737964b954be6bae99816dcdf055c66100703c14473e3493`. The public manifest now links `https://ci.chowmes.com/data/phase8/argus-pmm-disposition-request.md`; package contract, public redaction, public safety scan, live operational safety, live dashboard click validation, E2E launch readiness, and controlled-pilot monitoring pass. The exit checker now fails only on `named_team_disposition_final`, with current recommendation `2` matching the pending disposition.
 
 ## Current Gate
 
@@ -136,6 +137,9 @@ Phase 8 public PMM work artifact publication is recorded in
 
 Phase 8 repeatable PMM artifact publication is recorded in
 `docs/workspace/arrie-phase6-3d-field/25-phase8-repeatable-pmm-artifact-publication.md`.
+
+Phase 8 PMM disposition request publication is recorded in
+`docs/workspace/arrie-phase6-3d-field/26-phase8-disposition-request-publication.md`.
 
 ## Related
 
