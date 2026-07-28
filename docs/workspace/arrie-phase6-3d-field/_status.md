@@ -1,7 +1,7 @@
 # aRRIe Phase 6 True 3D Market Field Status
 
 Date: 2026-07-28
-Status: true 3D Product IA direction accepted; production shell slice verified locally
+Status: true 3D Product IA direction accepted; production interaction slice verified locally
 
 ## Scope
 
@@ -38,9 +38,13 @@ Build and validate a true 3D constellation-style Market Field prototype that use
 - Verified `python3 -m pytest tests/scripts/test_verify_hermes_package_contract.py -q` passed.
 - Verified `python3 scripts/verify_hermes_package_contract.py --app-dir . --skip-python-imports` passed.
 - Verified local Playwright browser smoke on `/tmp/cios-market-field-shell.html`: canvas exists, pixel probe nonblank, no console errors.
+- CI-OS production interaction slice implemented: hotspot buttons now carry click-to-reveal payload, selected read/facts/unknowns update from clicked hotspots, graph nodes mirror selected hotspot context, time-window controls update Market Field state, and the 3D canvas redraws from the selected context.
+- `scripts/validate_dashboard_clicks.py` now requires `#market-field-3d`, checks canvas pixels, verifies selected hotspot state, and verifies Today / 7D / 30D / Custom state changes.
+- Verified `python3 -m pytest tests/dashboard/test_cockpit_renderer.py tests/scripts/test_validate_dashboard_clicks_market_field.py tests/scripts/test_verify_hermes_package_contract.py -q` passed.
+- Verified local Playwright browser smoke on `/tmp/cios-market-field-interactions.html`: second hotspot click updated selected read, facts, unknowns, selected graph nodes, 30D time state, proof drawer, canvas pixels, and produced no console errors.
 
 ## Gate
 
 The human direction gate is cleared.
 
-Next production work: connect the 3D shell to hotspot/time/proof interactions with Playwright coverage, then resolve or explicitly waive the missing UI/UX SOP path before claiming final Phase 6 visual acceptance.
+Next production work: render the richer visual/intelligence story from real Agent Studio data, then resolve or explicitly waive the missing UI/UX SOP path before claiming final Phase 6 visual acceptance and live deployment.
