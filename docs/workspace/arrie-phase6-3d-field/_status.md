@@ -1,7 +1,7 @@
 # aRRIe Phase 6 True 3D Market Field Status
 
 Date: 2026-07-28
-Status: true 3D Product IA direction accepted; reusable Agent Studio validation and visual verifier artifacts verified locally
+Status: true 3D Product IA direction accepted; reusable Agent Studio validation, visual verifier, and public-safety artifacts verified locally
 
 ## Scope
 
@@ -65,13 +65,24 @@ Build and validate a true 3D constellation-style Market Field prototype that use
 - Verified `python3 scripts/verify_hermes_package_contract.py --app-dir . --skip-python-imports` passed.
 - Verified `python3 -m py_compile scripts/validate_market_field_visual_acceptance.py scripts/validate_market_field_story.py scripts/build_agent_studio_market_field_fixture.py scripts/verify_hermes_package_contract.py` passed.
 - Verified `git diff --check` passed.
+- CI-OS reusable public artifact safety scan implemented:
+  - `scripts/scan_public_artifacts.py` scans public HTML/JS/JSON/CSS/TXT/map artifacts for private local paths, `file://` references, secret-like values, and forbidden external runtime/CDN hosts.
+  - Package contract now requires the public-safety scanner.
+  - The Agent Studio fixture manifest was hardened to write relative artifact names instead of absolute local paths.
+- Built reusable local artifact under `/tmp/cios-agent-studio-public-safety/`.
+- Verified `/tmp/cios-agent-studio-public-safety/public-artifact-safety-scan.json`: `status=passed`, `public_safe=true`, `scanned_file_count=3`, `findings=[]`.
+- Verified `python3 -m pytest tests/scripts/test_build_agent_studio_market_field_fixture.py tests/scripts/test_scan_public_artifacts.py tests/scripts/test_verify_hermes_package_contract.py -q` passed with `71 passed`.
+- Verified `python3 -m pytest tests/dashboard/test_market_field_view_model.py tests/dashboard/test_state_builder.py tests/dashboard/test_cockpit_renderer.py tests/scripts/test_validate_dashboard_clicks_market_field.py tests/scripts/test_validate_market_field_story.py tests/scripts/test_build_agent_studio_market_field_fixture.py tests/scripts/test_validate_market_field_visual_acceptance.py tests/scripts/test_scan_public_artifacts.py tests/scripts/test_verify_hermes_package_contract.py -q` passed with `170 passed`.
+- Verified `python3 scripts/verify_hermes_package_contract.py --app-dir . --skip-python-imports` passed.
+- Verified `python3 -m py_compile scripts/scan_public_artifacts.py scripts/validate_market_field_visual_acceptance.py scripts/validate_market_field_story.py scripts/build_agent_studio_market_field_fixture.py scripts/verify_hermes_package_contract.py` passed.
+- Verified `git diff --check` passed.
 
 ## Gate
 
 The human direction gate is cleared.
 
-Reusable local story and visual verifier gates are cleared for the Agent Studio Market Field artifact.
+Reusable local story, visual verifier, and public-safety gates are cleared for the Agent Studio Market Field artifact.
 
 Phase 6 final visual acceptance is not cleared yet because the UI/UX SOP/design-authority dependency remains missing or unwaived.
 
-Next production work: restore/provide the UI/UX SOP path or explicitly waive it as temporary pilot design authority, then prepare the live deployment/staging gate.
+Next production work: restore/provide the UI/UX SOP path or explicitly waive it as temporary pilot design authority, then prepare and execute the live deployment/staging gate with public-safety scan against the deployed artifact.

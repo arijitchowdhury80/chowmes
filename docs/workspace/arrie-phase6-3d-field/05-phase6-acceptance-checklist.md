@@ -75,7 +75,7 @@ Five representative users must be able to answer without a builder explanation:
 - [ ] Public production HTML/JS contains no external CDN dependency.
 - [x] Any vendored 3D runtime has license and checksum recorded.
 - [x] Package verifier checks required 3D/runtime assets and reusable Market Field validation scripts.
-- [ ] Public safety scan rejects secret, local path, or private artifact leakage.
+- [x] Public safety scan rejects secret, local path, private artifact leakage, and forbidden external runtime hosts for the reusable Agent Studio artifact.
 - [ ] Deployment uses the CI-OS package path and preserves rollback.
 - [ ] Live dashboard click validation passes.
 
