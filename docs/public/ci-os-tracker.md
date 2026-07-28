@@ -64,6 +64,7 @@ Launch status: **Controlled monitored pilot released; observation window active*
 - Arijit accepted the Phase 7 human usefulness gate on 2026-07-28. Phase 8 may start.
 - Phase 8 controlled pilot release `cios-pilot-algolia-20260728-47ef4d5` deployed CI-OS commit `47ef4d565f00e8907c42280f62cf9943678805c4` to `/opt/cios/app`, preserved rollback bundle `/opt/cios/releases/rollback-before-phase8-20260728T141016Z-pre-2b88539.tar.gz`, created release bundle `/opt/cios/releases/47ef4d5.tar.gz` with SHA-256 `fcd7d6aee86a4a2fd9cdc26afbefda73651032ea6926fc5d877b36d1890009f7`, and passed package, operational safety, dashboard click, launch readiness, and controlled-pilot monitoring gates.
 - Phase 8 observation 2 corrected the public recommendation surfacing gap. CI-OS commit `b4d7423cff92b719dd48bc4b34af0ff21faefc16` is deployed to `/opt/cios/app`, release bundle `/opt/cios/releases/b4d7423.tar.gz` has SHA-256 `4ef05bc3466ffc36d4729eb2a375973a2128ba9f9ae0f71e32a25417b441cc31`, `https://ci.chowmes.com/data/argus-latest-run-status.json` now reports `recommendation_count=1`, and E2E launch readiness plus controlled-pilot monitoring pass against the served public status.
+- CI-OS commit `63f819b649fedf2625fad126dcd776fb5fe66788` added the Phase 8 pilot disposition artifact writer and deployed it to `/opt/cios/app`. Release bundle `/opt/cios/releases/63f819b.tar.gz` has SHA-256 `e121955765c9cbbb55406b6489522260c5828de6a111b21c7f2eb2bf8b20a323`; live package contract, operational safety, E2E launch readiness, and controlled-pilot monitoring pass. Pending disposition artifact: `/opt/cios/app/out/phase8/argus-recommendation-disposition-pending.json`.
 
 ## Current Gate
 
@@ -116,6 +117,9 @@ Phase 8 observation 1 is recorded in
 
 Phase 8 observation 2 is recorded in
 `docs/workspace/arrie-phase6-3d-field/20-phase8-observation-2.md`.
+
+Phase 8 recommendation disposition handoff is recorded in
+`docs/workspace/arrie-phase6-3d-field/21-phase8-disposition-handoff.md`.
 
 ## Related
 

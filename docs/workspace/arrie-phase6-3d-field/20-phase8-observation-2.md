@@ -13,7 +13,8 @@ Observation 2 is based on the corrected live controlled-pilot release and public
 - Review packet: `/opt/cios/app/out/phase8/argus-recommendation-review-packet.json`
 - Release record: `/opt/cios/app/out/cios-controlled-pilot-release.json`
 - Release ID: `cios-pilot-algolia-20260728-b4d7423`
-- Package commit: `b4d7423cff92b719dd48bc4b34af0ff21faefc16`
+- Package commit at observation time: `b4d7423cff92b719dd48bc4b34af0ff21faefc16`
+- Current follow-up release with disposition handoff: `63f819b649fedf2625fad126dcd776fb5fe66788`
 
 ## Correction From Observation 1
 
@@ -97,3 +98,5 @@ Run the next scheduled CI-OS daily cycle, then rerun:
 ```
 
 Phase 8 completion requires repeatable trusted decisions during the observation window and at least one named-team use, rejection, or amendment of the current Argus recommendation.
+
+Follow-up handoff for recording the final disposition is in `docs/workspace/arrie-phase6-3d-field/21-phase8-disposition-handoff.md`.
