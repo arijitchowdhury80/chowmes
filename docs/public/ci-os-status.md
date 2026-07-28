@@ -1,7 +1,7 @@
 ---
 title: CI-OS Project Status
 type: project-status
-status: phase-6-product-ia
+status: phase-7-e2e-validation
 updated: 2026-07-28
 ---
 
@@ -19,7 +19,7 @@ CI-OS is an Algolia-first Competitive Intelligence Operating System operated by 
 
 The target output is an evidence-backed recommendation for Product, Product Marketing, Sales, Content, or executive teams.
 
-Current product completion is approximately **60 percent**. The engineering scaffold is approximately **82 percent** complete. CI-OS is **not launch-ready**.
+Current product completion is approximately **70 percent**. The engineering scaffold is approximately **86 percent** complete. CI-OS is **not launch-ready**.
 
 ## What Has Been Built
 
@@ -44,7 +44,7 @@ Current product completion is approximately **60 percent**. The engineering scaf
 | Phase 0 baseline | Passed | Clean, published CI-OS recovery baseline. |
 | Phase 1 Hermes execution | Passed | Two consecutive real Hermes runs exited 0 as `cios`, with no permission error, timeout, orphan work, or ownership drift. |
 | Phase 2 publication | Passed | Fresh public run `cios-20260728T032901Z-3409872` published through the Hermes wrapper with matching public status and semantic dashboard run IDs. |
-| Deployed package | Verified | CI-OS commit `fa2f31f` is deployed for the demand-amendment handoff integration; package contract and source compile checks passed as `cios`. |
+| Deployed package | Verified | CI-OS commit `760f03c` is deployed at `/opt/cios/app`; package contract passed as `cios`. |
 | Competitor registry | Partial | 27 competitors represented. |
 | Source coverage | Current with one fetch failure | Latest Hermes wrapper run reported 42 active sources, 41 fetched, and 1 failed source fetch. |
 | Product reality | Passed for Phase 3 | Product Muscle queue is now `0` after verified Google Vertex AI Search, Lucidworks, Meilisearch, Bloomreach, and Athos evidence work. The latest served semantic dashboard has 12 feature-comparison rows and explicit unknown states where proof is absent. |
@@ -52,20 +52,20 @@ Current product completion is approximately **60 percent**. The engineering scaf
 | Audience demand | Passed with limited confidence | Agent Studio was explicitly accepted into the Argus demand plan, imported into the demand ledger, and refreshed. The live run now reports 101 demand signals, 1 rising demand topic, and partial plan coverage. Confidence remains limited because the accepted trend compares comparable but not identical Looker export families. |
 | Recommendations | Phase 5 passed with confidence caveat | Arijit accepted the Agent Studio recommendation for Product Marketing: turn the shipped Agent Studio capability into an evidence-backed market narrative before the demand window cools. |
 | Learning | Phase 5 proof passed | Acceptance was recorded as learning event `2` and approved improvement `3`; next-sweep plan, apply plan, approved policy, and policy audit are publicly available. |
-| Production UI | Market Field live gate passed | Market Field-first UX is live at `https://ci.chowmes.com/` and passed live click validation on release `cios-20260728T102723Z-manual-d6d4b6e`; broader Product IA remains pending. |
-| Launch readiness | Not ready | Product Muscle, Audience Demand, Market Field publication, and Argus recommendation learning are live-verified, but broader Product IA and final E2E gates remain open. |
+| Production UI | Phase 6 passed for controlled pilot | Market Field-first Product IA is live at `https://ci.chowmes.com/`, public artifact redaction and safety scan passed, and live click validation passed across desktop, tablet, and mobile on release `cios-20260728T122836Z-3951326`. |
+| Launch readiness | Not ready | Product Muscle, Audience Demand, Product IA, and Argus recommendation learning are live-verified for the controlled pilot, but final E2E validation and pilot release gates remain open. |
 
 ## What Comes Next
 
-1. Complete the remaining Product IA workflows beyond the live Market Field journey: Product Muscle Matrix, Conversation/Demand drilldowns, Pattern Board, Actions, Registry, Evidence Lab, and Command/Admin.
-2. Complete exhaustive frontend, backend, semantic, accessibility, security, and live-cron validation.
-3. Release a controlled Algolia pilot only after every gate passes.
+1. Complete exhaustive frontend, backend, semantic, accessibility, security, and live-cron validation.
+2. Run the corrected production launch gate and human acceptance pass.
+3. Release a controlled Algolia pilot only after Phase 7 passes.
 
 ## Next Gate
 
-Phase 6 is next. Argus must turn the accepted Market Field and recommendation spine into coherent Product IA workflows without losing the evidence-first, click-to-reveal model.
+Phase 7 is next. CI-OS must prove the complete system technically, semantically, visually, and operationally before the controlled Algolia pilot can be released.
 
-The latest served package is `b7c787d`. Agent Studio was explicitly amended into the Argus demand plan, imported as a traceable demand signal, refreshed into one recommendation, accepted by Arijit, and recorded into an approved learning policy. Phase 4 and Phase 5 are treated as passed with limited confidence, not perfect coverage. Recurring GA4 automation remains deferred.
+The latest served package is `760f03c`. Agent Studio was explicitly amended into the Argus demand plan, imported as a traceable demand signal, refreshed into one recommendation, accepted by Arijit, and recorded into an approved learning policy. Phase 4 and Phase 5 are treated as passed with limited confidence, not perfect coverage. Phase 6 is passed for the controlled pilot with a temporary design-authority waiver. Recurring GA4 automation remains deferred.
 
 ## Project Records
 

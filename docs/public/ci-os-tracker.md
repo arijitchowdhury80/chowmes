@@ -1,7 +1,7 @@
 ---
 title: CI-OS Completion Tracker
 type: project-tracker
-status: phase-6-active
+status: phase-7-active
 updated: 2026-07-28
 ---
 
@@ -9,9 +9,9 @@ updated: 2026-07-28
 
 Last verified: 2026-07-28 UTC
 
-Overall product completion: **60 percent**
+Overall product completion: **70 percent**
 
-Engineering scaffold completion: **82 percent**
+Engineering scaffold completion: **86 percent**
 
 Launch status: **Not ready**
 
@@ -25,8 +25,8 @@ Launch status: **Not ready**
 | 3. Product Muscle | Current Scout-backed product comparison | Passed |
 | 4. Audience Demand | Valid GA4 / Looker evidence plane | Passed with limited confidence |
 | 5. Argus Intelligence | Accepted cross-plane pattern, action, and learning | Passed with limited-confidence caveat |
-| 6. Product IA | Coherent Argus business workflows | Active; Market Field live gate passed, broader IA pending |
-| 7. End-to-end validation | Backend, frontend, semantic, UX, accessibility, and security proof | Pending |
+| 6. Product IA | Coherent Argus business workflows | Passed for controlled pilot with temporary design-authority waiver |
+| 7. End-to-end validation | Backend, frontend, semantic, UX, accessibility, and security proof | Active |
 | 8. Algolia pilot | Versioned, monitored, controlled release | Pending |
 
 ## Completed Foundations
@@ -59,15 +59,16 @@ Launch status: **Not ready**
 - CI-OS commit `fa2f31f` deployed the intermediate release `cios-20260728T101358Z-manual-fa2f31f`. The live dashboard and public handoff exposed the Agent Studio demand-plan amendment candidate while preserving `blocked_on_evidence`; live dashboard click validation passed after restoring the served competitor brief links.
 - CI-OS commit `d6d4b6e` added explicit demand-plan amendment support. Agent Studio was accepted into the Argus demand plan, imported into the demand ledger, refreshed through Argus, and served from release `cios-20260728T102723Z-manual-d6d4b6e`. The live run now has 101 demand signals, 1 rising demand topic, 3 patterns, and 1 generated recommendation; dashboard click validation passed after restoring served competitor brief links.
 - CI-OS commit `b7c787d` added the Phase 5 recommendation review packet exporter and recommendation acceptance recorder. Arijit accepted the Agent Studio recommendation for Product Marketing. The live DB recorded learning event `2` and approved improvement `3`; the generated next-sweep plan, apply plan, approved policy, and learning-policy audit are public at `https://ci.chowmes.com/data/`.
+- Phase 6 Product IA passed for the controlled pilot after CI-OS commit `760f03c` deployed to `/opt/cios/app`, public-store release `cios-20260728T122836Z-3951326` became current, public artifact redaction removed 216 internal references, the public safety scan passed with zero findings across 68 staged artifacts, hidden staging directories were removed from served release roots, and live dashboard click validation passed on `https://ci.chowmes.com/` across desktop, tablet, and mobile. Arijit's 2026-07-28 approval is recorded as the temporary pilot design-authority waiver; formal five-user comprehension and full accessibility studies move to post-pilot UX hardening.
 
 ## Current Gate
 
-The project is currently entering Phase 6 Product IA, with Phase 3 Product Muscle, Phase 4 Audience Demand, Phase 5 Argus Intelligence, and the Market Field live gate passed but broader Product IA still open:
+The project is currently entering Phase 7 E2E validation, with Phases 0 through 6 passed for the controlled pilot:
 
 1. Preserve the accepted Agent Studio recommendation and learning policy as Phase 5 evidence.
-2. Complete the remaining Product IA workflows: Product Muscle Matrix, Conversation/Demand drilldowns, Pattern Board, Actions, Registry, Evidence Lab, and Command/Admin.
-3. Preserve explicit unknown states in the feature matrix; unknown must not become absent.
-4. Keep the Market Field click-to-reveal model as the primary product spine.
+2. Preserve the Phase 6 Market Field click-to-reveal Product IA as the controlled-pilot spine.
+3. Run exhaustive backend, Hermes, semantic, frontend, UX, accessibility, security, and live proof.
+4. Do not start Phase 8 release until the corrected production launch gate and human acceptance pass.
 
 Phase 1 evidence is recorded in
 `docs/status/2026-07-14-ci-os-phase1-hermes-execution-gate.md`.
@@ -92,6 +93,10 @@ Phase 4 planned-demand evidence is recorded in
 
 Phase 5 recommendation and learning evidence is recorded in
 `docs/status/2026-07-28-ci-os-phase5-argus-recommendation-acceptance.md`.
+
+Phase 6 Product IA live deployment evidence is recorded in
+`docs/workspace/arrie-phase6-3d-field/12-live-deployment-and-click-validation.md` and
+`docs/workspace/arrie-phase6-3d-field/13-phase6-pilot-waiver-and-pass.md`.
 
 ## Related
 
