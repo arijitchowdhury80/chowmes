@@ -1,7 +1,7 @@
 # aRRIe Phase 6 True 3D Market Field Status
 
 Date: 2026-07-28
-Status: true 3D Product IA direction accepted; production interaction slice verified locally
+Status: true 3D Product IA direction accepted; Agent Studio story slice verified locally
 
 ## Scope
 
@@ -42,9 +42,12 @@ Build and validate a true 3D constellation-style Market Field prototype that use
 - `scripts/validate_dashboard_clicks.py` now requires `#market-field-3d`, checks canvas pixels, verifies selected hotspot state, and verifies Today / 7D / 30D / Custom state changes.
 - Verified `python3 -m pytest tests/dashboard/test_cockpit_renderer.py tests/scripts/test_validate_dashboard_clicks_market_field.py tests/scripts/test_verify_hermes_package_contract.py -q` passed.
 - Verified local Playwright browser smoke on `/tmp/cios-market-field-interactions.html`: second hotspot click updated selected read, facts, unknowns, selected graph nodes, 30D time state, proof drawer, canvas pixels, and produced no console errors.
+- CI-OS Agent Studio story slice implemented in the state builder: Market Field now emits product reality, market conversation, Audience Demand, Argus action, confidence-limit nodes/edges, and proof planes from the accepted recommendation evidence rather than only a generic top-pattern node.
+- Verified `python3 -m pytest tests/dashboard/test_market_field_view_model.py tests/dashboard/test_state_builder.py tests/dashboard/test_cockpit_renderer.py tests/scripts/test_validate_dashboard_clicks_market_field.py tests/scripts/test_verify_hermes_package_contract.py -q` passed.
+- Verified local Playwright browser smoke on `/tmp/cios-agent-studio-story.html`: Agent Studio product reality, market conversation, Audience Demand, Product Marketing action, confidence boundary, graph payload, canvas pixels, and console health all passed.
 
 ## Gate
 
 The human direction gate is cleared.
 
-Next production work: render the richer visual/intelligence story from real Agent Studio data, then resolve or explicitly waive the missing UI/UX SOP path before claiming final Phase 6 visual acceptance and live deployment.
+Next production work: run a full local dashboard validation artifact for the built Agent Studio story, then resolve or explicitly waive the missing UI/UX SOP path before claiming final Phase 6 visual acceptance and live deployment.
