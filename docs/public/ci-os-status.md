@@ -1,13 +1,13 @@
 ---
 title: CI-OS Project Status
 type: project-status
-status: recovery
-updated: 2026-07-13
+status: phase-3-product-muscle
+updated: 2026-07-27
 ---
 
 # CI-OS Project Status
 
-Last verified: 2026-07-13
+Last verified: 2026-07-27 ET / 2026-07-28 UTC
 
 ## Current Position
 
@@ -19,7 +19,7 @@ CI-OS is an Algolia-first Competitive Intelligence Operating System operated by 
 
 The target output is an evidence-backed recommendation for Product, Product Marketing, Sales, Content, or executive teams.
 
-Current product completion is approximately **35 percent**. The engineering scaffold is approximately **65 percent** complete. CI-OS is **not launch-ready**.
+Current product completion is approximately **45 percent**. The engineering scaffold is approximately **75 percent** complete. CI-OS is **not launch-ready**.
 
 ## What Has Been Built
 
@@ -31,40 +31,43 @@ Current product completion is approximately **35 percent**. The engineering scaf
 - Product Muscle and demand work queues.
 - Local administration for competitors, sources, product surfaces, demand, and runs.
 - Dashboard renderer and selected browser-validation journeys.
-- 1,184 passing local tests in the latest verified suite.
+- 1,251 passing local tests in the latest verified suite.
+- Dedicated `cios` application user, secure Hermes queue handoff, and delegated cgroup containment.
+- Run-bound public publication through the Hermes wrapper.
+- Manual Audience Demand ingestion from the approved Looker export path.
 
 ## Current Verified State
 
 | Area | Status | Current evidence |
 |---|---|---|
-| Phase 0 baseline | Passed | Clean CI-OS branch at `149e63c`; deployed package mapped to `13731ac` plus non-code status-note drift. |
-| Hermes daily execution | Blocked | Latest scheduled run failed because runtime output ownership drifted. |
+| Phase 0 baseline | Passed | Clean, published CI-OS recovery baseline. |
+| Phase 1 Hermes execution | Passed | Two consecutive real Hermes runs exited 0 as `cios`, with no permission error, timeout, orphan work, or ownership drift. |
+| Phase 2 publication | Passed | Fresh public run `cios-20260728T032901Z-3409872` published through the Hermes wrapper with matching public status and semantic dashboard run IDs. |
+| Deployed package | Verified | Commit `1fa7ac5` plus renderer hotfix from CI-OS commit `95caab9`; immutable archive and rollback-bundle drill passed for the Phase 1 baseline. |
 | Competitor registry | Partial | 27 competitors represented. |
-| Source coverage | Partial | 43 active sources reported checked; latest successful autonomous cycle is not proven. |
-| Product reality | Partial | 12 historical product events; current product-surface extraction is not proven. |
-| Market conversation | Present | 500 themes and 3 candidate patterns. |
-| Audience demand | Blocked | No ready GA4 / Looker source; 0 demand signals. |
-| Recommendations | Blocked | 0 current recommendations because required evidence is incomplete. |
+| Source coverage | Current | Latest Hermes run reports 43 active, 43 checked, and 0 failed sources. |
+| Product reality | Partial | Fresh run reports product evidence but next action is still product-surface extraction for Athos Commerce and the 200+ third-party publishers matrix cell. |
+| Market conversation | Present | 500 themes and 2 current candidate patterns. |
+| Audience demand | Connected manual feed | Fresh semantic data reports `demand_plane_status=processed` and `demand_signal_count=100`; recurring GA4 automation remains deferred. |
+| Recommendations | Blocked | 0 current recommendations because Product Muscle evidence is still incomplete. |
 | Learning | Unproven | No learning effect visible in the current run. |
 | Production UI | In redesign | Accepted Product Muscle IA is not yet the live application. |
-| Launch readiness | Failed | Public run status is blocked and the dashboard was not updated by the latest run. |
+| Launch readiness | Not ready | Publication is now fresh and run-bound, but Product Muscle, Argus recommendation quality, accepted IA, and E2E gates remain open. |
 
 ## What Comes Next
 
-1. Restore Hermes-owned scheduled execution.
-2. Make publication atomic, current-run bound, and safety-validated.
-3. Complete Scout-backed product and feature comparison.
-4. Connect GA4 / Looker audience-demand evidence.
-5. Prove one useful cross-plane Argus recommendation and one learning effect.
-6. Build the accepted Argus Read, Product Muscle Matrix, Conversation Heatmap, Demand Lens, Pattern Board, Actions, Registry, Evidence Lab, and Command/Admin workflows.
-7. Complete exhaustive frontend, backend, semantic, accessibility, security, and live-cron validation.
-8. Release a controlled Algolia pilot only after every gate passes.
+1. Complete Scout-backed product and feature comparison.
+2. Keep the manual Audience Demand feed as the pilot input while recurring GA4 automation is deferred.
+3. Prove one useful cross-plane Argus recommendation and one learning effect.
+4. Build the accepted Argus Read, Product Muscle Matrix, Conversation Heatmap, Demand Lens, Pattern Board, Actions, Registry, Evidence Lab, and Command/Admin workflows.
+5. Complete exhaustive frontend, backend, semantic, accessibility, security, and live-cron validation.
+6. Release a controlled Algolia pilot only after every gate passes.
 
 ## Next Gate
 
-The immediate gate is deliberately narrow: repair runtime ownership, harden output handling, and prove a complete scheduled Hermes run with no root intervention.
+Phase 3 is active. Product Muscle must produce current evidence or explicit unknown states for every active competitor and matrix cell.
 
-No additional product feature work should begin before that gate passes.
+The next live action is product-surface extraction for Athos Commerce and the 200+ third-party publishers matrix cell. Recurring GA4 automation is deferred and does not block Phase 3.
 
 ## Project Records
 

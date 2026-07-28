@@ -46,7 +46,7 @@ An identical failed action must not be repeated without new evidence or a change
 
 ## Current Execution Boundary
 
-Phase 0 passed on 2026-07-13 after the clean CI-OS branch and deployed runtime baseline were mapped. Phase 1 is active. Scout, GA4/Looker, Argus intelligence, and production UI work remain locked until their predecessor gates pass.
+Phase 0 passed on 2026-07-13 after the clean CI-OS branch and deployed runtime baseline were mapped. Phase 1 passed on 2026-07-14 after two consecutive real Hermes runs completed as `cios` with exit code 0, no permission errors, no timeout, no orphan work, no ownership drift, and fresh blocked diagnostics. Phase 2 passed on 2026-07-27 ET / 2026-07-28 UTC after a fresh Hermes-wrapper run published run-bound public status and semantic dashboard artifacts for `cios-20260728T032901Z-3409872`, with live click validation passing. Phase 3 Product Muscle is active. Audience Demand is connected through the manual Looker export path for the pilot; recurring GA4 automation is deferred until credentials are provided.
 
 ## Human Decision Boundaries
 

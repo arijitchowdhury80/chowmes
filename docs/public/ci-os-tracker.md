@@ -2,16 +2,16 @@
 title: CI-OS Completion Tracker
 type: project-tracker
 status: active
-updated: 2026-07-13
+updated: 2026-07-27
 ---
 
 # CI-OS Completion Tracker
 
-Last verified: 2026-07-13
+Last verified: 2026-07-27 ET / 2026-07-28 UTC
 
-Overall product completion: **35 percent**
+Overall product completion: **45 percent**
 
-Engineering scaffold completion: **65 percent**
+Engineering scaffold completion: **75 percent**
 
 Launch status: **Not ready**
 
@@ -20,10 +20,10 @@ Launch status: **Not ready**
 | Phase | Outcome | Status |
 |---|---|---|
 | 0. Contain and baseline | Clean, reviewable, versioned implementation | Passed |
-| 1. Restore Hermes execution | Healthy scheduled operating loop | Active: read-only preflight |
-| 2. Trustworthy publication | Atomic, fresh, run-bound release evidence | Pending |
-| 3. Product Muscle | Current Scout-backed product comparison | Pending |
-| 4. Audience Demand | Valid GA4 / Looker evidence plane | Pending external data source |
+| 1. Restore Hermes execution | Healthy scheduled operating loop | Passed |
+| 2. Trustworthy publication | Atomic, fresh, run-bound release evidence | Passed |
+| 3. Product Muscle | Current Scout-backed product comparison | Active |
+| 4. Audience Demand | Valid GA4 / Looker evidence plane | Connected manual feed; recurring GA4 deferred |
 | 5. Argus Intelligence | Accepted cross-plane pattern, action, and learning | Pending |
 | 6. Product IA | Coherent Argus business workflows | Pending |
 | 7. End-to-end validation | Backend, frontend, semantic, UX, accessibility, and security proof | Pending |
@@ -40,21 +40,34 @@ Launch status: **Not ready**
 - Public dashboard and competitor-specific brief scaffolding.
 - Broad local automated test suite.
 - Forensic status review and gated completion plan.
+- Two consecutive real Hermes runs as `cios`, both exit 0, with clean containment and ownership.
+- Immutable deployed package `1fa7ac5` and verified rollback bundle.
+- Fresh public run `cios-20260728T032901Z-3409872` published through the Hermes wrapper.
+- Live public run status and semantic dashboard agree on run ID.
+- Manual Looker Audience Demand feed processed with `demand_signal_count=100`.
+- Live dashboard click validation passed after the nav-contract hotfix from CI-OS commit `95caab9`.
 
 ## Current Gate
 
-The project is currently limited to runtime recovery work:
+The project is currently in Phase 3 Product Muscle:
 
-1. Restore Hermes-owned scheduled execution.
-2. Harden output handling and publication.
-3. Prove a complete scheduled run without manual intervention.
+1. Run current product-surface extraction for the unresolved competitor/capability cells.
+2. Resolve the Athos Commerce and 200+ third-party publishers matrix gap named by the fresh run.
+3. Mark every active competitor/matrix cell as supported, unknown, not applicable, blocked, or needs operator review.
+4. Prevent blank or unsupported matrix claims.
+5. Refresh Argus from the evidence ledger after extraction.
 
-Phase 0 baseline evidence is recorded in
-`docs/status/2026-07-13-ci-os-phase0-containment-baseline.md`.
+Phase 1 evidence is recorded in
+`docs/status/2026-07-14-ci-os-phase1-hermes-execution-gate.md`.
+
+Phase 2 evidence is recorded in
+`docs/status/2026-07-27-ci-os-phase2-publication-gate.md`.
 
 ## Next Gate
 
-After runtime recovery, CI-OS must bind every public artifact to one fresh run and prove publication safety before Product Muscle, Audience Demand, intelligence, or interface expansion resumes.
+CI-OS must complete Product Muscle before Argus intelligence, accepted IA, final E2E validation, and the controlled Algolia pilot can pass.
+
+Recurring GA4 automation remains deferred. It is not the current blocker because the pilot now has a processed manual Audience Demand feed.
 
 ## Related
 

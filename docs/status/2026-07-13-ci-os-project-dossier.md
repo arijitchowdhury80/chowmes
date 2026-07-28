@@ -1,7 +1,7 @@
 # CI-OS Project Dossier
 
-Date: 2026-07-13
-Status: recovery required
+Date: 2026-07-13; refreshed through 2026-07-27 ET / 2026-07-28 UTC
+Status: Phase 2 passed; Phase 3 active
 Product owner: Arijit Chowdhury
 Operating agent: Argus
 Runtime: Hermes / MyOS-Core
@@ -9,11 +9,11 @@ First tenant: Algolia
 
 ## Executive Position
 
-CI-OS is approximately 35 percent complete against the original product goal. The engineering scaffold is approximately 65 percent complete, but the product does not yet deliver a reliable, evidence-backed competitive decision loop.
+CI-OS is approximately 45 percent complete against the original product goal. The engineering scaffold is approximately 75 percent complete, but the product does not yet deliver a reliable, evidence-backed competitive decision loop.
 
-The system must not be called launch-ready. The latest real Hermes scheduled run failed, the latest public status is blocked, the inward demand plane has zero signals, the current product-surface status proves no extraction work, the live intelligence output contains zero recommendations, and the accepted Product Muscle IA remains a mockup rather than the production interface.
+The system must not be called launch-ready. Phase 1 passed after two consecutive real Hermes runs completed successfully as the dedicated `cios` application user. Phase 2 now also passed after fresh public artifacts were published through the Hermes wrapper with one run ID, live public JSON agreed with semantic dashboard data, and live dashboard click validation passed. The inward demand plane is connected through the approved manual Looker export path, but Product Muscle remains incomplete, the live intelligence output contains zero recommendations, and the accepted Product Muscle IA remains unfinished.
 
-The project has real foundations worth preserving. It also has a large amount of uncommitted, partially validated work that must be recovered into a controlled release sequence before more feature expansion.
+The retained implementation now has a clean, published branch, an immutable deployed package baseline, and a verified run-bound publication path. Feature expansion is now gated on current product evidence, intelligence quality, and the accepted product IA. Recurring GA4 automation remains deferred and is not the current Phase 3 blocker.
 
 ## Product Goal
 
@@ -41,11 +41,11 @@ The intended architecture remains correct:
 - GA4 / Looker is the inward audience-demand layer.
 - CI-OS must not modify Hermes core to solve domain problems.
 
-The reviewed implementation follows this boundary directionally. Production ownership, package release discipline, and run identity are not yet strong enough.
+The deployed implementation now enforces the runtime boundary: Hermes owns the schedule, `hermes` may only enqueue, and `cios` owns application execution inside a delegated cgroup. Package release discipline is established for Phase 1, and Phase 2 proved shared run identity plus run-bound publication on the fresh public run `cios-20260728T032901Z-3409872`.
 
 ## Verified Live State
 
-Evidence was refreshed directly from Chowmes on 2026-07-13.
+Evidence was refreshed directly from Chowmes through 2026-07-27 ET / 2026-07-28 UTC.
 
 ### Hermes run
 
@@ -55,22 +55,24 @@ Evidence was refreshed directly from Chowmes on 2026-07-13.
 | Schedule | `0 9 * * *`, America/New_York |
 | Execution mode | Hermes no-agent script |
 | Wrapper | `cios-daily.sh` |
-| Latest completed schedule | 2026-07-12 09:00 ET |
-| Result | Failed, exit code 1 |
-| Failure | Hermes could not remove root-owned output artifacts |
-| Autonomous daily loop | Not healthy |
+| Latest completed schedules | Phase 1 pair: 2026-07-14 03:49 ET and 04:05 ET; latest Phase 2 verification run: 2026-07-27 23:29 ET |
+| Request IDs | Phase 1: `a70f4e219d294280a26703962c9be4e9`, `1b938c9de92f4568a059bdb84d3f9e6b`; Phase 2 public run: `cios-20260728T032901Z-3409872` |
+| Results | Exit code 0 for the Phase 1 pair and the latest Phase 2 verification run |
+| Runtime owner | `cios`, reached through the Hermes queue handoff |
+| Autonomous daily loop | Phase 2 publication path verified; Phase 3 Product Muscle active |
 
-The failure is not a cosmetic dashboard problem. Root/manual repair paths recreated root-owned files, so the Hermes runtime user could not begin the next scheduled cycle. Public artifacts may look newer than the last successful Hermes run because manual/root paths refreshed them.
+Both runs completed without root intervention, permission errors, timeout, orphan work, or ownership drift. The systemd service and delegated cgroup were empty after each run, and post-run hashes remained stable. Full evidence is recorded in `docs/status/2026-07-14-ci-os-phase1-hermes-execution-gate.md`.
 
 ### Public run status
 
 | Item | Verified state |
 |---|---|
-| Status | `blocked_on_evidence` |
-| Publish status | `blocked` |
-| Generated at | `2026-07-13T01:51:21.937836Z` |
-| Public dashboard updated | false |
-| Next Hermes action | Configure GA4 or upload a demand export |
+| Status | `published` |
+| Publish status | `published` |
+| Generated at | `2026-07-28T03:39:54.169253Z` |
+| Public dashboard updated | true |
+| Run ID | `cios-20260728T032901Z-3409872` |
+| Next Hermes action | Run product-surface extraction for Athos Commerce and the 200+ third-party publishers matrix cell |
 
 ### Evidence planes
 
@@ -78,22 +80,22 @@ The failure is not a cosmetic dashboard problem. Root/manual repair paths recrea
 |---|---:|---|
 | Monitored competitors | 27 | Registry exists and is represented publicly. |
 | Active sources | 43 | Reported active in current public state. |
-| Checked sources | 43 | Reported checked by a manual/root refreshed artifact, not a successful scheduled run. |
+| Checked sources | 43 | Verified by the latest successful Hermes-triggered run. |
 | Blocked sources | 5 | Present in the public source ledger. |
 | Failed active sources | 0 | Current artifact reports none. |
-| Product events | 12 | Ledger contains product evidence. |
+| Product events | 500 | Fresh semantic dashboard reports product events, but Product Muscle still has unresolved matrix gaps. |
 | Current product-surface targets | 38 | Targets are registered. |
 | Current product-surface planned | 0 | Current status does not prove execution. |
 | Current product-surface succeeded | 0 | Current status does not prove execution. |
 | Current product rows extracted | 0 | Current status does not prove execution. |
 | Companies missing product muscle | 11 | Product comparison remains incomplete. |
 | Conversation themes | 500 | Market-conversation evidence exists. |
-| Demand signals | 0 | No ready GA4 / Looker source. |
-| Patterns | 3 | Deterministic pattern primitives produced output. |
+| Demand signals | 100 | Manual Looker Audience Demand feed is processed in the fresh public run. |
+| Patterns | 2 | Deterministic pattern primitives produced output in the latest fresh run. |
 | Recommendations | 0 | No promoted action because evidence is incomplete. |
 | Consumed learnings | 0 | Learning effect on the current run is not proven. |
 
-Blocking the recommendation plane while demand is absent is the correct behavior. The problem is that the required inward evidence has still not been connected.
+Blocking the recommendation plane while Product Muscle remains incomplete is the correct behavior. The demand plane is now connected for the pilot through the manual Looker export path; recurring GA4 automation remains deferred.
 
 ## Repository State
 
@@ -101,19 +103,20 @@ Verified local CI-OS repository state:
 
 | Item | State |
 |---|---|
-| Branch | `codex/ci-os-phase0-baseline` |
-| Latest commit | `149e63c` |
+| Branch | `codex/ci-os-phase1-runtime` |
+| Branch documentation head | `dea1816` |
+| Deployed code commit | `1fa7ac5` |
 | Git remote | `https://github.com/arijitchowdhury80/algolia-competitive-intelligence.git` |
 | Tracked files changed | 0 |
 | Tracked diff | 0 |
 | Untracked source files | 0 |
-| Full local test suite | 1,184 passed, 1 skipped, 23 deselected |
+| Full local test suite | 1,251 passed, 3 skipped, 23 deselected |
 | Whitespace check | Passed |
-| Deployed package mapping | Code maps to `13731ac` plus non-code status-note drift |
+| Deployed package mapping | Immutable archive maps to `1fa7ac5` |
 
-The test suite proves that the current local test contract passes. It does not prove the live Hermes path, current evidence, UI usability, or production publication contract.
+The test suite and two live runs prove the Phase 1 runtime contract. They do not yet prove Phase 2 atomic publication, Product Muscle completeness, demand evidence, intelligence usefulness, UI usability, or pilot readiness.
 
-The repository remote and Phase 0 branch ownership have been reconciled. The deployed runtime package is an older copied bundle; its executable source maps to `13731ac`, while the current source branch head is `149e63c`.
+The authoritative remote and branch ownership are reconciled. Commit `dea1816` adds the verified Phase 1 workflow record only; it does not change the deployed code. The deployed archive is `/opt/cios/releases/1fa7ac5.tar.gz` with SHA-256 `63b3c56e7129c8c710e895d29c72a57c02986ef92bdfa10afbe162b275da255c`; its rollback-bundle drill passed without changing the live service.
 
 ## Implemented Capability Inventory
 
@@ -131,11 +134,11 @@ The repository remote and Phase 0 branch ownership have been reconciled. The dep
 - Manual demand upload and GA4 readiness controls.
 - Learning event, challenge, proposal, and apply-plan artifacts.
 - Hermes package wrapper and cron registration.
+- Reliable Hermes-owned execution through the dedicated `cios` application user.
 - Public dashboard renderer and selected Playwright interaction checks.
 
 ### Partially implemented or unproven
 
-- Reliable Hermes-owned daily execution.
 - Current-run Scout product-surface extraction.
 - Product feature comparison across every active competitor.
 - GA4 / Looker ingestion with validated demand coverage.
@@ -164,21 +167,21 @@ The repository remote and Phase 0 branch ownership have been reconciled. The dep
 
 | Workstream | Completion | Current judgment |
 |---|---:|---|
-| Hermes extension boundary | 65% | Boundary exists; package release and ownership need control. |
-| Hermes scheduled execution | 15% | Job exists; latest real scheduled run failed. |
+| Hermes extension boundary | Phase 1 passed | Hermes schedules, `hermes` enqueues, and `cios` executes without modifying Hermes core. |
+| Hermes scheduled execution | Phase 1 passed | Two consecutive real runs exited 0 with clean containment and ownership. |
 | Competitor and source registry | 55% | Data/admin/public roster exist; onboarding proof incomplete. |
-| Daily outward collection | 45% | Coverage can be reported; autonomous reliability is unproven. |
+| Daily outward collection | 55% | Coverage can be reported and the latest Hermes-wrapper publication run exited 0. |
 | Scout product muscle | 30% | Model and queues exist; current extraction proof is absent. |
-| GA4 / Looker demand | 10% | Plumbing exists; no production demand signals. |
-| Pattern intelligence | 25% | Three patterns exist; cross-plane validation is incomplete. |
+| GA4 / Looker demand | 60% | Manual Looker export is processed with 100 demand signals; recurring GA4 automation is deferred. |
+| Pattern intelligence | 30% | Patterns exist; cross-plane validation is incomplete. |
 | Recommendations | 10% | Structures exist; current output is zero. |
 | Frontend IA and usability | 20% | Existing UI is not the accepted Product Muscle IA. |
 | History, heatmap, semantic views | 30% | Surfaces exist; business validity is not acceptance-tested. |
 | Learning loop | 25% | Artifacts exist; downstream run impact is unproven. |
-| E2E and launch validation | 35% | Broad tests exist; gate and UI coverage have major blind spots. |
-| Version control and release hygiene | 60% | Clean branch and deployed baseline exist; production still needs release-recorded deploy discipline. |
+| E2E and launch validation | 45% | Broad tests exist; live click validation now passes, but full launch validation remains open. |
+| Version control and release hygiene | 70% | Clean branch, deployed baseline, Phase 2 status evidence, and renderer hotfix backup exist; production still needs full release-recorded deploy discipline. |
 
-Weighted product completion: approximately 35 percent.
+Weighted product completion: approximately 45 percent.
 
 ## Critical Code And Operational Findings
 
@@ -222,16 +225,15 @@ Without these answers, the application remains monitoring and plumbing rather th
 
 ## Remaining Deliverables
 
-1. A healthy Hermes-owned scheduled loop with no root/manual production path.
-2. Safe staging, atomic publication, current-run identity, and trustworthy launch evidence.
-3. Scout extraction across active product surfaces and a validated feature/capability matrix.
-4. A real GA4 or Looker demand source with topic coverage and time-series signals.
-5. Cross-plane patterns with explicit support, contradiction, confidence, and unknowns.
-6. Specific recommendations with owner, urgency, evidence, and generated work products.
-7. A proven learning loop whose instruction changes the following run.
-8. The accepted Argus Product Muscle IA implemented as one coherent product.
-9. Exhaustive backend, frontend, accessibility, semantic, security, and live cron E2E validation.
-10. A clean, versioned, reviewable release and an evidence-backed pilot gate.
+1. Safe staging, atomic publication, current-run identity, and trustworthy launch evidence.
+2. Scout extraction across active product surfaces and a validated feature/capability matrix.
+3. A real GA4 or Looker demand source with topic coverage and time-series signals.
+4. Cross-plane patterns with explicit support, contradiction, confidence, and unknowns.
+5. Specific recommendations with owner, urgency, evidence, and generated work products.
+6. A proven learning loop whose instruction changes the following run.
+7. The accepted Argus Product Muscle IA implemented as one coherent product.
+8. Exhaustive backend, frontend, accessibility, semantic, security, and live cron E2E validation.
+9. A clean, versioned, reviewable release and an evidence-backed pilot gate.
 
 ## Dependencies And Decisions
 
@@ -240,7 +242,6 @@ Without these answers, the application remains monitoring and plumbing rather th
 - Provide or authorize a GA4 / Looker export or connector for the Algolia tenant.
 - Confirm who may access public CI-OS status versus internal evidence and admin data.
 - Approve the first human-reviewed recommendation as useful enough to operationalize.
-- Provide a deploy/release owner for future promotion from the clean CI-OS branch to `/root/.hermes/apps/cios`.
 
 ### System dependencies
 
