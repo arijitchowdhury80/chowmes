@@ -1,7 +1,7 @@
 ---
 title: CI-OS Completion Tracker
 type: project-tracker
-status: phase-8-controlled-pilot-released
+status: phase-8-controlled-pilot-complete
 updated: 2026-07-28
 ---
 
@@ -9,11 +9,11 @@ updated: 2026-07-28
 
 Last verified: 2026-07-28 UTC
 
-Overall product completion: **80 percent**
+Overall product completion: **85 percent**
 
 Engineering scaffold completion: **90 percent**
 
-Launch status: **Controlled monitored pilot released; observation window active**
+Launch status: **Controlled monitored pilot complete**
 
 ## Phase Status
 
@@ -27,7 +27,7 @@ Launch status: **Controlled monitored pilot released; observation window active*
 | 5. Argus Intelligence | Accepted cross-plane pattern, action, and learning | Passed with limited-confidence caveat |
 | 6. Product IA | Coherent Argus business workflows | Passed for controlled pilot with temporary design-authority waiver |
 | 7. End-to-end validation | Backend, frontend, semantic, UX, accessibility, and security proof | Passed |
-| 8. Algolia pilot | Versioned, monitored, controlled release | Released; observation window active |
+| 8. Algolia pilot | Versioned, monitored, controlled release | Passed |
 
 ## Completed Foundations
 
@@ -70,15 +70,17 @@ Launch status: **Controlled monitored pilot released; observation window active*
 - CI-OS commit `8aff99a26a6f4825e682f4be31b4fd4c223507e6` added a public-safe publisher for the Phase 8 Product Marketing artifact and deployed it to `/opt/cios/app`. Release bundle `/opt/cios/releases/8aff99a.tar.gz` has SHA-256 `54125d5bf8dd85ee2cba654d688a96509fdfe4b6c3ea60ade79df83adaf70715`. The public manifest is now reachable at `https://ci.chowmes.com/data/phase8/argus-phase8-work-artifacts.json`, with the Markdown brief at `https://ci.chowmes.com/data/phase8/argus-pmm-narrative-brief.md`. The served public safety scan passes with zero findings; live operational safety, E2E launch readiness, and controlled-pilot monitoring pass; the exit checker still correctly fails on `named_team_disposition_final`.
 - CI-OS commit `2a4923973857ac035ba53b58168792ffb85c3fa2` hardened the daily wrapper so Phase 8 PMM work artifacts are generated and published through the staged public release path whenever a current reviewable recommendation exists. Release bundle `/opt/cios/releases/2a49239.tar.gz` has SHA-256 `0a7224a914aab459f7409f3e870d51865b22305e06fdc066dfe1f704fdc5fb28`. Package contract, served public safety scan, live operational safety, E2E launch readiness, and controlled-pilot monitoring pass; the exit checker still correctly fails on `named_team_disposition_final`.
 - CI-OS commit `8c39f15` added and deployed a public-safe Phase 8 PMM disposition request beside the PMM work artifact. Release bundle `/opt/cios/releases/8c39f15.tar.gz` has SHA-256 `84a1c27db3ee1386737964b954be6bae99816dcdf055c66100703c14473e3493`. The public manifest now links `https://ci.chowmes.com/data/phase8/argus-pmm-disposition-request.md`; package contract, public redaction, public safety scan, live operational safety, live dashboard click validation, E2E launch readiness, and controlled-pilot monitoring pass. The exit checker now fails only on `named_team_disposition_final`, with current recommendation `2` matching the pending disposition.
+- CI-OS commit `e02d680` hardened the daily wrapper interrupt path so the active daily runner and watchdog are cleaned on `EXIT`, `INT`, `HUP`, and `TERM`. Release bundle `/opt/cios/releases/e02d680.tar.gz` has SHA-256 `34b5f8e15fd0238d586759ce36f0b820cdf6f6c764b3d2c846ffc683ecb04fac`. Local wrapper/preflight tests passed, the controlled VPS interrupt smoke test passed, live operational safety passed with `orphan_process_count=0`, and E2E launch readiness plus controlled-pilot monitoring still pass. The exit checker still fails only on `named_team_disposition_final`.
+- Arijit approved the final Phase 8 PMM disposition on 2026-07-28. Product Marketing disposition for recommendation `2` is recorded as `used`, with the concrete use case of using the Phase 8 PMM narrative brief as pilot PMM input for Agent Studio launch-defense messaging. `/opt/cios/app/out/phase8/cios-phase8-exit.json` now reports `status=pass`, `phase8_exit_evidence=true`, and `blockers=[]`.
 
 ## Current Gate
 
-The project has released the controlled monitored Algolia pilot, with Phases 0 through 7 passed:
+The project has completed the controlled monitored Algolia pilot, with Phases 0 through 8 passed:
 
 1. Preserve the accepted Agent Studio recommendation and learning policy as Phase 5 evidence.
 2. Preserve the Phase 6 Market Field click-to-reveal Product IA as the controlled-pilot spine.
 3. Preserve the Phase 7 production validation artifact at `docs/workspace/arrie-phase6-3d-field/16-phase7-technical-e2e-gate.md`.
-4. Run the observation window and record real recommendation usage, rejection, or amendment for current PMM recommendation `2`.
+4. Preserve the final Product Marketing `used` disposition for current PMM recommendation `2`.
 
 Phase 1 evidence is recorded in
 `docs/status/2026-07-14-ci-os-phase1-hermes-execution-gate.md`.
@@ -94,9 +96,9 @@ Market Field UX gate evidence is recorded in
 
 ## Next Gate
 
-CI-OS must complete the controlled Algolia pilot observation window before the full goal can pass.
+The CI-OS completion goal can close. Post-pilot work should move into a new UX hardening and productization goal.
 
-Recurring GA4 automation remains deferred. The current work is Phase 8 observation, recommendation usage proof, and learning review.
+Recurring GA4 automation remains deferred.
 
 Phase 4 planned-demand evidence is recorded in
 `docs/status/2026-07-28-ci-os-phase4-audience-demand-evaluation.md`.
@@ -140,6 +142,12 @@ Phase 8 repeatable PMM artifact publication is recorded in
 
 Phase 8 PMM disposition request publication is recorded in
 `docs/workspace/arrie-phase6-3d-field/26-phase8-disposition-request-publication.md`.
+
+Phase 8 wrapper interrupt cleanup is recorded in
+`docs/workspace/arrie-phase6-3d-field/27-phase8-wrapper-interrupt-cleanup.md`.
+
+Phase 8 final disposition and exit evidence is recorded in
+`docs/workspace/arrie-phase6-3d-field/28-phase8-final-disposition-and-exit.md`.
 
 ## Related
 
