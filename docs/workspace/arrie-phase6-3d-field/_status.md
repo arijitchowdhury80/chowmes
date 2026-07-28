@@ -1,7 +1,7 @@
 # aRRIe Phase 6 True 3D Market Field Status
 
 Date: 2026-07-28
-Status: true 3D Product IA direction accepted; production guardrail slice active
+Status: true 3D Product IA direction accepted; production shell slice verified locally
 
 ## Scope
 
@@ -32,9 +32,15 @@ Build and validate a true 3D constellation-style Market Field prototype that use
 - Phase 6 acceptance checklist written.
 - 3D runtime dependency review written, including Three.js `0.160.0` license, integrity, tarball checksum, candidate vendoring path, CDN rejection rule, and production validation requirements.
 - Human direction gate accepted by Arijit on 2026-07-28: true 3D constellation Market Field is the Product IA spine for production implementation.
+- CI-OS production guardrail slice committed: vendored Three.js runtime, license/checksum manifest, package verifier required paths, checksum validation, and CDN rejection coverage.
+- CI-OS production shell slice implemented: `#market-field-3d` canvas, serialized Market Field graph JSON, reviewed runtime metadata, and deterministic canvas rendering from existing graph state.
+- Verified `python3 -m pytest tests/dashboard/test_cockpit_renderer.py -q` passed.
+- Verified `python3 -m pytest tests/scripts/test_verify_hermes_package_contract.py -q` passed.
+- Verified `python3 scripts/verify_hermes_package_contract.py --app-dir . --skip-python-imports` passed.
+- Verified local Playwright browser smoke on `/tmp/cios-market-field-shell.html`: canvas exists, pixel probe nonblank, no console errors.
 
 ## Gate
 
 The human direction gate is cleared.
 
-Next production work: implement the vendored runtime guardrails with TDD, then implement the first production 3D Market Field slice in CI-OS.
+Next production work: connect the 3D shell to hotspot/time/proof interactions with Playwright coverage, then resolve or explicitly waive the missing UI/UX SOP path before claiming final Phase 6 visual acceptance.
