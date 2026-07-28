@@ -46,8 +46,8 @@ Current product completion is approximately **45 percent**. The engineering scaf
 | Deployed package | Verified | Commit `1fa7ac5` plus renderer hotfix from CI-OS commit `95caab9`; immutable archive and rollback-bundle drill passed for the Phase 1 baseline. |
 | Competitor registry | Partial | 27 competitors represented. |
 | Source coverage | Current | Latest Hermes run reports 43 active, 43 checked, and 0 failed sources. |
-| Product reality | Partial | Phase 3 repaired the first Athos Commerce product-muscle gap and removed the `A/B Testing & Optimization` item from the queue; 39 limiting matrix items remain. |
-| Market conversation | Present | 500 themes and 2 current candidate patterns. |
+| Product reality | Partial | Phase 3 resolved the first two Athos Commerce product-muscle gaps, removing `A/B Testing & Optimization` and `100s+ Robust Integrations` from the queue; 39 limiting matrix items remain after regeneration. |
+| Market conversation | Present | 500 themes and 3 current candidate patterns. |
 | Audience demand | Connected manual feed | Fresh semantic data reports `demand_plane_status=processed` and `demand_signal_count=100`; recurring GA4 automation remains deferred. |
 | Recommendations | Blocked | 0 current recommendations because Product Muscle evidence is still incomplete. |
 | Learning | Unproven | No learning effect visible in the current run. |
@@ -67,7 +67,7 @@ Current product completion is approximately **45 percent**. The engineering scaf
 
 Phase 3 is active. Product Muscle must produce current evidence or explicit unknown states for every active competitor and matrix cell.
 
-The next live actions are the remaining Product Muscle queue items, starting with Athos Commerce capability gaps for `100s+ Robust Integrations`, `30-day Free Trial`, and `99.99% Uptime SLA`. Recurring GA4 automation is deferred and does not block Phase 3.
+The next live actions are the remaining Product Muscle queue items, starting with Athos Commerce capability gaps for `1:1 AI Personalization`, `1:1 Personalized Search Results`, and `30-day Free Trial`. Recurring GA4 automation is deferred and does not block Phase 3.
 
 ## Project Records
 

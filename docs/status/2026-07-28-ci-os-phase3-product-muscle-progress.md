@@ -1,10 +1,10 @@
 # CI-OS Phase 3 Product Muscle Progress
 
 Date: 2026-07-28 UTC
-Status: Phase 3 active; first Product Muscle repair verified
+Status: Phase 3 active; first Product Muscle repair and second Product Muscle extraction verified
 Tenant: Algolia
 
-## What Was Verified
+## First Verified Movement
 
 After the Phase 2 publication gate passed, the fresh public run named an Athos Commerce product-muscle gap as the next Hermes action. The first direct product-surface extraction for Athos Commerce and `A/B Testing & Optimization` returned `status=empty`, so the repair path was run for the same competitor.
 
@@ -52,6 +52,42 @@ Live dashboard click validation passed after this run:
 
 The repaired `Athos Commerce` / `A/B Testing & Optimization` work item is no longer present in the Product Muscle queue.
 
+## Second Verified Movement
+
+The next queue item after the first repair was `Athos Commerce` / `100s+ Robust Integrations`. Direct product-surface extraction succeeded without requiring the repair path.
+
+| Item | Verified value |
+|---|---|
+| Competitor | Athos Commerce |
+| Target capability | `100s+ Robust Integrations` |
+| Extraction result | `status=ready` |
+| Product plane status | `ready` |
+| Command status | `ok` |
+| Return code | 0 |
+| Scout export | `/tmp/cios-product-market/algolia/surface-exports/000222-athos-commerce-pricing.json` |
+| Source URL | `https://athoscommerce.com/pricing` |
+| Product events after extraction refresh | 12 |
+| Feature positions after extraction refresh | 12 |
+
+The Hermes wrapper was run again after this extraction. It completed with exit code 0 and published another fresh public run.
+
+| Item | Verified value |
+|---|---|
+| Latest public run ID | `cios-20260728T041240Z-3510681` |
+| Status | `published` |
+| Publish status | `published` |
+| Generated at | `2026-07-28T04:26:03.661856Z` |
+| Public dashboard updated | true |
+| Semantic dashboard run ID match | true |
+| Demand plane status | `processed` |
+| Demand signal count | 100 |
+| Pattern count | 3 |
+| Recommendation count | 0 |
+
+Live dashboard click validation passed again after this run.
+
+The `Athos Commerce` / `100s+ Robust Integrations` work item is no longer present in the Product Muscle queue.
+
 The queue still reports:
 
 | Item | Verified value |
@@ -60,16 +96,16 @@ The queue still reports:
 | Blocking items | 0 |
 | Limiting items | 39 |
 
-The current top queue items are now:
+After the second movement, the current top queue items are now:
 
-1. Athos Commerce / `100s+ Robust Integrations`
-2. Athos Commerce / `30-day Free Trial`
-3. Athos Commerce / `99.99% Uptime SLA`
-4. Bloomreach / `100s+ Robust Integrations`
-5. Bloomreach / `30-day Free Trial`
-6. Bloomreach / `99.99% Uptime SLA`
-7. Constructor / `100s+ Robust Integrations`
-8. Constructor / `30-day Free Trial`
+1. Athos Commerce / `1:1 AI Personalization`
+2. Athos Commerce / `1:1 Personalized Search Results`
+3. Athos Commerce / `30-day Free Trial`
+4. Bloomreach / `1:1 AI Personalization`
+5. Bloomreach / `1:1 Personalized Search Results`
+6. Bloomreach / `30-day Free Trial`
+7. Constructor / `1:1 AI Personalization`
+8. Constructor / `1:1 Personalized Search Results`
 
 ## Gate Judgment
 
