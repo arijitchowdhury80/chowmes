@@ -1,7 +1,7 @@
 # CI-OS Phase 3 Product Muscle Progress
 
 Date: 2026-07-28 UTC
-Status: Phase 3 active; first Product Muscle repair, second Product Muscle extraction, and third Product Muscle repair verified
+Status: Phase 3 active; four Product Muscle movements verified
 Tenant: Algolia
 
 ## First Verified Movement
@@ -122,6 +122,41 @@ Live dashboard click validation passed again after this run.
 
 The `Athos Commerce` / `1:1 AI Personalization` work item is no longer present in the Product Muscle queue.
 
+## Fourth Verified Movement
+
+The next queue item after the third movement was `Athos Commerce` / `100s+ robust integrations & Open APIs`. Direct product-surface extraction succeeded without requiring the repair path.
+
+| Item | Verified value |
+|---|---|
+| Competitor | Athos Commerce |
+| Target capability | `100s+ robust integrations & Open APIs` |
+| Extraction result | `status=ready` |
+| Product plane status | `ready` |
+| Command status | `ok` |
+| Return code | 0 |
+| Scout export | `/tmp/cios-product-market/algolia/surface-exports/000222-athos-commerce-pricing.json` |
+| Product events after extraction refresh | 12 |
+| Feature positions after extraction refresh | 12 |
+
+The Hermes wrapper was run again after this extraction. It completed with exit code 0 and published another fresh public run.
+
+| Item | Verified value |
+|---|---|
+| Latest public run ID | `cios-20260728T044324Z-3552802` |
+| Status | `published` |
+| Publish status | `published` |
+| Generated at | `2026-07-28T05:05:13.246801Z` |
+| Public dashboard updated | true |
+| Semantic dashboard run ID match | true |
+| Demand plane status | `processed` |
+| Demand signal count | 100 |
+| Pattern count | 2 |
+| Recommendation count | 0 |
+
+Live dashboard click validation passed again after this run.
+
+The `Athos Commerce` / `100s+ robust integrations & Open APIs` work item is no longer present in the Product Muscle queue.
+
 The queue still reports:
 
 | Item | Verified value |
@@ -130,16 +165,16 @@ The queue still reports:
 | Blocking items | 0 |
 | Limiting items | 39 |
 
-After the third movement, the current top queue items are now:
+After the fourth movement, the current top queue items are now:
 
-1. Athos Commerce / `100s+ robust integrations & Open APIs`
-2. Athos Commerce / `A/B Testing`
-3. Athos Commerce / `ABRA`
-4. Bloomreach / `100s+ robust integrations & Open APIs`
-5. Bloomreach / `A/B Testing`
-6. Bloomreach / `ABRA`
-7. Constructor / `100s+ robust integrations & Open APIs`
-8. Constructor / `A/B Testing`
+1. Athos Commerce / `A/B Testing`
+2. Athos Commerce / `ABRA`
+3. Athos Commerce / `Account & Billing Management`
+4. Bloomreach / `A/B Testing`
+5. Bloomreach / `ABRA`
+6. Bloomreach / `Account & Billing Management`
+7. Constructor / `A/B Testing`
+8. Constructor / `ABRA`
 
 ## Gate Judgment
 
