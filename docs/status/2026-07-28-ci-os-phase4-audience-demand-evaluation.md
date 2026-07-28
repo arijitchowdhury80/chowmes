@@ -66,6 +66,14 @@ The available Looker exports do contain off-plan audience movement:
 
 Agent Studio is meaningful audience demand, but it is not in the active Argus demand plan. It cannot pass Phase 4 unless the Argus demand plan is explicitly amended to include Agent Studio or the product/conversation work order is refreshed so Agent Studio becomes a planned topic.
 
+The evaluator now emits a plan-amendment candidate CSV when off-plan movement qualifies. The real run produced one candidate:
+
+| Candidate | Current sessions | Previous sessions | Change | Suggested filters | Caveat |
+|---|---:|---:|---:|---|---|
+| Agent Studio | 1,619 | 751 | 1.1558 | Agent Studio; agentic ai; ai agent; ai agents | Comparison quality is `comparable_limited` because current landing-page metrics are compared to previous landing-page device sessions. |
+
+This candidate should be treated as a work-order amendment proposal, not as a passed gate by itself.
+
 ## Next Required Action
 
 One of these must happen before Phase 4 can pass:
@@ -84,11 +92,13 @@ Commands run from `/Users/arijitchowdhury/Dropbox/AI-Development/CI-OS`:
 python3 -m pytest tests/scripts/test_evaluate_argus_planned_demand_exports.py -q
 python3 -m py_compile scripts/evaluate_argus_planned_demand_exports.py
 python3 scripts/evaluate_argus_planned_demand_exports.py --plan /tmp/argus-demand-plan-template.csv --data-dir data --output /tmp/argus-planned-demand-evaluation.json --prepared-output /tmp/argus-planned-demand-prepared.csv
+python3 scripts/evaluate_argus_planned_demand_exports.py --plan /tmp/argus-demand-plan-template.csv --data-dir data --output /tmp/argus-planned-demand-evaluation.json --prepared-output /tmp/argus-planned-demand-prepared.csv --amendment-output /tmp/argus-demand-plan-amendment-candidates.csv
 ```
 
 Results:
 
-- evaluator tests: `3 passed`
+- evaluator tests: `4 passed`
 - compile check: passed
 - real evaluation exit code: `2`, expected for a failed phase gate
 - prepared demand CSV contained header only because no planned topic passed
+- amendment candidate CSV contained one proposed candidate, Agent Studio

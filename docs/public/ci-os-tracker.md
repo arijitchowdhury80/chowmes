@@ -55,7 +55,7 @@ Launch status: **Not ready**
 - Product-surface extraction was hardened against cookie-consent and privacy-policy boilerplate in CI-OS commit `b55979e`; the Athos platform extraction that previously produced 8 bad cookie rows now correctly returns empty.
 - Bloomreach Discovery product evidence was extracted and ingested from `https://www.bloomreach.com/en/products/discovery`; the current served release `cios-20260728T0928Z-manual-b55979e` has 12 feature-comparison rows, 25 Market Field nodes, and a Product Muscle work queue reduced to 3 limiting items.
 - Google Vertex AI Search, Lucidworks, and Meilisearch product-surface extractions succeeded and were ingested; the current served release `cios-20260728T0934Z-manual-b55979e` has a Product Muscle work queue of `0`.
-- Phase 4 planned-demand evaluation ran against the active live Argus demand plan and local Looker exports. It inspected 12 active planned topics and 11,057 metric rows; no planned topic had matching current demand rows, so the Phase 4 gate remains open. Off-plan Agent Studio demand was detected, but it is not current gate evidence until the Argus plan is explicitly refreshed or amended.
+- Phase 4 planned-demand evaluation ran against the active live Argus demand plan and local Looker exports. It inspected 12 active planned topics and 11,057 metric rows; no planned topic had matching current demand rows, so the Phase 4 gate remains open. Off-plan Agent Studio demand was detected, and the evaluator now emits it as a demand-plan amendment candidate with 1,619 current sessions versus 751 previous sessions. It is not current gate evidence until the Argus plan is explicitly refreshed or amended.
 
 ## Current Gate
 
