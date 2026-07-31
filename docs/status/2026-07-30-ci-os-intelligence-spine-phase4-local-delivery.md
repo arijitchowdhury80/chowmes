@@ -1,7 +1,7 @@
 # CI-OS Intelligence Spine Phase 4 Local Delivery Gate
 
 Date: 2026-07-30
-Status: Human-usefulness gate failed after live Telegram review; local corrective patch verified; deployment and resend pending
+Status: Human-usefulness gate failed after live Telegram review; corrective package deployed with no-send previews verified; resend pending human approval
 CI-OS branch: `codex/ci-os-phase0-baseline`
 
 ## Scope
@@ -157,15 +157,16 @@ Observed root causes:
 - The weekly forced send used a daily packet as if it were a weekly synthesis, producing repeated "weekly pattern" rows from a daily view.
 - The report title preserved the raw packet sentence, so even successful delivery ledger rows could carry the confusing headline.
 
-Local corrective patch:
+Corrective patch:
 
 - Collapse duplicate movement cells into one packet movement per capability.
 - Convert blocker-derived `needed_evidence` into evidence requests instead of repeating blocker explanations.
 - Render watch/degraded/stale no-recommendation daily packets as a compact mobile operator brief: read state, one market movement, one reason action is withheld, one next check, and a compact proof line.
 - Make weekly Telegram rendering refuse to masquerade a daily packet as a weekly synthesis.
 - Use the same channel-specific titles for delivery reports and rendered Telegram bodies.
+- Align weekly-unavailable next checks with the displayed movement so a cadence warning does not introduce a contradictory subject.
 
-Corrected local preview from the same rejected server packet:
+Corrected deployed no-send preview from the same rejected server packet:
 
 ```text
 Argus read: Watch, no owner action
@@ -182,6 +183,16 @@ Next check: Collect GA / Looker demand evidence for Shopping Assistant before pr
 Proof: Product Reality present (524); Market Conversation present (80); Audience Demand missing
 ```
 
+Corrected deployed weekly-unavailable no-send preview:
+
+```text
+Weekly synthesis unavailable
+This is a daily packet, not a weekly synthesis packet.
+Run: product-market-local-tenant-1-20260730T204949Z
+
+Next check: Collect GA / Looker demand evidence for Shopping Assistant before promoting it into a recommendation.
+```
+
 Local verification:
 
 - `python3 -m pytest tests/delivery/test_packet_telegram_format.py::test_watch_packet_telegram_brief_compresses_repeated_packet_text -q`
@@ -191,10 +202,27 @@ Local verification:
 - `python3 -m py_compile src/cios/intelligence/argus_packet.py src/cios/delivery/packet_telegram_format.py src/cios/delivery/packet_delivery.py`
   - Result: passed
 
+Deployment verification:
+
+- CI-OS commits pushed:
+  - `36d3326` - Fix Argus Telegram watch brief semantics.
+  - `3188c81` - Align weekly unavailable Telegram next check.
+- Deployed package marker: `3188c81db5f3e393c920f2ea69147f61e35e2bf6`.
+- Release archive SHA-256: `5a65af434c42e3c7170fc5019e446c7fba8098ae3dbca2d83737e8d13bae0826`.
+- Rollback bundle before final deploy: `/opt/cios/releases/rollback-before-weekly-unavailable-next-check-20260731T061153Z.tar.gz`.
+- Remote package contract: `PASS: CI-OS Hermes package contract satisfied`.
+- Deployed no-send preview artifacts:
+  - `/opt/cios/app/out/argus-phase4-deployed-daily-preview.txt`
+  - `/opt/cios/app/out/argus-phase4-deployed-weekly-preview.txt`
+- Preview checks:
+  - Daily `no tenant-side demand evidence` repetition count: `1`.
+  - Weekly unavailable notice present: `true`.
+  - Weekly unavailable preview Support mismatch: `false`.
+
 Gate implication:
 
 - Phase 4 is not accepted yet.
-- Do not send more Telegram messages until the corrected code is deployed and a no-send preview from the deployed server matches the corrected local preview.
+- Do not send more Telegram messages until Arijit approves the deployed no-send preview.
 - Weekly delivery cannot be accepted from a daily packet. A true weekly packet or an explicit "weekly synthesis unavailable" message is required.
 - Dashboard same-run parity remains pending.
 
@@ -204,4 +232,4 @@ The Telegram transport portion of Phase 4 was verified live, but the Telegram hu
 
 Phase 4 should remain at its human gate until Arijit confirms the corrected Telegram preview is useful and until the dashboard same-run clause is either satisfied by Phase 5 packet-dashboard work or explicitly moved to Phase 5 by decision.
 
-Next step: deploy the corrective package without sending, regenerate the fresh packet preview on the VPS, inspect the exact Telegram body, then request approval before any resend.
+Next step: request human review of the deployed no-send preview before any resend. If accepted, resend the corrected daily brief only; keep weekly as unavailable until a true weekly packet exists.
