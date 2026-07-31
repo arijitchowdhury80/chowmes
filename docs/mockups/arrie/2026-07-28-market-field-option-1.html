@@ -1,0 +1,914 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>aRRIe Market Field Option 1</title>
+  <style>
+    :root {
+      --field: #090a0f;
+      --field-2: #11131b;
+      --ink: #f4f0e6;
+      --muted: #a7a396;
+      --quiet: #242833;
+      --line: rgba(244, 240, 230, 0.18);
+      --blue: #0a4cff;
+      --cyan: #48d7e8;
+      --amber: #d9a84e;
+      --warn: #f26d5b;
+      --green: #73d68a;
+      --panel: rgba(18, 20, 29, 0.78);
+      --panel-strong: rgba(24, 27, 38, 0.94);
+      --focus: #f4f0e6;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--field);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+
+    html,
+    body {
+      overflow-x: hidden;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      background:
+        radial-gradient(circle at 25% 28%, rgba(10, 76, 255, 0.18), transparent 28%),
+        radial-gradient(circle at 70% 34%, rgba(72, 215, 232, 0.12), transparent 26%),
+        linear-gradient(120deg, #090a0f 0%, #0d0f16 54%, #11110f 100%);
+    }
+
+    .topbar {
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 28px;
+      border-bottom: 1px solid rgba(244, 240, 230, 0.12);
+      background: rgba(9, 10, 15, 0.78);
+      backdrop-filter: blur(18px);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .mark {
+      width: 34px;
+      height: 34px;
+      border: 1px solid rgba(244, 240, 230, 0.3);
+      background:
+        linear-gradient(145deg, rgba(244, 240, 230, 0.12), rgba(244, 240, 230, 0.02)),
+        var(--field-2);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3px;
+      padding: 7px;
+    }
+
+    .mark span {
+      background: var(--ink);
+      opacity: 0.75;
+      border-radius: 50%;
+    }
+
+    .brand-title {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 22px;
+      line-height: 1;
+      margin: 0;
+      white-space: nowrap;
+    }
+
+    .tenant {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 3px;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .segmented,
+    .route-links {
+      display: flex;
+      align-items: center;
+      border: 1px solid rgba(244, 240, 230, 0.16);
+      background: rgba(244, 240, 230, 0.06);
+      padding: 3px;
+    }
+
+    .segmented button,
+    .route-links button {
+      min-height: 38px;
+      border: 0;
+      color: var(--muted);
+      background: transparent;
+      padding: 0 13px;
+      cursor: pointer;
+    }
+
+    .segmented button[aria-pressed="true"] {
+      color: var(--field);
+      background: var(--ink);
+    }
+
+    .route-links button {
+      color: var(--ink);
+    }
+
+    .segmented button:focus-visible,
+    .route-links button:focus-visible,
+    .node:focus-visible,
+    .action-link:focus-visible,
+    .drawer-toggle:focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 3px;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(340px, 430px);
+      gap: 0;
+      min-height: calc(100vh - 72px);
+      width: 100%;
+      max-width: 100vw;
+    }
+
+    .field-panel {
+      position: relative;
+      min-height: 720px;
+      overflow: hidden;
+      border-right: 1px solid rgba(244, 240, 230, 0.12);
+    }
+
+    .field-header {
+      position: absolute;
+      left: 32px;
+      top: 30px;
+      z-index: 3;
+      max-width: 430px;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--cyan);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+    }
+
+    .field-header h2 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(34px, 4vw, 58px);
+      line-height: 0.95;
+      margin: 0;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .field-header p {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.55;
+      max-width: 470px;
+      margin: 16px 0 0;
+    }
+
+    .field-canvas {
+      position: absolute;
+      inset: 0;
+      min-height: 720px;
+    }
+
+    .grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(244, 240, 230, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(244, 240, 230, 0.04) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: radial-gradient(circle at center, black 0%, transparent 74%);
+      opacity: 0.62;
+    }
+
+    .links {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      opacity: 0.92;
+    }
+
+    .links line,
+    .links path {
+      vector-effect: non-scaling-stroke;
+    }
+
+    .node {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      border: 1px solid rgba(244, 240, 230, 0.28);
+      color: var(--ink);
+      background: rgba(18, 20, 29, 0.84);
+      min-width: 138px;
+      max-width: 184px;
+      min-height: 54px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      cursor: pointer;
+      text-align: left;
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.34);
+    }
+
+    .node::before {
+      content: "";
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 12px;
+      background: var(--muted);
+      box-shadow: 0 0 0 6px rgba(244, 240, 230, 0.06);
+    }
+
+    .node strong {
+      display: block;
+      font-size: 13px;
+      line-height: 1.15;
+      font-weight: 760;
+    }
+
+    .node span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.2;
+      margin-top: 3px;
+    }
+
+    .node.theme {
+      width: 210px;
+      min-height: 72px;
+      border-color: rgba(72, 215, 232, 0.58);
+      background: rgba(12, 30, 42, 0.82);
+    }
+
+    .node.theme::before {
+      background: var(--cyan);
+      box-shadow: 0 0 0 7px rgba(72, 215, 232, 0.12), 0 0 34px rgba(72, 215, 232, 0.45);
+    }
+
+    .node.competitor::before {
+      background: var(--blue);
+      box-shadow: 0 0 0 6px rgba(10, 76, 255, 0.13);
+    }
+
+    .node.capability::before {
+      background: var(--amber);
+      box-shadow: 0 0 0 6px rgba(217, 168, 78, 0.14);
+    }
+
+    .node.demand::before {
+      background: var(--green);
+      box-shadow: 0 0 0 6px rgba(115, 214, 138, 0.13);
+    }
+
+    .node.unknown {
+      border-style: dashed;
+      border-color: rgba(242, 109, 91, 0.64);
+    }
+
+    .node.unknown::before {
+      background: var(--warn);
+      box-shadow: 0 0 0 6px rgba(242, 109, 91, 0.13);
+    }
+
+    .node.partner::before {
+      background: #bda1ff;
+      box-shadow: 0 0 0 6px rgba(189, 161, 255, 0.12);
+    }
+
+    .node.selected {
+      border-color: var(--ink);
+      background: rgba(244, 240, 230, 0.1);
+      box-shadow: 0 0 0 1px rgba(244, 240, 230, 0.2), 0 0 70px rgba(72, 215, 232, 0.16);
+    }
+
+    .node.selected::after {
+      content: "";
+      position: absolute;
+      inset: -16px;
+      border: 1px solid rgba(72, 215, 232, 0.38);
+      animation: pulse 2.8s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.25; transform: scale(0.98); }
+      50% { opacity: 0.75; transform: scale(1.03); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .node.selected::after {
+        animation: none;
+      }
+    }
+
+    .n-ai { left: 56%; top: 33%; }
+    .n-constructor { left: 34%; top: 47%; }
+    .n-coveo { left: 68%; top: 47%; }
+    .n-demand { left: 42%; top: 62%; }
+    .n-capability { left: 61%; top: 62%; }
+    .n-unknown { left: 61%; top: 76%; }
+    .n-elastic { left: 25%; top: 76%; }
+    .n-tco { left: 38%; top: 86%; }
+    .n-shopify { left: 76%; top: 77%; }
+    .n-partner { left: 84%; top: 89%; }
+
+    .legend {
+      position: absolute;
+      left: 32px;
+      bottom: 26px;
+      z-index: 4;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      max-width: 680px;
+    }
+
+    .legend span {
+      border: 1px solid rgba(244, 240, 230, 0.16);
+      background: rgba(9, 10, 15, 0.66);
+      color: var(--muted);
+      min-height: 32px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 10px;
+      font-size: 12px;
+    }
+
+    .legend b {
+      color: var(--ink);
+      font-weight: 760;
+      margin-right: 5px;
+    }
+
+    .inspector {
+      background: linear-gradient(180deg, rgba(17, 19, 27, 0.94), rgba(9, 10, 15, 0.98));
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      min-width: 0;
+    }
+
+    .panel {
+      border: 1px solid rgba(244, 240, 230, 0.14);
+      background: var(--panel);
+      padding: 18px;
+      box-shadow: 0 18px 48px rgba(0, 0, 0, 0.24);
+    }
+
+    .panel h3,
+    .panel h4 {
+      margin: 0;
+      line-height: 1.1;
+    }
+
+    .read h3 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 30px;
+      letter-spacing: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .read p {
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 14px;
+      margin: 12px 0 0;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .meta {
+      border: 1px solid rgba(244, 240, 230, 0.12);
+      padding: 12px;
+      min-height: 66px;
+    }
+
+    .meta span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+
+    .meta strong {
+      font-size: 14px;
+      line-height: 1.25;
+    }
+
+    .actions {
+      display: grid;
+      gap: 10px;
+    }
+
+    .action-link,
+    .drawer-toggle {
+      width: 100%;
+      border: 1px solid rgba(244, 240, 230, 0.14);
+      background: rgba(244, 240, 230, 0.04);
+      color: var(--ink);
+      min-height: 54px;
+      padding: 12px;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .action-link strong,
+    .drawer-toggle strong {
+      display: block;
+      font-size: 13px;
+    }
+
+    .action-link span,
+    .drawer-toggle span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 4px;
+      line-height: 1.35;
+    }
+
+    .proof-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .proof-item {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 10px;
+      align-items: start;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .proof-item b {
+      color: var(--ink);
+    }
+
+    .proof-index {
+      width: 24px;
+      height: 24px;
+      border: 1px solid rgba(244, 240, 230, 0.18);
+      color: var(--ink);
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    .state-note {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+      border-top: 1px solid rgba(244, 240, 230, 0.1);
+      padding-top: 12px;
+      margin-top: 14px;
+    }
+
+    .drawer {
+      display: none;
+      border-color: rgba(72, 215, 232, 0.34);
+      background: var(--panel-strong);
+    }
+
+    .drawer[data-open="true"] {
+      display: block;
+    }
+
+    .mobile-hint {
+      display: none;
+    }
+
+    @media (max-width: 980px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .field-panel {
+        min-height: 700px;
+        border-right: 0;
+        border-bottom: 1px solid rgba(244, 240, 230, 0.12);
+      }
+
+      .inspector {
+        padding: 20px;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .topbar {
+        align-items: flex-start;
+        gap: 14px;
+        flex-direction: column;
+        padding: 14px;
+        width: 100%;
+        max-width: 100vw;
+      }
+
+      .controls {
+        justify-content: flex-start;
+        width: 100%;
+      }
+
+      .segmented {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .segmented button {
+        padding: 0 6px;
+      }
+
+      .route-links {
+        width: 100%;
+      }
+
+      .route-links button {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .field-panel {
+        width: 100%;
+        max-width: 100vw;
+        min-height: 620px;
+      }
+
+      .field-header {
+        left: 18px;
+        right: 18px;
+        top: 22px;
+        max-width: 340px;
+      }
+
+      .field-header h2 {
+        font-size: 34px;
+        line-height: 1;
+        max-width: 330px;
+        overflow-wrap: anywhere;
+      }
+
+      .field-header p {
+        max-width: 340px;
+      }
+
+      .node {
+        min-width: 112px;
+        max-width: 128px;
+        min-height: 50px;
+        padding: 8px;
+      }
+
+      .node strong {
+        font-size: 12px;
+      }
+
+      .node span {
+        font-size: 10px;
+      }
+
+      .node.theme {
+        width: 142px;
+        min-height: 62px;
+      }
+
+      .n-ai { left: 50%; top: 38%; }
+      .n-constructor { left: 31%; top: 53%; }
+      .n-coveo { left: 69%; top: 53%; }
+      .n-demand { left: 31%; top: 67%; }
+      .n-capability { left: 69%; top: 67%; }
+      .n-unknown { left: 50%; top: 82%; }
+      .n-elastic { display: none; }
+      .n-tco { display: none; }
+      .n-shopify { display: none; }
+      .n-partner { display: none; }
+
+      .legend {
+        display: none;
+      }
+
+      .legend span {
+        font-size: 11px;
+        min-height: 28px;
+        padding: 0 8px;
+      }
+
+      .meta-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .inspector {
+        width: 100%;
+        max-width: 100vw;
+        min-width: 0;
+        padding: 20px;
+      }
+
+      .panel {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+      }
+
+      .read h3 {
+        max-width: 290px;
+        font-size: 27px;
+        line-height: 1.05;
+      }
+
+      .mobile-hint {
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar" aria-label="Argus market field controls">
+      <div class="brand">
+        <div class="mark" aria-hidden="true">
+          <span></span><span></span><span></span>
+          <span></span><span></span><span></span>
+          <span></span><span></span><span></span>
+        </div>
+        <div>
+          <h1 class="brand-title">Argus / CI-OS</h1>
+          <div class="tenant">Tenant: Algolia. Review mockup, not production.</div>
+        </div>
+      </div>
+      <div class="controls">
+        <div class="segmented" role="group" aria-label="Time window">
+          <button type="button" data-window="Today" aria-pressed="false">Today</button>
+          <button type="button" data-window="7D" aria-pressed="true">7D</button>
+          <button type="button" data-window="30D" aria-pressed="false">30D</button>
+          <button type="button" data-window="Custom" aria-pressed="false">Custom</button>
+        </div>
+        <div class="route-links" role="group" aria-label="Secondary routes">
+          <button type="button">Evidence</button>
+          <button type="button">Admin</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="workspace" aria-label="Market Field first screen">
+      <div class="field-panel">
+        <div class="field-header">
+          <p class="eyebrow">Market Field</p>
+          <h2>Where the market is concentrating</h2>
+          <p>The field starts with movement, not rows. Select a hotspot to reveal Argus's read, named actions, proof, and confidence limits.</p>
+        </div>
+
+        <div class="field-canvas" aria-label="Competitive intelligence constellation">
+          <div class="grid" aria-hidden="true"></div>
+          <svg class="links" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <line x1="50" y1="31" x2="31" y2="45" stroke="rgba(10,76,255,0.55)" stroke-width="0.25"></line>
+            <line x1="50" y1="31" x2="64" y2="45" stroke="rgba(10,76,255,0.45)" stroke-width="0.25"></line>
+            <line x1="31" y1="45" x2="40" y2="61" stroke="rgba(72,215,232,0.58)" stroke-width="0.32"></line>
+            <line x1="64" y1="45" x2="57" y2="61" stroke="rgba(217,168,78,0.6)" stroke-width="0.34"></line>
+            <line x1="40" y1="61" x2="57" y2="61" stroke="rgba(115,214,138,0.65)" stroke-width="0.38"></line>
+            <line x1="57" y1="61" x2="57" y2="76" stroke="rgba(242,109,91,0.62)" stroke-width="0.24" stroke-dasharray="1 1"></line>
+            <line x1="25" y1="76" x2="38" y2="86" stroke="rgba(244,240,230,0.22)" stroke-width="0.22"></line>
+            <line x1="76" y1="77" x2="84" y2="89" stroke="rgba(189,161,255,0.34)" stroke-width="0.22"></line>
+            <path d="M 45 24 C 42 20, 48 18, 51 23" fill="none" stroke="rgba(244,240,230,0.24)" stroke-width="0.22" stroke-dasharray="0.8 1.2"></path>
+          </svg>
+
+          <button class="node theme selected n-ai" type="button" data-hotspot="AI commerce ownership">
+            <span aria-hidden="true"></span>
+            <span><strong>AI commerce ownership</strong><span>theme hotspot</span></span>
+          </button>
+          <button class="node competitor n-constructor" type="button" data-hotspot="Constructor">
+            <span aria-hidden="true"></span>
+            <span><strong>Constructor</strong><span>competitor</span></span>
+          </button>
+          <button class="node competitor n-coveo" type="button" data-hotspot="Coveo">
+            <span aria-hidden="true"></span>
+            <span><strong>Coveo</strong><span>competitor</span></span>
+          </button>
+          <button class="node demand n-demand" type="button" data-hotspot="Audience demand">
+            <span aria-hidden="true"></span>
+            <span><strong>Audience demand</strong><span>agentic shopping</span></span>
+          </button>
+          <button class="node capability n-capability" type="button" data-hotspot="Product proof">
+            <span aria-hidden="true"></span>
+            <span><strong>Product proof</strong><span>capability cluster</span></span>
+          </button>
+          <button class="node unknown n-unknown" type="button" data-hotspot="Unknown boundary">
+            <span aria-hidden="true"></span>
+            <span><strong>Unknown boundary</strong><span>confidence limit</span></span>
+          </button>
+          <button class="node competitor n-elastic" type="button" data-hotspot="Elastic">
+            <span aria-hidden="true"></span>
+            <span><strong>Elastic</strong><span>TCO pressure</span></span>
+          </button>
+          <button class="node theme n-tco" type="button" data-hotspot="TCO narrative">
+            <span aria-hidden="true"></span>
+            <span><strong>TCO narrative</strong><span>secondary hotspot</span></span>
+          </button>
+          <button class="node partner n-shopify" type="button" data-hotspot="Shopify">
+            <span aria-hidden="true"></span>
+            <span><strong>Shopify</strong><span>partner watch</span></span>
+          </button>
+          <button class="node partner n-partner" type="button" data-hotspot="Partner ecosystem">
+            <span aria-hidden="true"></span>
+            <span><strong>Partner ecosystem</strong><span>quiet watch</span></span>
+          </button>
+        </div>
+
+        <div class="legend" aria-label="Market Field legend">
+          <span><b>Blue</b> competitor pressure</span>
+          <span><b>Cyan</b> market theme</span>
+          <span><b>Amber</b> product proof</span>
+          <span><b>Green</b> Audience Demand</span>
+          <span><b>Warning</b> unknown boundary</span>
+        </div>
+      </div>
+
+      <aside class="inspector" aria-label="Selected movement">
+        <section class="panel read">
+          <p class="eyebrow">Selected movement</p>
+          <h3 id="selected-title">AI commerce ownership</h3>
+          <p id="selected-read">AI commerce ownership is becoming the active competitive frame in commerce search. Constructor is pushing the clearest narrative while Coveo and Bloomreach create supporting proof pressure.</p>
+          <div class="meta-grid">
+            <div class="meta">
+              <span>Movement</span>
+              <strong id="movement">Rising over 7D</strong>
+            </div>
+            <div class="meta">
+              <span>Confidence</span>
+              <strong>Medium-high, proof partial</strong>
+            </div>
+            <div class="meta">
+              <span>Evidence planes</span>
+              <strong>Conversation, product, demand</strong>
+            </div>
+            <div class="meta">
+              <span>Boundary</span>
+              <strong>Unknown capabilities remain</strong>
+            </div>
+          </div>
+          <p class="state-note mobile-hint">Mobile fallback: focused mini-field first, then this read, then actions and proof as stacked disclosures.</p>
+        </section>
+
+        <section class="panel">
+          <p class="eyebrow">What Algolia should do next</p>
+          <div class="actions">
+            <button class="action-link" type="button">
+              <strong>PMM: sharpen AI commerce positioning</strong>
+              <span>P1. Competitor narrative is moving faster than Algolia's visible story in this window.</span>
+            </button>
+            <button class="action-link" type="button">
+              <strong>Sales: prepare Constructor and Coveo talk tracks</strong>
+              <span>P1. Expect AI commerce objections where discovery and agentic shopping overlap.</span>
+            </button>
+            <button class="action-link" type="button">
+              <strong>Product: review unknown capability cells</strong>
+              <span>P2. Do not treat missing proof as a confirmed product gap.</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <button class="drawer-toggle" type="button" aria-expanded="false" aria-controls="proof-drawer">
+            <strong>Open proof drawer</strong>
+            <span>Reveal the evidence chain without dumping raw rows on the first screen.</span>
+          </button>
+        </section>
+
+        <section class="panel drawer" id="proof-drawer" data-open="false">
+          <p class="eyebrow">Proof chain</p>
+          <h4>Why Argus is willing to recommend PMM action</h4>
+          <div class="proof-list">
+            <div class="proof-item">
+              <div class="proof-index">1</div>
+              <div><b>Market conversation:</b> competitor language concentrates around AI commerce ownership.</div>
+            </div>
+            <div class="proof-item">
+              <div class="proof-index">2</div>
+              <div><b>Product reality:</b> supporting product proof exists, but not every capability cell is resolved.</div>
+            </div>
+            <div class="proof-item">
+              <div class="proof-index">3</div>
+              <div><b>Audience Demand:</b> Algolia audience response overlaps with the selected market theme.</div>
+            </div>
+            <div class="proof-item">
+              <div class="proof-index">4</div>
+              <div><b>Confidence limit:</b> unknown cells are explicit boundaries, not claims of absence.</div>
+            </div>
+          </div>
+          <p class="state-note">Evidence Lab owns raw rows, source health, failed checks, and audit detail. Admin owns run controls and registry operations.</p>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const reads = {
+      "AI commerce ownership": "AI commerce ownership is becoming the active competitive frame in commerce search. Constructor is pushing the clearest narrative while Coveo and Bloomreach create supporting proof pressure.",
+      "Constructor": "Constructor is the clearest actor attached to the AI commerce ownership hotspot. Argus treats the pressure as narrative-led until product proof is inspected.",
+      "Coveo": "Coveo supports the same hotspot through adjacent commerce proof. The read is useful, but not strong enough to make Coveo the lead actor today.",
+      "Audience demand": "Audience Demand overlaps the AI commerce theme. This is audience response, not competitor proof, so it strengthens priority without proving competitor movement.",
+      "Product proof": "Product proof is present but partial. This supports action, while unresolved capability cells keep confidence below high.",
+      "Unknown boundary": "Unknown capability cells limit confidence. Argus should expose the boundary instead of pretending the comparison is complete.",
+      "Elastic": "Elastic is connected to a separate TCO and infrastructure narrative. It is visible, but not the selected primary hotspot in this window.",
+      "TCO narrative": "The TCO narrative is active but secondary. It may become primary over a longer strategic window.",
+      "Shopify": "Shopify is an ecosystem watch signal. It influences context, but does not currently drive the primary Algolia action.",
+      "Partner ecosystem": "Partner ecosystem movement is quiet in this candidate view. It remains monitored but visually subordinate."
+    };
+
+    const movementByWindow = {
+      Today: "Fresh movement today",
+      "7D": "Rising over 7D",
+      "30D": "Durable over 30D",
+      Custom: "Custom investigation"
+    };
+
+    let currentWindow = "7D";
+    const title = document.getElementById("selected-title");
+    const read = document.getElementById("selected-read");
+    const movement = document.getElementById("movement");
+
+    document.querySelectorAll(".node").forEach((node) => {
+      node.addEventListener("click", () => {
+        document.querySelectorAll(".node").forEach((n) => n.classList.remove("selected"));
+        node.classList.add("selected");
+        const key = node.dataset.hotspot;
+        title.textContent = key;
+        read.textContent = reads[key];
+        movement.textContent = movementByWindow[currentWindow];
+      });
+    });
+
+    document.querySelectorAll("[data-window]").forEach((button) => {
+      button.addEventListener("click", () => {
+        currentWindow = button.dataset.window;
+        document.querySelectorAll("[data-window]").forEach((b) => b.setAttribute("aria-pressed", "false"));
+        button.setAttribute("aria-pressed", "true");
+        movement.textContent = movementByWindow[currentWindow];
+      });
+    });
+
+    const drawerButton = document.querySelector(".drawer-toggle");
+    const drawer = document.getElementById("proof-drawer");
+    drawerButton.addEventListener("click", () => {
+      const open = drawer.dataset.open !== "true";
+      drawer.dataset.open = String(open);
+      drawerButton.setAttribute("aria-expanded", String(open));
+      drawerButton.querySelector("strong").textContent = open ? "Close proof drawer" : "Open proof drawer";
+    });
+  </script>
+</body>
+</html>
