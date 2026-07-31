@@ -1,7 +1,7 @@
 # CI-OS Intelligence Spine Phase 4 Local Delivery Gate
 
 Date: 2026-07-30
-Status: Telegram delivery proof passed; dashboard same-run clause still pending
+Status: Human-usefulness gate failed after live Telegram review; local corrective patch verified; deployment and resend pending
 CI-OS branch: `codex/ci-os-phase0-baseline`
 
 ## Scope
@@ -146,10 +146,62 @@ Served dashboard/public identity check:
 - `/opt/cios/public/data/argus-latest-run-status.json` is still generated at `2026-07-28T14:31:38.284219Z`, and has no packet id.
 - Therefore the Phase 4 Telegram send proof is passed, but the exit-gate clause "Telegram and dashboard point to the same run id and same core read" is not yet passed by the live dashboard.
 
+## Human Review Failure
+
+Arijit reviewed the forced Telegram messages and rejected the content as not making sense. The failure was not Telegram transport: the bot delivered successfully. The failure was the intelligence packaging and channel copy.
+
+Observed root causes:
+
+- The canonical packet could carry repeated market movement rows because packet movements were emitted per heat cell instead of being collapsed by capability.
+- The daily Telegram brief rendered raw packet fields directly, which repeated the same missing-demand statement as headline, plain read, why, and blocked evidence.
+- The weekly forced send used a daily packet as if it were a weekly synthesis, producing repeated "weekly pattern" rows from a daily view.
+- The report title preserved the raw packet sentence, so even successful delivery ledger rows could carry the confusing headline.
+
+Local corrective patch:
+
+- Collapse duplicate movement cells into one packet movement per capability.
+- Convert blocker-derived `needed_evidence` into evidence requests instead of repeating blocker explanations.
+- Render watch/degraded/stale no-recommendation daily packets as a compact mobile operator brief: read state, one market movement, one reason action is withheld, one next check, and a compact proof line.
+- Make weekly Telegram rendering refuse to masquerade a daily packet as a weekly synthesis.
+- Use the same channel-specific titles for delivery reports and rendered Telegram bodies.
+
+Corrected local preview from the same rejected server packet:
+
+```text
+Argus read: Watch, no owner action
+Run: product-market-local-tenant-1-20260730T204949Z
+Window: today
+
+Market movement: Shopping Assistant
+Shopping Assistant is heating up across Luigi's Box, Constructor, and Bloomreach.
+
+Why it matters: Product and market-conversation proof exist, but no tenant-side demand evidence was captured, so Argus is watching instead of promoting an owner action.
+
+Next check: Collect GA / Looker demand evidence for Shopping Assistant before promoting it into a recommendation.
+
+Proof: Product Reality present (524); Market Conversation present (80); Audience Demand missing
+```
+
+Local verification:
+
+- `python3 -m pytest tests/delivery/test_packet_telegram_format.py::test_watch_packet_telegram_brief_compresses_repeated_packet_text -q`
+  - Result: `1 passed in 0.10s`
+- `python3 -m pytest tests/delivery tests/db tests/intelligence tests/dashboard tests/scripts/test_send_argus_packet_telegram.py -q`
+  - Result: `362 passed in 1.33s`
+- `python3 -m py_compile src/cios/intelligence/argus_packet.py src/cios/delivery/packet_telegram_format.py src/cios/delivery/packet_delivery.py`
+  - Result: passed
+
+Gate implication:
+
+- Phase 4 is not accepted yet.
+- Do not send more Telegram messages until the corrected code is deployed and a no-send preview from the deployed server matches the corrected local preview.
+- Weekly delivery cannot be accepted from a daily packet. A true weekly packet or an explicit "weekly synthesis unavailable" message is required.
+- Dashboard same-run parity remains pending.
+
 ## Gate Status
 
-The Telegram portion of Phase 4 is verified live.
+The Telegram transport portion of Phase 4 was verified live, but the Telegram human-usefulness portion failed.
 
-Phase 4 should remain at its human gate until Arijit confirms Telegram usefulness and until the dashboard same-run clause is either satisfied by Phase 5 packet-dashboard work or explicitly moved to Phase 5 by decision.
+Phase 4 should remain at its human gate until Arijit confirms the corrected Telegram preview is useful and until the dashboard same-run clause is either satisfied by Phase 5 packet-dashboard work or explicitly moved to Phase 5 by decision.
 
-Next step: review the two Telegram messages on mobile for usefulness. If accepted, proceed into the dashboard/3D packet-consumer phase with the dashboard same-run clause carried as a required first check.
+Next step: deploy the corrective package without sending, regenerate the fresh packet preview on the VPS, inspect the exact Telegram body, then request approval before any resend.
